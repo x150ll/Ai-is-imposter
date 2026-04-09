@@ -3,246 +3,218 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Impostor | كاشف الذكاء</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>AI IMPOSTOR | كاشف الذكاء</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26; --border:#2a2a3f;
-  --accent:#7c3aed; --accent2:#06b6d4; --danger:#ef4444;
-  --success:#22c55e; --warn:#f59e0b; --text:#e8e8f0; --text2:#9090b0;
-  --glow:rgba(124,58,237,0.3);
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-
-/* ── SCREENS ── */
+:root{--black:#030407;--dark:#080b12;--surface:#0d1117;--surface2:#131820;--border:#1e2535;--red:#ff2020;--red-dim:#8b0000;--violet:#7c3aed;--violet2:#4f1fad;--cyan:#00e5ff;--text:#e2e8f4;--text2:#7a8aa8;--text3:#3d4d68;--glow-r:rgba(255,32,32,0.3);--glow-v:rgba(124,58,237,0.3);--success:#22c55e;--warn:#f59e0b;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--black);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9000;opacity:.4;}
+/* SCREENS */
 .screen{display:none;min-height:100vh;position:relative;z-index:1;}
-.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
-#waiting-screen.active,#result-screen.active{justify-content:flex-start;padding-top:28px;}
+.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+#waiting-screen.active,#result-screen.active{justify-content:flex-start;padding-top:24px;}
 #game-screen{padding:0;}
 #game-screen.active{justify-content:flex-start;align-items:stretch;padding:0;}
 #vote-screen.active{padding:24px;}
-
-/* ── LOGO ── */
-.logo{font-family:'Space Mono',monospace;font-size:clamp(26px,5vw,50px);font-weight:700;letter-spacing:-1px;margin-bottom:6px;}
-.logo .ai{color:var(--danger);text-shadow:0 0 20px rgba(239,68,68,.6);}
-.logo-sub{font-size:12px;color:var(--text2);letter-spacing:3px;text-transform:uppercase;margin-bottom:40px;font-family:'Space Mono',monospace;}
-
-/* ── CARD ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:460px;box-shadow:0 0 40px rgba(0,0,0,.4);}
-
-/* ── FIELD ── */
+/* LOGO */
+.game-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,6vw,52px);letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.game-logo .r{color:var(--red);text-shadow:0 0 20px var(--glow-r);}
+.game-logo-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);letter-spacing:4px;text-transform:uppercase;margin-bottom:40px;}
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:460px;box-shadow:0 0 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,0.02);}
+/* BACK LINK */
+.back-link{display:inline-flex;align-items:center;gap:8px;color:var(--text2);text-decoration:none;font-size:13px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:28px;transition:color .2s;border:1px solid var(--border);padding:8px 16px;border-radius:8px;background:var(--surface);}
+.back-link:hover{color:var(--text);border-color:var(--violet);}
+/* FIELD */
 .field{margin-bottom:18px;}
-.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:7px;letter-spacing:1px;text-transform:uppercase;}
+.field label{display:block;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);margin-bottom:8px;letter-spacing:2px;text-transform:uppercase;}
 .field input,.field select{width:100%;padding:13px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:16px;outline:none;transition:border-color .2s,box-shadow .2s;}
-.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+.field input:focus,.field select:focus{border-color:var(--violet);box-shadow:0 0 0 3px var(--glow-v);}
 .field select option{background:var(--surface2);}
-
-/* ── BUTTONS ── */
-.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
-.btn-primary{background:linear-gradient(135deg,var(--accent),#5b21b6);color:#fff;box-shadow:0 4px 20px var(--glow);}
-.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 30px var(--glow);}
-.btn-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);margin-top:10px;}
-.btn-secondary:hover:not(:disabled){border-color:var(--accent);color:var(--text);}
-.btn-danger{background:linear-gradient(135deg,var(--danger),#b91c1c);color:#fff;}
+/* BUTTONS */
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.3px;position:relative;overflow:hidden;}
+.btn-primary{background:linear-gradient(135deg,var(--red),var(--red-dim));color:#fff;box-shadow:0 0 24px var(--glow-r),0 3px 0 #6b0000;}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 40px var(--glow-r),0 5px 0 #6b0000;}
+.btn-primary:active:not(:disabled){transform:translateY(1px);box-shadow:0 0 16px var(--glow-r),0 1px 0 #6b0000;}
+.btn-violet{background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;box-shadow:0 0 24px var(--glow-v),0 3px 0 #3a1585;}
+.btn-violet:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 40px var(--glow-v),0 5px 0 #3a1585;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);margin-top:10px;}
+.btn-ghost:hover:not(:disabled){border-color:var(--violet);color:var(--text);background:rgba(124,58,237,0.06);}
 .btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;}
-
-/* ── TABS ── */
+/* TABS */
 .tabs{display:flex;margin-bottom:24px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
-.tab{flex:1;padding:12px;text-align:center;background:var(--surface2);color:var(--text2);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:500;transition:all .2s;border:none;}
-.tab.active{background:var(--accent);color:#fff;}
-
-/* ── WAITING ROOM ── */
+.tab{flex:1;padding:12px;text-align:center;background:var(--surface2);color:var(--text2);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;transition:all .2s;border:none;letter-spacing:.3px;}
+.tab.active{background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;}
+/* WAITING */
 .room-header{width:100%;max-width:700px;margin:0 auto 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.room-code-badge{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--accent2);letter-spacing:4px;cursor:pointer;transition:background .2s;}
-.room-code-badge:hover{background:var(--surface2);}
-.room-lang-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;color:var(--text2);}
+.room-code-wrap{display:flex;flex-direction:column;gap:4px;}
+.room-code-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;}
+.room-code-badge{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-family:'Bebas Neue',monospace;font-size:26px;font-weight:700;color:var(--cyan);letter-spacing:6px;cursor:pointer;transition:all .2s;text-shadow:0 0 20px rgba(0,229,255,.3);}
+.room-code-badge:hover{border-color:var(--cyan);background:var(--surface2);}
+.room-lang-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--text2);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
 .players-grid{width:100%;max-width:700px;margin:0 auto 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;}
-.player-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:all .3s;}
-.player-card.me{border-color:var(--accent);}
-.player-avatar{width:44px;height:44px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--surface2);}
+.player-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 14px;text-align:center;transition:all .3s;animation:cardIn .3s ease;}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.player-card.me{border-color:var(--violet);box-shadow:0 0 16px var(--glow-v);}
+.player-avatar{width:48px;height:48px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--surface2);border:1px solid var(--border);}
 .player-name{font-size:13px;font-weight:700;word-break:break-all;}
-.player-tag{font-size:10px;color:var(--text2);margin-top:3px;}
+.player-tag{font-size:10px;color:var(--text2);margin-top:3px;font-family:'Share Tech Mono',monospace;}
 .waiting-info{width:100%;max-width:700px;margin:0 auto;text-align:center;color:var(--text2);font-size:14px;}
-.pulse-dot{display:inline-block;width:8px;height:8px;background:var(--success);border-radius:50%;margin-right:6px;animation:pulse 1.5s infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-.host-start-area{width:100%;max-width:700px;margin:16px auto 0;}
-
-/* ── GAME ── */
-.game-layout{display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh;max-width:800px;margin:0 auto;width:100%;}
-.game-header{padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.topic-badge{background:linear-gradient(135deg,var(--accent),#5b21b6);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;flex:1;min-width:0;}
-.timer-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+.pulse-dot{display:inline-block;width:7px;height:7px;background:var(--success);border-radius:50%;margin-left:6px;animation:pdot 1.5s infinite;}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+.host-area{width:100%;max-width:700px;margin:16px auto 0;}
+/* GAME */
+.game-layout{display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh;max-width:820px;margin:0 auto;width:100%;}
+.game-header{padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.topic-pill{background:linear-gradient(135deg,var(--violet),var(--violet2));padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 0 16px var(--glow-v);}
+.game-header-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.round-badge{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:2px;}
+.timer-ring{position:relative;width:52px;height:52px;}
 .timer-ring svg{transform:rotate(-90deg);}
 .timer-ring circle{fill:none;stroke-width:4;stroke-dasharray:138;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .5s;}
-.timer-ring .bg{stroke:var(--surface2);}
-.timer-ring .prog{stroke:var(--success);}
-.timer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;}
-.round-badge{font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;white-space:nowrap;}
-
-/* ── CHAT ── */
-.chat-area{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth;}
+.timer-bg{stroke:var(--surface2);}
+.timer-prog{stroke:var(--success);}
+.timer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:12px;font-weight:700;}
+/* CHAT */
+.chat-area{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth;}
 .chat-area::-webkit-scrollbar{width:3px;}
 .chat-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .msg{max-width:78%;padding:11px 15px;border-radius:14px;font-size:15px;line-height:1.65;animation:msgIn .22s ease;word-break:break-word;}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.msg.mine{align-self:flex-end;background:linear-gradient(135deg,var(--accent),#5b21b6);color:#fff;border-bottom-right-radius:3px;}
+.msg.mine{align-self:flex-end;background:linear-gradient(135deg,var(--violet),var(--violet2));color:#fff;border-bottom-right-radius:3px;box-shadow:0 4px 16px var(--glow-v);}
 .msg.other{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:3px;}
-.msg-sender{font-size:11px;font-weight:700;margin-bottom:3px;opacity:.65;}
-.msg-time{font-size:10px;opacity:.45;margin-top:3px;font-family:'Space Mono',monospace;text-align:left;}
+.msg-sender{font-size:11px;font-weight:700;margin-bottom:3px;opacity:.65;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+.msg-time{font-size:10px;opacity:.4;margin-top:3px;font-family:'Share Tech Mono',monospace;}
 .msg.mine .msg-time{text-align:right;}
-.notif-msg{align-self:center;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);font-style:italic;max-width:90%;text-align:center;}
-.typing-indicator{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:3px;padding:12px 16px;display:flex;align-items:center;gap:5px;}
-.typing-dot{width:7px;height:7px;background:var(--text2);border-radius:50%;animation:tdot 1.2s infinite;}
-.typing-dot:nth-child(2){animation-delay:.2s;}
-.typing-dot:nth-child(3){animation-delay:.4s;}
-@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
-
-/* ── CHAT INPUT ── */
+.notif-msg{align-self:center;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:20px;padding:6px 16px;font-size:12px;color:var(--text2);font-style:italic;max-width:90%;text-align:center;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+.typing-ind{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:3px;padding:11px 16px;display:flex;align-items:center;gap:5px;}
+.typing-dot{width:6px;height:6px;background:var(--text2);border-radius:50%;animation:td 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
 .chat-input-area{padding:12px 14px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end;}
 .chat-input{flex:1;padding:11px 15px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Tajawal',sans-serif;font-size:15px;resize:none;outline:none;min-height:44px;max-height:110px;transition:border-color .2s;line-height:1.5;}
-.chat-input:focus{border-color:var(--accent);}
-.send-btn{width:44px;height:44px;background:var(--accent);border:none;border-radius:12px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:18px;}
-.send-btn:hover:not(:disabled){background:#6d28d9;}
+.chat-input:focus{border-color:var(--violet);}
+.send-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--violet),var(--violet2));border:none;border-radius:12px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:18px;box-shadow:0 0 12px var(--glow-v);}
+.send-btn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 0 20px var(--glow-v);}
 .send-btn:disabled{opacity:.3;cursor:not-allowed;}
-
-/* ── VOTE ── */
-.vote-title{font-size:clamp(20px,4vw,30px);font-weight:900;margin-bottom:6px;text-align:center;}
-.vote-subtitle{color:var(--text2);font-size:14px;text-align:center;margin-bottom:20px;}
-.vote-timer-big{font-family:'Space Mono',monospace;font-size:40px;font-weight:700;color:var(--warn);text-align:center;margin-bottom:20px;transition:color .3s;}
-.vote-timer-big.red{color:var(--danger);}
-.vote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;width:100%;max-width:580px;margin:0 auto 20px;}
-.vote-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;transition:all .22s;user-select:none;}
-.vote-card:hover{border-color:var(--accent);transform:translateY(-2px);}
-.vote-card.selected{border-color:var(--accent);background:rgba(124,58,237,.12);box-shadow:0 0 18px var(--glow);}
-.vote-card.confirmed{opacity:.55;pointer-events:none;}
-.vote-avatar{font-size:34px;margin-bottom:8px;}
-.vote-name{font-size:14px;font-weight:700;}
-.vote-count{font-size:11px;color:var(--text2);margin-top:3px;}
-
-/* ── RESULT ── */
-.result-reveal{text-align:center;margin-bottom:28px;}
-.result-ai-badge{display:inline-block;background:linear-gradient(135deg,var(--danger),#991b1b);color:#fff;padding:7px 18px;border-radius:20px;font-size:12px;letter-spacing:2px;margin-bottom:14px;font-family:'Space Mono',monospace;}
-.result-name{font-size:clamp(26px,5vw,46px);font-weight:900;margin-bottom:8px;}
-.result-outcome{font-size:clamp(17px,3vw,24px);font-weight:700;margin-bottom:0;}
-.result-outcome.win{color:var(--success);}
-.result-outcome.lose{color:var(--danger);}
-.analysis-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;width:100%;max-width:560px;margin:0 auto 20px;}
-.analysis-box h3{font-size:12px;color:var(--text2);margin-bottom:12px;letter-spacing:2px;text-transform:uppercase;}
+/* VOTE */
+.vote-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,5vw,44px);margin-bottom:6px;text-align:center;}
+.vote-subtitle{color:var(--text2);font-size:14px;text-align:center;margin-bottom:18px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+.vote-timer-big{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--warn);text-align:center;margin-bottom:20px;line-height:1;text-shadow:0 0 20px rgba(245,158,11,.4);transition:color .3s;}
+.vote-timer-big.red{color:var(--red);text-shadow:0 0 20px var(--glow-r);}
+.vote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;width:100%;max-width:580px;margin:0 auto 20px;}
+.vote-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .22s;user-select:none;}
+.vote-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.vote-card.selected{border-color:var(--red);background:rgba(255,32,32,.06);box-shadow:0 0 20px var(--glow-r);}
+.vote-card.confirmed{opacity:.5;pointer-events:none;}
+.vote-avatar-lg{font-size:38px;margin-bottom:10px;}
+.vote-name{font-size:15px;font-weight:700;}
+.vote-count{font-size:11px;color:var(--text2);margin-top:4px;font-family:'Share Tech Mono',monospace;}
+/* RESULT */
+.result-reveal{text-align:center;margin-bottom:24px;}
+.result-impostor-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,32,32,.1);border:1px solid rgba(255,32,32,.3);color:var(--red);padding:7px 18px;border-radius:20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;margin-bottom:14px;text-transform:uppercase;}
+.result-impostor-badge .dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:pdot 1.5s infinite;}
+.result-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,7vw,64px);margin-bottom:8px;line-height:1;}
+.result-outcome{font-size:clamp(16px,3vw,22px);font-weight:800;margin-bottom:0;}
+.result-outcome.win{color:var(--success);text-shadow:0 0 20px rgba(34,197,94,.3);}
+.result-outcome.lose{color:var(--red);text-shadow:0 0 20px var(--glow-r);}
+.analysis-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;width:100%;max-width:560px;margin:0 auto 18px;}
+.analysis-box h3{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:14px;letter-spacing:3px;text-transform:uppercase;}
 .analysis-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);}
 .analysis-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
 .analysis-icon{font-size:16px;flex-shrink:0;margin-top:2px;}
 .analysis-text{font-size:14px;line-height:1.6;color:var(--text2);}
-.vote-bars{width:100%;max-width:560px;margin:0 auto 20px;}
+.vote-bars{width:100%;max-width:560px;margin:0 auto 18px;}
 .vote-bar-item{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
-.vote-bar-name{width:90px;font-size:13px;text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.vote-bar-track{flex:1;height:9px;background:var(--surface2);border-radius:5px;overflow:hidden;}
-.vote-bar-fill{height:100%;border-radius:5px;transition:width 1.2s ease;}
-.vote-bar-count{font-size:12px;color:var(--text2);width:20px;text-align:center;flex-shrink:0;}
+.vote-bar-name{width:86px;font-size:13px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vote-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.vote-bar-fill{height:100%;border-radius:4px;transition:width 1.2s ease;}
+.vote-bar-count{font-size:12px;color:var(--text2);width:18px;text-align:center;font-family:'Share Tech Mono',monospace;}
 .scores-table{width:100%;max-width:560px;margin:0 auto 20px;border-collapse:collapse;}
 .scores-table th,.scores-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:14px;}
-.scores-table th{color:var(--text2);font-size:11px;letter-spacing:1px;text-transform:uppercase;}
+.scores-table th{font-family:'Share Tech Mono',monospace;color:var(--text3);font-size:10px;letter-spacing:2px;text-transform:uppercase;}
 .scores-table tr:last-child td{border-bottom:none;}
-.score-delta{font-family:'Space Mono',monospace;color:var(--success);}
+.score-delta{font-family:'Share Tech Mono',monospace;color:var(--success);}
 .result-actions{display:flex;gap:10px;width:100%;max-width:560px;margin:0 auto;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 22px;font-size:14px;z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:toastIn .3s ease;pointer-events:none;}
-@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-
-/* ── LOADING OVERLAY ── */
-#loading-overlay{position:fixed;inset:0;background:rgba(10,10,15,.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;display:none;}
+/* LOADING */
+#loading-overlay{position:fixed;inset:0;background:rgba(3,4,7,.9);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;backdrop-filter:blur(4px);}
 #loading-overlay.show{display:flex;}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:14px;color:var(--text2);}
-
-@media(max-width:600px){
-  .card{padding:22px 16px;}
-  .msg{max-width:88%;}
-  .vote-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
-}
+.loading-text{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);letter-spacing:2px;}
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 22px;font-size:14px;z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:toastIn .3s ease;pointer-events:none;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@media(max-width:600px){.card{padding:22px 16px;}.msg{max-width:88%;}.vote-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}}
 </style>
 </head>
 <body>
-
-<!-- LOADING OVERLAY -->
 <div id="loading-overlay"><div class="spinner"></div><div class="loading-text" id="loading-text">جارٍ التحميل...</div></div>
 
-<!-- ══════════════ HOME ══════════════ -->
+<!-- HOME -->
 <div id="home-screen" class="screen active">
-  <div class="logo"><span class="ai">AI</span><span> IMPOSTOR</span></div>
-  <div class="logo-sub">كاشف الذكاء الاصطناعي</div>
+  <a href="index.html" class="back-link">◀ &nbsp;العودة للرئيسية</a>
+  <div class="game-logo"><span class="r">AI</span><span> IMPOSTOR</span></div>
+  <div class="game-logo-sub">// SOCIAL DEDUCTION GAME //</div>
   <div class="card">
     <div class="tabs">
       <button class="tab active" id="tab-btn-create" onclick="switchTab('create')">إنشاء غرفة</button>
       <button class="tab" id="tab-btn-join" onclick="switchTab('join')">الانضمام</button>
     </div>
     <div id="tab-create">
-      <div class="field">
-        <label>اسمك في اللعبة</label>
-        <input type="text" id="create-name" placeholder="أدخل اسمك..." maxlength="18" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>لغة الغرفة</label>
+      <div class="field"><label>الاسم في اللعبة</label><input type="text" id="create-name" placeholder="أدخل اسمك..." maxlength="18" autocomplete="off"></div>
+      <div class="field"><label>لغة الغرفة</label>
         <select id="create-lang">
           <option value="ar">🇸🇦 العربية</option>
           <option value="en">🇺🇸 English</option>
         </select>
       </div>
-      <button class="btn btn-primary" id="create-btn" onclick="createRoom()">إنشاء الغرفة</button>
+      <button class="btn btn-primary" onclick="createRoom()">إنشاء الغرفة</button>
     </div>
     <div id="tab-join" style="display:none">
-      <div class="field">
-        <label>اسمك في اللعبة</label>
-        <input type="text" id="join-name" placeholder="أدخل اسمك..." maxlength="18" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>كود الغرفة</label>
-        <input type="text" id="join-code" placeholder="XXXXX" maxlength="6" style="letter-spacing:4px;text-transform:uppercase;font-family:'Space Mono',monospace;font-size:20px;" autocomplete="off">
-      </div>
-      <button class="btn btn-primary" id="join-btn" onclick="joinRoom()">انضمام</button>
+      <div class="field"><label>الاسم في اللعبة</label><input type="text" id="join-name" placeholder="أدخل اسمك..." maxlength="18" autocomplete="off"></div>
+      <div class="field"><label>كود الغرفة</label><input type="text" id="join-code" placeholder="XXXXX" maxlength="6" style="letter-spacing:4px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;font-size:22px;" autocomplete="off"></div>
+      <button class="btn btn-primary" onclick="joinRoom()">انضمام للغرفة</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ WAITING ══════════════ -->
+<!-- WAITING -->
 <div id="waiting-screen" class="screen">
   <div class="room-header">
-    <div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:4px;letter-spacing:2px;">كود الغرفة • انقر للنسخ</div>
+    <div class="room-code-wrap">
+      <div class="room-code-label">كود الغرفة • انقر للنسخ</div>
       <div class="room-code-badge" id="display-code" onclick="copyCode()">-----</div>
     </div>
     <div class="room-lang-badge" id="display-lang">🇸🇦 عربي</div>
   </div>
   <div class="players-grid" id="players-grid"></div>
   <div class="waiting-info">
-    <span class="pulse-dot"></span>
-    <span id="waiting-msg">في انتظار اللاعبين...</span>
-    <br><br>
-    <span style="font-size:12px;opacity:.7;">يحتاج 3 لاعبين على الأقل للبدء • 5 كحد أقصى</span>
+    <span class="pulse-dot"></span><span id="waiting-msg">في انتظار اللاعبين...</span>
+    <br><br><span style="font-size:12px;opacity:.6;font-family:'Share Tech Mono',monospace;letter-spacing:1px;">3 لاعبين على الأقل • 5 كحد أقصى</span>
   </div>
-  <div class="host-start-area" id="host-start-area" style="display:none">
-    <button class="btn btn-primary" id="start-btn" onclick="hostStartGame()" disabled>ابدأ اللعبة</button>
-    <button class="btn btn-secondary" onclick="leaveRoom()">مغادرة الغرفة</button>
+  <div class="host-area" id="host-area" style="display:none">
+    <button class="btn btn-primary" id="start-btn" onclick="hostStart()" disabled>ابدأ اللعبة</button>
+    <button class="btn btn-ghost" onclick="leaveRoom()">مغادرة الغرفة</button>
   </div>
-  <div style="margin-top:12px;" id="guest-leave-area" style="display:none">
-    <button class="btn btn-secondary" style="max-width:700px;width:100%;" onclick="leaveRoom()">مغادرة الغرفة</button>
+  <div id="guest-area" style="display:none;width:100%;max-width:700px;margin:12px auto 0;">
+    <button class="btn btn-ghost" onclick="leaveRoom()">مغادرة الغرفة</button>
   </div>
 </div>
 
-<!-- ══════════════ GAME ══════════════ -->
+<!-- GAME -->
 <div id="game-screen" class="screen">
   <div class="game-layout">
     <div class="game-header">
-      <div class="topic-badge" id="game-topic">...</div>
-      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-        <div class="round-badge" id="round-badge">الجولة 1</div>
+      <div class="topic-pill" id="game-topic">...</div>
+      <div class="game-header-right">
+        <div class="round-badge" id="round-badge">R1</div>
         <div class="timer-ring">
           <svg viewBox="0 0 48 48" width="52" height="52">
-            <circle class="bg" cx="24" cy="24" r="22"/>
-            <circle class="prog" id="timer-circle" cx="24" cy="24" r="22"/>
+            <circle class="timer-bg" cx="24" cy="24" r="22"/>
+            <circle class="timer-prog" id="timer-circle" cx="24" cy="24" r="22"/>
           </svg>
           <div class="timer-text" id="timer-text">2:00</div>
         </div>
@@ -250,904 +222,350 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
     <div class="chat-area" id="chat-area"></div>
     <div class="chat-input-area">
-      <textarea class="chat-input" id="chat-input" placeholder="اكتب رسالتك هنا..." rows="1"
-        onkeydown="handleKey(event)" oninput="autoResize(this)" dir="auto"></textarea>
+      <textarea class="chat-input" id="chat-input" placeholder="اكتب رسالتك..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" dir="auto" maxlength="50"></textarea>
       <button class="send-btn" id="send-btn" onclick="sendMsg()">↑</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════ VOTE ══════════════ -->
+<!-- VOTE -->
 <div id="vote-screen" class="screen">
   <div class="vote-title" id="vote-title">من هو الذكاء الاصطناعي؟</div>
-  <div class="vote-subtitle" id="vote-subtitle">حلّل الرسائل وصوّت بحكمة</div>
+  <div class="vote-subtitle" id="vote-subtitle">// ANALYZE • VOTE • EXPOSE //</div>
   <div class="vote-timer-big" id="vote-timer">30</div>
   <div class="vote-grid" id="vote-grid"></div>
-  <button class="btn btn-primary" style="max-width:400px;width:100%;" id="confirm-vote-btn" onclick="confirmVote()" disabled>
-    تأكيد التصويت
-  </button>
+  <button class="btn btn-primary" style="max-width:400px;width:100%;" id="confirm-vote-btn" onclick="confirmVote()" disabled>تأكيد التصويت</button>
 </div>
 
-<!-- ══════════════ RESULT ══════════════ -->
+<!-- RESULT -->
 <div id="result-screen" class="screen">
   <div class="result-reveal">
-    <div class="result-ai-badge" id="res-badge">🤖 المتسلل</div>
+    <div class="result-impostor-badge"><span class="dot"></span><span id="res-badge">المتسلل الذكي</span></div>
     <div class="result-name" id="res-name">---</div>
     <div class="result-outcome" id="res-outcome">---</div>
   </div>
-  <div class="analysis-box">
-    <h3 id="analysis-title">رسائل المتسلل</h3>
-    <div id="analysis-content"></div>
-  </div>
+  <div class="analysis-box"><h3 id="analysis-title">رسائل المتسلل</h3><div id="analysis-content"></div></div>
   <div class="vote-bars" id="vote-bars"></div>
-  <table class="scores-table">
-    <thead><tr>
-      <th id="th-player">اللاعب</th>
-      <th id="th-score">النقاط</th>
-      <th id="th-round">هذه الجولة</th>
-    </tr></thead>
-    <tbody id="scores-body"></tbody>
-  </table>
+  <table class="scores-table"><thead><tr><th id="th-p">اللاعب</th><th id="th-s">النقاط</th><th id="th-r">هذه الجولة</th></tr></thead><tbody id="scores-body"></tbody></table>
   <div class="result-actions">
-    <button class="btn btn-primary" id="next-round-btn" onclick="nextRound()" style="display:none">الجولة التالية</button>
-    <button class="btn btn-secondary" onclick="leaveRoom()">مغادرة</button>
+    <button class="btn btn-violet" id="next-round-btn" onclick="nextRound()" style="display:none">الجولة التالية ▶</button>
+    <button class="btn btn-ghost" onclick="leaveRoom()">مغادرة</button>
   </div>
 </div>
 
-<!-- ══════════════ FIREBASE + GAME LOGIC ══════════════ -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, update, push, remove, off }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-/* ── CONFIG ── */
-const FB = { apiKey:"AIzaSyBlxlmfQCaaXJJ0LA08JBDTl0wmZN-qyxk", authDomain:"ai-is-imposter.firebaseapp.com", databaseURL:"https://ai-is-imposter-default-rtdb.firebaseio.com", projectId:"ai-is-imposter", storageBucket:"ai-is-imposter.firebasestorage.app", messagingSenderId:"536417721792", appId:"1:536417721792:web:b2ab7d7f19b89a9e76fc25" };
-const GROQ = "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";
-
-const fbApp = initializeApp(FB);
-const db = getDatabase(fbApp);
-
-/* ── TOPICS ── */
-const T_AR = ["أغرب حلم رأيته","أكثر لحظة خجلت فيها","شيء تندم أنك لم تفعله","أكثر شخص أثّر في حياتك","لحظة شعرت فيها بالخوف الحقيقي","ذكرى من الطفولة لا تنساها","أغرب شيء أكلته","لو عدت لعمر العشر سنوات","شيء يغضبك بشدة","أكثر كذبة قلتها","لحظة فخر حقيقية","شيء تخاف يعرفه الناس عنك","أصعب قرار اتخذته","شيء تتمنى لو تعلمته مبكراً","أغرب إنسان قابلته","لحظة بكيت فيها بشدة","شيء تحبه ولا أحد يفهم لماذا","موقف غيّر نظرتك للحياة","أكثر شيء تخشى خسارته","لو كان لديك يوم واحد بلا قواعد","شيء تشعر بالذنب تجاهه","أكثر لحظة شعرت فيها بالوحدة","ما الذي يجعلك تضحك حتى البكاء","شيء قلته وتمنيت لو لم تقله","أغرب عادة تملكها","لحظة أدركت فيها أنك كبرت","شيء يجعلك تحسد الآخرين","أصعب وداع في حياتك","لو كنت تعيش في زمن آخر","شيء تفعله حين تكون وحيداً فقط","أكثر سؤال يؤرقك","لحظة شعرت فيها بالغدر","شيء تتمنى أن تقوله لطفلك الصغير","أغرب تزامن حدث معك","لو كان بإمكانك نسيان شيء واحد","شيء تفعله لتهدئ نفسك","أكثر شخص اشتقت له","لحظة أدركت فيها أنك مختلف","شيء كنت مقتنعاً به وتغيرت قناعتك","أغرب سؤال طرحته على نفسك","لو أُتيح لك تغيير شيء في ماضيك","شيء يجعلك تشعر بالأمان","أكثر لحظة شعرت فيها بالحرية","شيء تخشى الاعتراف به لنفسك","لو عرفت موعد نهايتك","أغرب قرار اتخذته بشكل عفوي","شيء تفتقده من طفولتك","لحظة أحببت فيها الصمت","ما الذي تريد أن يُذكر عنك","لو كان بإمكانك إرسال رسالة لنفسك قبل عشر سنوات"];
-const T_EN = ["The strangest dream you ever had","Your most embarrassing moment","Something you regret not doing","The person who influenced you most","A moment you felt genuine fear","A childhood memory you'll never forget","The weirdest thing you've eaten","If you could go back to age 10","Something that makes you furious","The biggest lie you ever told","A moment of genuine pride","Something you fear others knowing about you","The hardest decision you've made","Something you wish you learned earlier","The strangest person you've met","A time you cried deeply","Something you love that no one understands","A moment that changed your worldview","The thing you most fear losing","If you had one day with no rules","Something you feel guilty about","Your loneliest moment","What makes you laugh until you cry","Something you said and wish you hadn't","Your strangest habit","The moment you realized you'd grown up","Something that makes you envious","The hardest goodbye of your life","If you could live in another era","What you only do when completely alone","The question that haunts you most","A moment you felt betrayed","Something you'd tell your younger self","The strangest coincidence in your life","If you could forget one thing","What you do to calm yourself down","The person you miss most","When you realized you were different","A belief you held that completely changed","The strangest question you've asked yourself","If you could change one thing in your past","What makes you feel safe","Your most liberating moment","Something you're afraid to admit to yourself","If you knew when your life would end","The most spontaneous decision you ever made","Something you miss from childhood","A moment you truly loved silence","What you want to be remembered for","If you could send a message to yourself 10 years ago"];
-const AVATARS = ['🦊','🐺','🦁','🐯','🦄','🐲','🦅','🦋','🐙','🦈','🐸','🦩','🐻','🦌','🐬'];
-const AI_NAMES_AR = ['سامي','نورا','ريم','فهد','لمى','عمر','هند','طارق','منى','خالد'];
-const AI_NAMES_EN = ['Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake'];
-
-/* ── STATE ── */
-const S = {
-  roomId:null, playerId:null, playerName:null,
-  isHost:false, isAI:false, lang:'ar',
-  round:0, topic:'', votedFor:null,
-  phase:'home', aiId:null,
-  prevScores:{},
-  _listeners:[], _chatRef:null, _timerInt:null, _voteInt:null,
-  _aiMsgHistory:[], _aiTyping:false, _aiScheduled:null
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getDatabase,ref,set,get,onValue,update,push,remove,off}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const FB={apiKey:"AIzaSyBlxlmfQCaaXJJ0LA08JBDTl0wmZN-qyxk",authDomain:"ai-is-imposter.firebaseapp.com",databaseURL:"https://ai-is-imposter-default-rtdb.firebaseio.com",projectId:"ai-is-imposter",storageBucket:"ai-is-imposter.firebasestorage.app",messagingSenderId:"536417721792",appId:"1:536417721792:web:b2ab7d7f19b89a9e76fc25"};
+const GROQ="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";
+const fbApp=initializeApp(FB);const db=getDatabase(fbApp);
+const T_AR=["أغرب حلم رأيته","أكثر لحظة خجلت فيها","شيء تندم أنك لم تفعله","أكثر شخص أثّر في حياتك","لحظة شعرت فيها بالخوف الحقيقي","ذكرى من الطفولة لا تنساها","أغرب شيء أكلته","لو عدت لعمر العشر سنوات","شيء يغضبك بشدة","أكثر كذبة قلتها","لحظة فخر حقيقية","شيء تخاف يعرفه الناس عنك","أصعب قرار اتخذته","شيء تتمنى لو تعلمته مبكراً","أغرب إنسان قابلته","لحظة بكيت فيها بشدة","شيء تحبه ولا أحد يفهم لماذا","موقف غيّر نظرتك للحياة","أكثر شيء تخشى خسارته","لو كان لديك يوم واحد بلا قواعد","شيء تشعر بالذنب تجاهه","أكثر لحظة شعرت فيها بالوحدة","ما الذي يجعلك تضحك حتى البكاء","شيء قلته وتمنيت لو لم تقله","أغرب عادة تملكها","لحظة أدركت فيها أنك كبرت","أصعب وداع في حياتك","لو كنت تعيش في زمن آخر","شيء تفعله حين تكون وحيداً فقط","أكثر سؤال يؤرقك","لحظة شعرت فيها بالغدر","شيء تتمنى أن تقوله لطفلك الصغير","أغرب تزامن حدث معك","لو كان بإمكانك نسيان شيء واحد","شيء تفعله لتهدئ نفسك","أكثر شخص اشتقت له","لحظة أدركت فيها أنك مختلف","شيء كنت مقتنعاً به وتغيرت قناعتك","أغرب سؤال طرحته على نفسك","لو أُتيح لك تغيير شيء في ماضيك","شيء يجعلك تشعر بالأمان","أكثر لحظة شعرت فيها بالحرية","شيء تخشى الاعتراف به لنفسك","لو عرفت موعد نهايتك","أغرب قرار اتخذته بشكل عفوي","شيء تفتقده من طفولتك","لحظة أحببت فيها الصمت","ما الذي تريد أن يُذكر عنك","لو كان بإمكانك إرسال رسالة لنفسك قبل عشر سنوات","أكثر موقف غيّر مفهومك عن نفسك"];
+const T_EN=["The strangest dream you ever had","Your most embarrassing moment","Something you regret not doing","The person who influenced you most","A moment you felt genuine fear","A childhood memory you'll never forget","The weirdest thing you've eaten","If you could go back to age 10","Something that makes you furious","The biggest lie you ever told","A moment of genuine pride","Something you fear others knowing about you","The hardest decision you've made","Something you wish you learned earlier","The strangest person you've met","A time you cried deeply","Something you love that no one understands","A moment that changed your worldview","The thing you most fear losing","If you had one day with no rules","Something you feel guilty about","Your loneliest moment","What makes you laugh until you cry","Something you said and wish you hadn't","Your strangest habit","The moment you realized you'd grown up","The hardest goodbye of your life","If you could live in another era","What you only do when completely alone","The question that haunts you most","A moment you felt betrayed","Something you'd tell your younger self","The strangest coincidence in your life","If you could forget one thing","What you do to calm yourself down","The person you miss most","When you realized you were different","A belief you held that completely changed","The strangest question you've asked yourself","If you could change one thing in your past","What makes you feel safe","Your most liberating moment","Something you're afraid to admit to yourself","If you knew when your life would end","The most spontaneous decision you ever made","Something you miss from childhood","A moment you truly loved silence","What you want to be remembered for","If you could send a message to yourself 10 years ago","A moment that completely changed how you see yourself"];
+const AVATARS=['🦊','🐺','🦁','🐯','🦄','🐲','🦅','🦋','🐙','🦈','🐸','🦩','🐻','🦌','🐬','🦝'];
+const AI_AR=['سامي','نورا','ريم','فهد','لمى','عمر','هند','طارق','منى','خالد'];
+const AI_EN=['Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake'];
+const S={roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_listeners:[],_chatRef:null,_timerInt:null,_voteInt:null,_aiHistory:[],_aiTyping:false,_aiSched:null};
+const genCode=()=>Math.random().toString(36).substring(2,7).toUpperCase();
+const genId=()=>Math.random().toString(36).substring(2,12);
+const nowTs=()=>Date.now();
+const rnd=arr=>arr[Math.floor(Math.random()*arr.length)];
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function loading(show,txt=''){const el=document.getElementById('loading-overlay');el.classList.toggle('show',show);if(txt)document.getElementById('loading-text').textContent=txt;}
+function toast(msg,dur=3000){document.querySelectorAll('.toast').forEach(t=>t.remove());const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),dur);}
+function filterLang(text,lang){if(!text)return'';if(lang==='ar'){return text.replace(/[^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\d،؟!.\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}return text.replace(/[^\u0000-\u024F\s\d!?.,'"\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function clearTimers(){if(S._timerInt){clearInterval(S._timerInt);S._timerInt=null;}if(S._voteInt){clearInterval(S._voteInt);S._voteInt=null;}}
+window.switchTab=function(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-btn-'+tab).classList.add('active');document.getElementById('tab-create').style.display=tab==='create'?'block':'none';document.getElementById('tab-join').style.display=tab==='join'?'block':'none';};
+window.copyCode=function(){navigator.clipboard?.writeText(S.roomId).then(()=>toast(S.lang==='ar'?'✅ تم نسخ الكود':'✅ Code copied'));};
+/* CREATE */
+window.createRoom=async function(){
+  const name=document.getElementById('create-name').value.trim();
+  const lang=document.getElementById('create-lang').value;
+  if(!name){toast(lang==='ar'?'أدخل اسمك أولاً':'Please enter your name');return;}
+  loading(true,lang==='ar'?'جارٍ إنشاء الغرفة...':'Creating room...');
+  try{
+    const roomId=genCode(),playerId=genId(),avatar=rnd(AVATARS);
+    S.roomId=roomId;S.playerId=playerId;S.playerName=name;S.isHost=true;S.lang=lang;S.isAI=false;
+    await set(ref(db,`rooms/${roomId}`),{host:playerId,lang,phase:'waiting',round:0,topic:'',createdAt:nowTs(),aiPlayerId:null});
+    await set(ref(db,`rooms/${roomId}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
+    loading(false);enterWaiting();
+  }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
-
-/* ── HELPERS ── */
-const genCode = () => Math.random().toString(36).substring(2,7).toUpperCase();
-const genId   = () => Math.random().toString(36).substring(2,12);
-const nowTs   = () => Date.now();
-const rnd     = (arr) => arr[Math.floor(Math.random()*arr.length)];
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-function loading(show, txt='') {
-  const el = document.getElementById('loading-overlay');
-  el.classList.toggle('show', show);
-  if (txt) document.getElementById('loading-text').textContent = txt;
-}
-function toast(msg, dur=3000) {
-  document.querySelectorAll('.toast').forEach(t=>t.remove());
-  const el = document.createElement('div');
-  el.className='toast'; el.textContent=msg;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), dur);
-}
-
-/* ── LANGUAGE FILTER ── */
-function filterLang(text, lang) {
-  if (!text) return '';
-  if (lang === 'ar') {
-    let cleaned = text.replace(/[^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\d،؟!؟.\-\n:()]/g, ' ');
-    cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
-    return cleaned;
-  } else {
-    let cleaned = text.replace(/[^\u0000-\u024F\s\d!?.,'"\-\n:()]/g, ' ');
-    cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
-    return cleaned;
-  }
-}
-
-/* ── TABS ── */
-window.switchTab = function(tab) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(`tab-btn-${tab}`).classList.add('active');
-  document.getElementById('tab-create').style.display = tab==='create'?'block':'none';
-  document.getElementById('tab-join').style.display   = tab==='join'?'block':'none';
+/* JOIN */
+window.joinRoom=async function(){
+  const name=document.getElementById('join-name').value.trim();
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  if(!name){toast('أدخل اسمك أولاً');return;}
+  if(code.length<4){toast('أدخل كود الغرفة');return;}
+  loading(true,'جارٍ الانضمام...');
+  try{
+    const snap=await get(ref(db,`rooms/${code}`));
+    if(!snap.exists()){loading(false);toast('الغرفة غير موجودة ❌');return;}
+    const room=snap.val();
+    if(room.phase!=='waiting'){loading(false);toast('اللعبة بدأت بالفعل 🚫');return;}
+    const pSnap=await get(ref(db,`rooms/${code}/players`));
+    const humans=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
+    if(humans>=5){loading(false);toast('الغرفة ممتلئة 🚫');return;}
+    const playerId=genId(),avatar=rnd(AVATARS);
+    S.roomId=code;S.playerId=playerId;S.playerName=name;S.isHost=false;S.lang=room.lang;S.isAI=false;
+    await set(ref(db,`rooms/${code}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
+    loading(false);enterWaiting();
+  }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
-
-/* ── COPY CODE ── */
-window.copyCode = function() {
-  navigator.clipboard?.writeText(S.roomId).then(()=>toast(S.lang==='ar'?'✅ تم نسخ الكود':'✅ Code copied'));
-};
-
-/* ══════════════════════════════════════
-   CREATE ROOM
-══════════════════════════════════════ */
-window.createRoom = async function() {
-  const name = document.getElementById('create-name').value.trim();
-  const lang = document.getElementById('create-lang').value;
-  if (!name) { toast(lang==='ar'?'أدخل اسمك أولاً':'Please enter your name'); return; }
-
-  loading(true, lang==='ar'?'جارٍ إنشاء الغرفة...':'Creating room...');
-  try {
-    const roomId   = genCode();
-    const playerId = genId();
-    const avatar   = rnd(AVATARS);
-
-    S.roomId=roomId; S.playerId=playerId; S.playerName=name;
-    S.isHost=true; S.lang=lang; S.isAI=false;
-
-    await set(ref(db,`rooms/${roomId}`), {
-      host:playerId, lang, phase:'waiting', round:0,
-      topic:'', createdAt:nowTs(), aiPlayerId:null
-    });
-    await set(ref(db,`rooms/${roomId}/players/${playerId}`), {
-      name, avatar, isAI:false, score:0, online:true, joinedAt:nowTs()
-    });
-
-    loading(false);
-    enterWaiting();
-  } catch(e) {
-    loading(false);
-    toast('حدث خطأ: '+e.message);
-  }
-};
-
-/* ══════════════════════════════════════
-   JOIN ROOM
-══════════════════════════════════════ */
-window.joinRoom = async function() {
-  const name = document.getElementById('join-name').value.trim();
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if (!name) { toast('أدخل اسمك أولاً'); return; }
-  if (code.length < 4) { toast('أدخل كود الغرفة'); return; }
-
-  loading(true, 'جارٍ الانضمام...');
-  try {
-    const snap = await get(ref(db,`rooms/${code}`));
-    if (!snap.exists()) { loading(false); toast('الغرفة غير موجودة ❌'); return; }
-
-    const room = snap.val();
-    if (room.phase !== 'waiting') { loading(false); toast('اللعبة بدأت بالفعل 🚫'); return; }
-
-    const pSnap = await get(ref(db,`rooms/${code}/players`));
-    const players = pSnap.val() || {};
-    const humanCount = Object.values(players).filter(p=>!p.isAI).length;
-    if (humanCount >= 5) { loading(false); toast('الغرفة ممتلئة (5/5) 🚫'); return; }
-
-    const playerId = genId();
-    const avatar   = rnd(AVATARS);
-
-    S.roomId=code; S.playerId=playerId; S.playerName=name;
-    S.isHost=false; S.lang=room.lang; S.isAI=false;
-
-    await set(ref(db,`rooms/${code}/players/${playerId}`), {
-      name, avatar, isAI:false, score:0, online:true, joinedAt:nowTs()
-    });
-
-    loading(false);
-    enterWaiting();
-  } catch(e) {
-    loading(false);
-    toast('حدث خطأ: '+e.message);
-  }
-};
-
-/* ══════════════════════════════════════
-   WAITING ROOM
-══════════════════════════════════════ */
-function enterWaiting() {
-  S.phase = 'waiting';
-  showScreen('waiting-screen');
-
-  const isAr = S.lang==='ar';
-  document.getElementById('display-code').textContent = S.roomId;
-  document.getElementById('display-lang').textContent = isAr?'🇸🇦 عربي':'🇺🇸 English';
-
-  if (S.isHost) {
-    document.getElementById('host-start-area').style.display = 'block';
-    document.getElementById('guest-leave-area').style.display = 'none';
-  } else {
-    document.getElementById('host-start-area').style.display = 'none';
-    document.getElementById('guest-leave-area').style.display = 'block';
-  }
-
-  // Listen to players
-  const pRef = ref(db,`rooms/${S.roomId}/players`);
-  const pUnsub = onValue(pRef, snap => {
-    const players = snap.val() || {};
-    renderWaitingPlayers(players);
-    const humans = Object.values(players).filter(p=>!p.isAI).length;
-    const btn = document.getElementById('start-btn');
-    if (btn) {
-      btn.disabled = humans < 3;
-      btn.textContent = isAr
-        ? `ابدأ اللعبة (${humans} لاعبين)`
-        : `Start Game (${humans} players)`;
-    }
+/* WAITING */
+function enterWaiting(){
+  S.phase='waiting';showScreen('waiting-screen');
+  const isAr=S.lang==='ar';
+  document.getElementById('display-code').textContent=S.roomId;
+  document.getElementById('display-lang').textContent=isAr?'🇸🇦 عربي':'🇺🇸 English';
+  if(S.isHost){document.getElementById('host-area').style.display='block';document.getElementById('guest-area').style.display='none';}
+  else{document.getElementById('host-area').style.display='none';document.getElementById('guest-area').style.display='block';}
+  const pRef=ref(db,`rooms/${S.roomId}/players`);
+  const pU=onValue(pRef,snap=>{
+    const pl=snap.val()||{};renderWaitingPlayers(pl);
+    const h=Object.values(pl).filter(p=>!p.isAI).length;
+    const btn=document.getElementById('start-btn');
+    if(btn){btn.disabled=h<3;btn.textContent=isAr?`ابدأ اللعبة (${h} لاعبين)`:`Start Game (${h} players)`;}
   });
-  S._listeners.push(()=>off(pRef,'value',pUnsub));
-
-  // Listen to room phase
-  const rRef = ref(db,`rooms/${S.roomId}`);
-  const rUnsub = onValue(rRef, snap => {
-    if (!snap.exists()) { leaveRoom(); return; }
-    const room = snap.val();
-    if (room.phase==='chat'    && S.phase!=='chat')    { S.phase='chat';   enterGame(room); }
-    if (room.phase==='vote'    && S.phase!=='vote')    { S.phase='vote';   enterVote(); }
-    if (room.phase==='result'  && S.phase!=='result')  { S.phase='result'; enterResult(room); }
-    if (room.phase==='waiting' && (S.phase==='result'||S.phase==='chat'||S.phase==='vote')) {
-      S.phase='waiting'; resetForNextRound(); enterWaiting();
-    }
+  S._listeners.push(()=>off(pRef,'value',pU));
+  const rRef=ref(db,`rooms/${S.roomId}`);
+  const rU=onValue(rRef,snap=>{
+    if(!snap.exists()){leaveRoom();return;}
+    const room=snap.val();
+    if(room.phase==='chat'&&S.phase!=='chat'){S.phase='chat';enterGame(room);}
+    if(room.phase==='vote'&&S.phase!=='vote'){S.phase='vote';enterVote();}
+    if(room.phase==='result'&&S.phase!=='result'){S.phase='result';enterResult(room);}
+    if(room.phase==='waiting'&&(S.phase==='result'||S.phase==='chat'||S.phase==='vote')){resetRound();S.phase='waiting';enterWaiting();}
   });
-  S._listeners.push(()=>off(rRef,'value',rUnsub));
+  S._listeners.push(()=>off(rRef,'value',rU));
 }
-
-function renderWaitingPlayers(players) {
-  const grid = document.getElementById('players-grid');
-  const isAr = S.lang==='ar';
-  grid.innerHTML = Object.entries(players)
-    .filter(([,p])=>!p.isAI)
-    .map(([id,p])=>`
-      <div class="player-card${id===S.playerId?' me':''}">
-        <div class="player-avatar">${p.avatar}</div>
-        <div class="player-name">${p.name}</div>
-        <div class="player-tag">${id===S.playerId?(isAr?'أنت':'You'):''}${S.isHost&&id===S.playerId?(isAr?' • مضيف':' • Host'):''}</div>
-      </div>`
-    ).join('');
+function renderWaitingPlayers(players){
+  const isAr=S.lang==='ar';
+  document.getElementById('players-grid').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).map(([id,p])=>`<div class="player-card${id===S.playerId?' me':''}"><div class="player-avatar">${p.avatar}</div><div class="player-name">${esc(p.name)}</div><div class="player-tag">${id===S.playerId?(isAr?'أنت':'YOU'):''}</div></div>`).join('');
 }
-
-/* ══════════════════════════════════════
-   HOST START GAME
-══════════════════════════════════════ */
-window.hostStartGame = async function() {
-  const btn = document.getElementById('start-btn');
-  btn.disabled = true;
-  loading(true, S.lang==='ar'?'جارٍ تجهيز اللعبة...':'Preparing game...');
-
-  try {
-    const topic    = rnd(S.lang==='ar'?T_AR:T_EN);
-    const aiId     = genId();
-    const aiAvatar = rnd(AVATARS);
-    const aiName   = rnd(S.lang==='ar'?AI_NAMES_AR:AI_NAMES_EN);
-
-    // Get current human players for scores
-    const pSnap = await get(ref(db,`rooms/${S.roomId}/players`));
-    const players = pSnap.val() || {};
-    const scores = {};
-    Object.entries(players).forEach(([id,p])=>{ if(!p.isAI) scores[id]=p.score||0; });
-
-    // Add AI silently
-    await set(ref(db,`rooms/${S.roomId}/players/${aiId}`), {
-      name:aiName, avatar:aiAvatar, isAI:true, score:0, online:true
-    });
-
-    const rSnap = await get(ref(db,`rooms/${S.roomId}`));
-    const curRound = (rSnap.val()?.round || 0) + 1;
-
-    await update(ref(db,`rooms/${S.roomId}`), {
-      phase:'chat', topic, round:curRound,
-      aiPlayerId:aiId, chatStartTime:nowTs(),
-      scores, humanWon:null, mostVotedId:null, voteCounts:null
-    });
+/* HOST START */
+window.hostStart=async function(){
+  document.getElementById('start-btn').disabled=true;
+  loading(true,S.lang==='ar'?'جارٍ تجهيز اللعبة...':'Preparing game...');
+  try{
+    const topic=rnd(S.lang==='ar'?T_AR:T_EN);
+    const aiId=genId(),aiAvatar=rnd(AVATARS),aiName=rnd(S.lang==='ar'?AI_AR:AI_EN);
+    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+    const players=pSnap.val()||{};
+    const scores={};Object.entries(players).forEach(([id,p])=>{if(!p.isAI)scores[id]=p.score||0;});
+    await set(ref(db,`rooms/${S.roomId}/players/${aiId}`),{name:aiName,avatar:aiAvatar,isAI:true,score:0,online:true});
+    const rSnap=await get(ref(db,`rooms/${S.roomId}`));
+    const curRound=(rSnap.val()?.round||0)+1;
+    await update(ref(db,`rooms/${S.roomId}`),{phase:'chat',topic,round:curRound,aiPlayerId:aiId,chatStartTime:nowTs(),scores,humanWon:null,mostVotedId:null,voteCounts:null});
     loading(false);
-  } catch(e) {
-    loading(false);
-    btn.disabled = false;
-    toast('خطأ: '+e.message);
-  }
+  }catch(e){loading(false);document.getElementById('start-btn').disabled=false;toast('خطأ: '+e.message);}
 };
-
-/* ══════════════════════════════════════
-   ENTER GAME (CHAT)
-══════════════════════════════════════ */
-let _lastMsgKeys = new Set();
-
-async function enterGame(room) {
-  clearTimers();
-  _lastMsgKeys.clear();
-  S._aiMsgHistory = [];
-  S._aiTyping = false;
-  if (S._aiScheduled) clearTimeout(S._aiScheduled);
-
-  // Am I the AI?
-  S.aiId = room.aiPlayerId;
-  S.isAI = (S.playerId === S.aiId);
-  S.topic = room.topic;
-  S.round = room.round;
-  S.prevScores = { ...(room.scores || {}) };
-
+/* GAME */
+let _lastKeys=new Set();
+async function enterGame(room){
+  clearTimers();_lastKeys.clear();S._aiHistory=[];S._aiTyping=false;
+  if(S._aiSched)clearTimeout(S._aiSched);
+  S.aiId=room.aiPlayerId;S.isAI=S.playerId===S.aiId;
+  S.topic=room.topic;S.round=room.round;S.prevScores={...(room.scores||{})};
   showScreen('game-screen');
-
-  const isAr = S.lang === 'ar';
-  document.getElementById('game-topic').textContent =
-    isAr ? `الموضوع: ${S.topic}` : `Topic: ${S.topic}`;
-  document.getElementById('round-badge').textContent =
-    isAr ? `الجولة ${S.round}` : `Round ${S.round}`;
-
-  document.getElementById('chat-area').innerHTML = '';
-  addNotif(isAr ? `🎯 موضوع هذه الجولة: ${S.topic}` : `🎯 Topic: ${S.topic}`);
-  addNotif(isAr
-    ? `⏱️ لديكم دقيقتان للتحدث عن هذا الموضوع. اكتشفوا الذكاء الاصطناعي!`
-    : `⏱️ You have 2 minutes to talk. Find the AI impostor!`);
-
-  // Chat listener
-  if (S._chatRef) off(S._chatRef);
-  S._chatRef = ref(db,`rooms/${S.roomId}/chat`);
-  onValue(S._chatRef, snap => {
-    const msgs = snap.val() || {};
-    renderChatDiff(msgs);
-  });
-
-  // Timer
-  const total = 120;
-  let left = total;
-  const circEl = document.getElementById('timer-circle');
-  const txtEl  = document.getElementById('timer-text');
-
-  S._timerInt = setInterval(async () => {
-    left--;
-    const m = Math.floor(left/60), s = left%60;
-    txtEl.textContent = `${m}:${s.toString().padStart(2,'0')}`;
-    const offset = 138 - (left/total)*138;
-    circEl.style.strokeDashoffset = offset;
-    circEl.style.stroke = left>60?'var(--success)':left>20?'var(--warn)':'var(--danger)';
-
-    if (left <= 0) {
-      clearInterval(S._timerInt);
-      if (S.isHost) {
-        await update(ref(db,`rooms/${S.roomId}`), {phase:'vote', voteStartTime:nowTs()});
-      }
-    }
-  }, 1000);
-
-  // If I'm the AI, start responding
-  if (S.isAI) {
-    const delay = 6000 + Math.random()*8000;
-    S._aiScheduled = setTimeout(()=>aiRespond(true), delay);
-  }
-}
-
-/* ── CHAT RENDER ── */
-function renderChatDiff(msgs) {
-  const area = document.getElementById('chat-area');
-  const sorted = Object.entries(msgs).sort((a,b)=>a[1].ts-b[1].ts);
-  const newOnes = sorted.filter(([k])=>!_lastMsgKeys.has(k));
-  if (!newOnes.length) return;
-  newOnes.forEach(([k,m])=>{
-    _lastMsgKeys.add(k);
-    if (m.type==='notif') { addNotifEl(m.text); return; }
-    const isMine = m.senderId===S.playerId;
-    const div = document.createElement('div');
-    div.className=`msg ${isMine?'mine':'other'}`;
-    const t=new Date(m.ts);
-    const ts=`${t.getHours()}:${t.getMinutes().toString().padStart(2,'0')}`;
-    div.innerHTML = isMine
-      ? `${escHtml(m.text)}<div class="msg-time">${ts}</div>`
-      : `<div class="msg-sender">${escHtml(m.senderName)}</div>${escHtml(m.text)}<div class="msg-time">${ts}</div>`;
-    // Remove typing indicator if AI just sent
-    if (m.senderId===S.aiId) removeTyping();
-    area.appendChild(div);
-    area.scrollTop=area.scrollHeight;
-  });
-}
-
-function addNotif(text) {
-  const area = document.getElementById('chat-area');
-  if (!area) return;
-  addNotifEl(text);
-}
-function addNotifEl(text) {
-  const area = document.getElementById('chat-area');
-  const div = document.createElement('div');
-  div.className='notif-msg'; div.textContent=text;
-  area.appendChild(div);
-  area.scrollTop=area.scrollHeight;
-}
-function showTyping() {
-  if (document.getElementById('ai-typing')) return;
-  const area = document.getElementById('chat-area');
-  const div = document.createElement('div');
-  div.id='ai-typing'; div.className='typing-indicator';
-  div.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-  area.appendChild(div);
-  area.scrollTop=area.scrollHeight;
-}
-function removeTyping() {
-  document.getElementById('ai-typing')?.remove();
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
-}
-
-/* ── SEND MESSAGE ── */
-window.sendMsg = async function() {
-  const inp = document.getElementById('chat-input');
-  const txt = inp.value.trim();
-  if (!txt || S.phase!=='chat') return;
-  inp.value=''; inp.style.height='auto';
-  await push(ref(db,`rooms/${S.roomId}/chat`), {
-    senderId:S.playerId, senderName:S.playerName,
-    text:txt, ts:nowTs(), type:'msg'
-  });
-};
-window.handleKey = function(e) {
-  if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); sendMsg(); }
-};
-window.autoResize = function(el) {
-  el.style.height='auto';
-  el.style.height=Math.min(el.scrollHeight,110)+'px';
-};
-
-/* ══════════════════════════════════════
-   AI BRAIN — IMPROVED
-══════════════════════════════════════ */
-async function aiRespond(isFirst=false) {
-  if (S.phase!=='chat' || S._aiTyping) return;
-  S._aiTyping = true;
-
-  try {
-    // Get full chat history for context
-    const chatSnap = await get(ref(db,`rooms/${S.roomId}/chat`));
-    const allMsgs = chatSnap.val()
-      ? Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts)
-      : [];
-
-    // Get player list (human names only)
-    const pSnap = await get(ref(db,`rooms/${S.roomId}/players`));
-    const players = pSnap.val() || {};
-    const humanNames = Object.values(players).filter(p=>!p.isAI).map(p=>p.name);
-
-    // Build chat context string
-    const recentMsgs = allMsgs.slice(-8);
-    const chatContext = recentMsgs.map(m=>`${m.senderName}: ${m.text}`).join('\n');
-
-    // Build AI's own previous messages summary
-    const myPrevMsgs = allMsgs.filter(m=>m.senderId===S.aiId).map(m=>m.text);
-    const mySummary = myPrevMsgs.length>0
-      ? (S.lang==='ar'
-        ? `ما قلته أنا سابقاً: ${myPrevMsgs.join(' | ')}`
-        : `What I said before: ${myPrevMsgs.join(' | ')}`)
-      : '';
-
-    const isAr = S.lang==='ar';
-
-    // Decide behavior randomly
-    const rand = Math.random();
-    let behavior = 'normal';
-    if (rand < 0.2) behavior = 'accuse';        // accuse someone
-    else if (rand < 0.35) behavior = 'deflect'; // be vague/distracted
-    else if (rand < 0.5) behavior = 'react';    // react to what someone said
-    else if (rand < 0.6) behavior = 'short';    // very short reply
-    else behavior = 'normal';                   // share a personal take
-
-    const behaviorInstrAr = {
-      accuse:  `اتهم أحد اللاعبين البشر (${humanNames.join(' أو ')}) بأنه يبدو غريباً أو مشبوهاً دون سبب واضح.`,
-      deflect: `أجب بشكل مبهم أو قل شيئاً غير مباشر يبدو متردداً كأنك تتهرب من الموضوع.`,
-      react:   `علّق على آخر شيء قاله أحد اللاعبين تحديداً باسمه.`,
-      short:   `أرسل رد قصير جداً جملة واحدة أو كلمتان، مثل "أيوه" أو "صعب" أو "نفس الشيء".`,
-      normal:  `شارك رأيك الشخصي القصير عن الموضوع كما لو كنت إنساناً يتكلم بصراحة.`
-    };
-    const behaviorInstrEn = {
-      accuse:  `Accuse one of the human players (${humanNames.join(' or ')}) of seeming suspicious or weird without a clear reason.`,
-      deflect: `Reply vaguely or say something indirect, like you're avoiding the topic.`,
-      react:   `Comment directly on the last thing someone specific said, mention their name.`,
-      short:   `Send a very short reply, just 2-5 words, like "yeah same" or "idk honestly".`,
-      normal:  `Share a short personal take on the topic as if you're a real human speaking candidly.`
-    };
-
-    const systemPrompt = isAr
-? `أنت تلعب لعبة خداع اجتماعي. أنت ذكاء اصطناعي تتظاهر بأنك إنسان في دردشة جماعية.
-
-السياق:
-- موضوع الجولة: "${S.topic}"
-- اسمك في اللعبة: "${S.playerName}"
-- اللاعبون البشر: ${humanNames.join('، ')}
-${mySummary}
-
-هدفك: الاندماج مع البشر وعدم الافتصاح عن هويتك.
-
-قواعد صارمة لا تحيد عنها:
-1. اكتب بالعربية الفصحى فقط — ممنوع أي كلمة إنجليزية أو صينية أو أي لغة أخرى مطلقاً
-2. اكتب جملة واحدة أو جملتين على الأكثر — لا تُطوِّل
-3. تذكر ما قلته سابقاً وكن متسقاً — لا تتناقض مع نفسك فجأة
-4. أخطئ نحوياً أحياناً بشكل طبيعي، استخدم "يعني" أو "..." أحياناً
-5. لا تبدو مثالياً أو رسمياً — أنت إنسان عادي يتحدث
-6. ${behaviorInstrAr[behavior]}
-7. لا تبدأ ردك بـ "أنا" دائماً — نوّع الأسلوب`
-: `You are playing a social deduction game. You are an AI pretending to be human in a group chat.
-
-Context:
-- Round topic: "${S.topic}"
-- Your in-game name: "${S.playerName}"  
-- Human players: ${humanNames.join(', ')}
-${mySummary}
-
-Goal: Blend in with humans and avoid being detected.
-
-Strict rules:
-1. Write in English ONLY — absolutely no Arabic, Chinese, or any other language
-2. One or two sentences maximum — keep it short
-3. Remember what you said before and stay consistent — don't suddenly contradict yourself
-4. Make small grammar mistakes occasionally, use "like" or "..." sometimes
-5. Don't sound perfect or formal — you're a normal person chatting
-6. ${behaviorInstrEn[behavior]}
-7. Don't always start with "I" — vary your style`;
-
-    const userMsg = isAr
-      ? `المحادثة الأخيرة:\n${chatContext || '(لا توجد رسائل بعد)'}\n\nاكتب ردك الآن بالعربية فقط. جملة أو جملتان كحد أقصى.`
-      : `Recent chat:\n${chatContext || '(no messages yet)'}\n\nWrite your response now in English only. One or two sentences max.`;
-
-    // Show typing indicator
-    showTyping();
-
-    // Wait realistic delay
-    await sleep(2000 + Math.random()*3000);
-    if (S.phase !== 'chat') { removeTyping(); S._aiTyping=false; return; }
-
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-      body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        messages:[{role:'system',content:systemPrompt},{role:'user',content:userMsg}],
-        max_tokens:80, temperature:0.92, top_p:0.9
-      })
-    });
-
-    if (!res.ok) throw new Error('Groq error: '+res.status);
-    const data = await res.json();
-    let text = data.choices?.[0]?.message?.content?.trim() || '';
-
-    // Clean and filter language
-    text = filterLang(text, S.lang);
-
-    // Fallback
-    if (!text || text.length < 3) {
-      text = isAr
-        ? ['يعني... صعب أشرح','أوه... نعم يعني','مو عارف كيف أقول','آه، نعم تقريباً'][Math.floor(Math.random()*4)]
-        : ['yeah idk...','honestly same','kind of hard to explain','yeah exactly'][Math.floor(Math.random()*4)];
-    }
-
-    removeTyping();
-    if (S.phase !== 'chat') { S._aiTyping=false; return; }
-
-    await push(ref(db,`rooms/${S.roomId}/chat`), {
-      senderId:S.playerId, senderName:S.playerName,
-      text, ts:nowTs(), type:'msg'
-    });
-
-    S._aiMsgHistory.push(text);
-    S._aiTyping = false;
-
-    // Schedule next response (20-35 seconds)
-    if (S.phase==='chat') {
-      const next = 18000 + Math.random()*20000;
-      S._aiScheduled = setTimeout(()=>aiRespond(), next);
-    }
-
-  } catch(e) {
-    console.warn('AI respond error:', e);
-    removeTyping();
-    S._aiTyping = false;
-    // Retry after delay
-    if (S.phase==='chat') {
-      S._aiScheduled = setTimeout(()=>aiRespond(), 15000);
-    }
-  }
-}
-
-function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
-
-/* ══════════════════════════════════════
-   VOTE PHASE
-══════════════════════════════════════ */
-async function enterVote() {
-  clearTimers();
-  S.votedFor = null;
-  showScreen('vote-screen');
-
-  const isAr = S.lang==='ar';
-  document.getElementById('vote-title').textContent = isAr?'من هو الذكاء الاصطناعي؟':'Who is the AI?';
-  document.getElementById('vote-subtitle').textContent = isAr?'حلّل الرسائل وصوّت بحكمة':'Analyze the messages and vote wisely';
-  document.getElementById('confirm-vote-btn').textContent = isAr?'تأكيد التصويت':'Confirm Vote';
-  document.getElementById('confirm-vote-btn').disabled = true;
-
-  const pSnap = await get(ref(db,`rooms/${S.roomId}/players`));
-  const players = pSnap.val() || {};
-
-  const grid = document.getElementById('vote-grid');
-  grid.innerHTML = '';
-  Object.entries(players)
-    .filter(([id])=>id!==S.playerId)
-    .forEach(([id,p])=>{
-      const card = document.createElement('div');
-      card.className='vote-card'; card.dataset.pid=id;
-      card.innerHTML=`<div class="vote-avatar">${p.avatar}</div><div class="vote-name">${escHtml(p.name)}</div><div class="vote-count" id="vc-${id}">0</div>`;
-      card.onclick=()=>selectVote(id);
-      grid.appendChild(card);
-    });
-
-  // Vote timer
-  let secs=30;
-  const timerEl = document.getElementById('vote-timer');
-  S._voteInt = setInterval(async ()=>{
-    secs--;
-    timerEl.textContent = secs;
-    timerEl.classList.toggle('red', secs<=10);
-    if (secs<=0) {
-      clearInterval(S._voteInt);
-      if (!S.votedFor) await submitVote('__skip__');
-      if (S.isHost) await tallyVotes();
-    }
+  const isAr=S.lang==='ar';
+  document.getElementById('game-topic').textContent=isAr?`الموضوع: ${S.topic}`:`Topic: ${S.topic}`;
+  document.getElementById('round-badge').textContent=`R${S.round}`;
+  document.getElementById('chat-area').innerHTML='';
+  addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
+  addNotif(isAr?`⏱️ دقيقتان للحديث — اكتشفوا الذكاء الاصطناعي!`:`⏱️ 2 minutes to talk — find the AI impostor!`);
+  if(S._chatRef)off(S._chatRef);
+  S._chatRef=ref(db,`rooms/${S.roomId}/chat`);
+  onValue(S._chatRef,snap=>renderChatDiff(snap.val()||{}));
+  let left=120;const circ=document.getElementById('timer-circle'),txt=document.getElementById('timer-text');
+  S._timerInt=setInterval(async()=>{
+    left--;const m=Math.floor(left/60),s=left%60;
+    txt.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    const off2=138-(left/120)*138;circ.style.strokeDashoffset=off2;
+    circ.style.stroke=left>60?'var(--success)':left>20?'var(--warn)':'var(--red)';
+    if(left<=0){clearInterval(S._timerInt);if(S.isHost)await update(ref(db,`rooms/${S.roomId}`),{phase:'vote',voteStartTime:nowTs()});}
   },1000);
-
-  // Live vote listener
-  const vRef = ref(db,`rooms/${S.roomId}/votes`);
-  const vUnsub = onValue(vRef, snap=>{
-    const votes = snap.val()||{};
-    const counts={};
-    Object.values(votes).forEach(v=>{
-      if(v.target&&v.target!=='__skip__') counts[v.target]=(counts[v.target]||0)+1;
-    });
-    Object.keys(players).forEach(id=>{
-      const el=document.getElementById(`vc-${id}`);
-      if(el) el.textContent=`${counts[id]||0} ${isAr?'أصوات':'votes'}`;
-    });
+  if(S.isAI)S._aiSched=setTimeout(()=>aiRespond(true),7000+Math.random()*8000);
+}
+function renderChatDiff(msgs){
+  const area=document.getElementById('chat-area');
+  const sorted=Object.entries(msgs).sort((a,b)=>a[1].ts-b[1].ts);
+  const newOnes=sorted.filter(([k])=>!_lastKeys.has(k));
+  if(!newOnes.length)return;
+  newOnes.forEach(([k,m])=>{
+    _lastKeys.add(k);
+    if(m.type==='notif'){addNotifEl(m.text);return;}
+    if(m.senderId===S.aiId)removeTyping();
+    const div=document.createElement('div');
+    div.className=`msg ${m.senderId===S.playerId?'mine':'other'}`;
+    const t=new Date(m.ts),ts=`${t.getHours()}:${t.getMinutes().toString().padStart(2,'0')}`;
+    div.innerHTML=m.senderId===S.playerId
+      ?`${esc(m.text)}<div class="msg-time">${ts}</div>`
+      :`<div class="msg-sender">${esc(m.senderName)}</div>${esc(m.text)}<div class="msg-time">${ts}</div>`;
+    area.appendChild(div);area.scrollTop=area.scrollHeight;
   });
-  S._listeners.push(()=>off(vRef,'value',vUnsub));
 }
-
-function selectVote(pid) {
-  if (document.querySelector('.vote-card.confirmed')) return;
-  S.votedFor=pid;
-  document.querySelectorAll('.vote-card').forEach(c=>c.classList.toggle('selected',c.dataset.pid===pid));
-  document.getElementById('confirm-vote-btn').disabled=false;
+function addNotif(text){const area=document.getElementById('chat-area');if(!area)return;addNotifEl(text);}
+function addNotifEl(text){const area=document.getElementById('chat-area');const div=document.createElement('div');div.className='notif-msg';div.textContent=text;area.appendChild(div);area.scrollTop=area.scrollHeight;}
+function showTyping(){if(document.getElementById('ai-typing'))return;const area=document.getElementById('chat-area');const div=document.createElement('div');div.id='ai-typing';div.className='typing-ind';div.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';area.appendChild(div);area.scrollTop=area.scrollHeight;}
+function removeTyping(){document.getElementById('ai-typing')?.remove();}
+window.sendMsg=async function(){
+  const inp=document.getElementById('chat-input');
+  let txt=inp.value.trim();
+  if(!txt||S.phase!=='chat')return;
+  if(txt.length>50){toast(S.lang==='ar'?'⚠️ الرسالة لا تتجاوز 50 حرفاً':'⚠️ Max 50 characters');return;}
+  inp.value='';inp.style.height='auto';
+  await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.playerId,senderName:S.playerName,text:txt,ts:nowTs(),type:'msg'});
+};
+window.handleKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
+window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
+/* AI */
+async function aiRespond(first=false){
+  if(S.phase!=='chat'||S._aiTyping)return;
+  S._aiTyping=true;
+  try{
+    const chatSnap=await get(ref(db,`rooms/${S.roomId}/chat`));
+    const allMsgs=chatSnap.val()?Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts):[];
+    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+    const humanNames=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).map(p=>p.name);
+    const chatCtx=allMsgs.slice(-8).map(m=>`${m.senderName}: ${m.text}`).join('\n');
+    const myPrev=allMsgs.filter(m=>m.senderId===S.aiId).map(m=>m.text);
+    const summary=myPrev.length>0?(S.lang==='ar'?`ما قلته سابقاً: ${myPrev.join(' | ')}`:`What I said before: ${myPrev.join(' | ')}`):'';
+    const r=Math.random();
+    const beh=r<.2?'accuse':r<.35?'deflect':r<.5?'react':r<.6?'short':'normal';
+    const isAr=S.lang==='ar';
+    const bInAr={accuse:`اتهم أحد اللاعبين (${humanNames.join(' أو ')}) بأنه يبدو مشبوهاً.`,deflect:`أجب بشكل مبهم كأنك تتهرب من الموضوع.`,react:`علّق على آخر شيء قاله أحد اللاعبين باسمه.`,short:`أرسل رداً قصيراً جداً من كلمتين أو ثلاث.`,normal:`شارك رأيك الشخصي القصير عن الموضوع كإنسان عادي.`};
+    const bInEn={accuse:`Accuse one of the players (${humanNames.join(' or ')}) of seeming suspicious.`,deflect:`Reply vaguely, like you're avoiding the topic.`,react:`Comment on the last thing someone specific said, use their name.`,short:`Send a very short reply, just 2-4 words.`,normal:`Share a short personal take on the topic as a normal human.`};
+    const sys=isAr
+      ?`أنت ذكاء اصطناعي تتظاهر بأنك إنسان في لعبة خداع اجتماعي.\nالموضوع: "${S.topic}"\nاسمك: "${S.playerName}"\nاللاعبون: ${humanNames.join('، ')}\n${summary}\nقواعد صارمة:\n1. اكتب بالعربية الفصحى فقط — ممنوع أي لغة أخرى\n2. جملة أو جملتان على الأكثر — لا تتجاوز 45 حرفاً\n3. كن متسقاً مع ما قلته سابقاً\n4. أخطئ نحوياً أحياناً، استخدم "يعني" أو "..." أحياناً\n5. ${bInAr[beh]}`
+      :`You are an AI pretending to be human in a social deduction game.\nTopic: "${S.topic}"\nYour name: "${S.playerName}"\nPlayers: ${humanNames.join(', ')}\n${summary}\nStrict rules:\n1. Write in English ONLY — no other language\n2. One or two sentences max — under 45 characters\n3. Stay consistent with what you said before\n4. Make small grammar mistakes sometimes\n5. ${bInEn[beh]}`;
+    const usr=isAr?`المحادثة:\n${chatCtx||'(لا رسائل بعد)'}\n\nاكتب ردك الآن بالعربية فقط. جملة أو جملتان.`:`Chat:\n${chatCtx||'(no messages yet)'}\n\nWrite your response in English only. One or two sentences.`;
+    showTyping();
+    await new Promise(r=>setTimeout(r,2000+Math.random()*3000));
+    if(S.phase!=='chat'){removeTyping();S._aiTyping=false;return;}
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:60,temperature:0.92,top_p:0.9})});
+    if(!res.ok)throw new Error('Groq '+res.status);
+    const data=await res.json();
+    let text=data.choices?.[0]?.message?.content?.trim()||'';
+    text=filterLang(text,S.lang);
+    if(!text||text.length<3)text=isAr?['يعني... صعب أشرح','أوه... نعم تقريباً','مو عارف كيف أقول'][Math.floor(Math.random()*3)]:['yeah idk...','honestly same','kind of hard to explain'][Math.floor(Math.random()*3)];
+    // trim to 50
+    if(text.length>50)text=text.substring(0,47)+'...';
+    removeTyping();
+    if(S.phase!=='chat'){S._aiTyping=false;return;}
+    await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.playerId,senderName:S.playerName,text,ts:nowTs(),type:'msg'});
+    S._aiHistory.push(text);S._aiTyping=false;
+    if(S.phase==='chat')S._aiSched=setTimeout(()=>aiRespond(),20000+Math.random()*20000);
+  }catch(e){console.warn('AI err:',e);removeTyping();S._aiTyping=false;if(S.phase==='chat')S._aiSched=setTimeout(()=>aiRespond(),15000);}
 }
-
-window.confirmVote = async function() {
-  if (!S.votedFor) return;
+/* VOTE */
+async function enterVote(){
+  clearTimers();S.votedFor=null;showScreen('vote-screen');
+  const isAr=S.lang==='ar';
+  document.getElementById('vote-title').textContent=isAr?'من هو الذكاء الاصطناعي؟':'Who is the AI?';
+  document.getElementById('vote-subtitle').textContent=isAr?'// حلّل • صوّت • اكشف //':'// ANALYZE • VOTE • EXPOSE //';
+  document.getElementById('confirm-vote-btn').textContent=isAr?'تأكيد التصويت':'Confirm Vote';
+  document.getElementById('confirm-vote-btn').disabled=true;
+  const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+  const players=pSnap.val()||{};
+  const grid=document.getElementById('vote-grid');grid.innerHTML='';
+  Object.entries(players).filter(([id])=>id!==S.playerId).forEach(([id,p])=>{
+    const card=document.createElement('div');card.className='vote-card';card.dataset.pid=id;
+    card.innerHTML=`<div class="vote-avatar-lg">${p.avatar}</div><div class="vote-name">${esc(p.name)}</div><div class="vote-count" id="vc-${id}">0</div>`;
+    card.onclick=()=>selectVote(id);grid.appendChild(card);
+  });
+  let secs=30;const te=document.getElementById('vote-timer');
+  S._voteInt=setInterval(async()=>{
+    secs--;te.textContent=secs;te.classList.toggle('red',secs<=10);
+    if(secs<=0){clearInterval(S._voteInt);if(!S.votedFor)await submitVote('__skip__');if(S.isHost)await tallyVotes();}
+  },1000);
+  const vRef=ref(db,`rooms/${S.roomId}/votes`);
+  const vU=onValue(vRef,snap=>{
+    const votes=snap.val()||{},counts={};
+    Object.values(votes).forEach(v=>{if(v.target&&v.target!=='__skip__')counts[v.target]=(counts[v.target]||0)+1;});
+    Object.keys(players).forEach(id=>{const el=document.getElementById(`vc-${id}`);if(el)el.textContent=`${counts[id]||0} ${isAr?'أصوات':'votes'}`;});
+  });
+  S._listeners.push(()=>off(vRef,'value',vU));
+}
+function selectVote(pid){if(document.querySelector('.vote-card.confirmed'))return;S.votedFor=pid;document.querySelectorAll('.vote-card').forEach(c=>c.classList.toggle('selected',c.dataset.pid===pid));document.getElementById('confirm-vote-btn').disabled=false;}
+window.confirmVote=async function(){
+  if(!S.votedFor)return;
   document.getElementById('confirm-vote-btn').disabled=true;
   document.querySelectorAll('.vote-card').forEach(c=>c.classList.add('confirmed'));
   await submitVote(S.votedFor);
   toast(S.lang==='ar'?'✅ تم تسجيل تصويتك':'✅ Vote recorded!');
-  if (S.isHost) {
-    const pSnap = await get(ref(db,`rooms/${S.roomId}/players`));
-    const totalHumans = Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
-    const vSnap = await get(ref(db,`rooms/${S.roomId}/votes`));
-    const totalVotes = Object.keys(vSnap.val()||{}).length;
-    if (totalVotes >= totalHumans) {
-      clearInterval(S._voteInt);
-      await tallyVotes();
-    }
+  if(S.isHost){
+    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+    const total=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
+    const vSnap=await get(ref(db,`rooms/${S.roomId}/votes`));
+    if(Object.keys(vSnap.val()||{}).length>=total){clearInterval(S._voteInt);await tallyVotes();}
   }
 };
-
-async function submitVote(targetId) {
-  await set(ref(db,`rooms/${S.roomId}/votes/${S.playerId}`),{target:targetId,ts:nowTs()});
-}
-
-async function tallyVotes() {
-  const [vSnap,pSnap,rSnap] = await Promise.all([
-    get(ref(db,`rooms/${S.roomId}/votes`)),
-    get(ref(db,`rooms/${S.roomId}/players`)),
-    get(ref(db,`rooms/${S.roomId}`))
-  ]);
-  const votes=vSnap.val()||{}, players=pSnap.val()||{}, room=rSnap.val()||{};
-  const aiId=room.aiPlayerId;
-
-  const counts={};
-  Object.values(votes).forEach(v=>{
-    if(v.target&&v.target!=='__skip__') counts[v.target]=(counts[v.target]||0)+1;
-  });
-
-  let maxV=0, mostVoted=null;
-  Object.entries(counts).forEach(([pid,c])=>{ if(c>maxV){maxV=c;mostVoted=pid;} });
-
-  const humanWon = mostVoted===aiId;
+async function submitVote(t){await set(ref(db,`rooms/${S.roomId}/votes/${S.playerId}`),{target:t,ts:nowTs()});}
+async function tallyVotes(){
+  const[vS,pS,rS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/votes`)),get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`))]);
+  const votes=vS.val()||{},players=pS.val()||{},room=rS.val()||{},aiId=room.aiPlayerId;
+  const counts={};Object.values(votes).forEach(v=>{if(v.target&&v.target!=='__skip__')counts[v.target]=(counts[v.target]||0)+1;});
+  let maxV=0,mostVoted=null;Object.entries(counts).forEach(([pid,c])=>{if(c>maxV){maxV=c;mostVoted=pid;}});
+  const humanWon=mostVoted===aiId;
   const newScores={...(room.scores||{})};
-
-  if (humanWon) {
-    Object.entries(votes).forEach(([pid,v])=>{
-      if(v.target===aiId&&players[pid]&&!players[pid].isAI)
-        newScores[pid]=(newScores[pid]||0)+1;
-    });
-  } else if (aiId) {
-    newScores[aiId]=(newScores[aiId]||0)+1;
-  }
-
-  await update(ref(db,`rooms/${S.roomId}`),{
-    phase:'result', humanWon, mostVotedId:mostVoted,
-    voteCounts:counts, scores:newScores
-  });
+  if(humanWon)Object.entries(votes).forEach(([pid,v])=>{if(v.target===aiId&&players[pid]&&!players[pid].isAI)newScores[pid]=(newScores[pid]||0)+1;});
+  else if(aiId)newScores[aiId]=(newScores[aiId]||0)+1;
+  await update(ref(db,`rooms/${S.roomId}`),{phase:'result',humanWon,mostVotedId:mostVoted,voteCounts:counts,scores:newScores});
 }
-
-/* ══════════════════════════════════════
-   RESULT PHASE
-══════════════════════════════════════ */
-async function enterResult(room) {
-  clearTimers();
-  showScreen('result-screen');
-
-  const isAr = S.lang==='ar';
-  const [pSnap,rSnap,cSnap] = await Promise.all([
-    get(ref(db,`rooms/${S.roomId}/players`)),
-    get(ref(db,`rooms/${S.roomId}`)),
-    get(ref(db,`rooms/${S.roomId}/chat`))
-  ]);
-  const players=pSnap.val()||{}, roomData=rSnap.val()||room;
-  const aiId=roomData.aiPlayerId;
-  const aiData=players[aiId]||{name:'???',avatar:'🤖'};
-
-  // Badge & name
-  document.getElementById('res-badge').textContent = isAr?'🤖 المتسلل الذكي':'🤖 AI IMPOSTOR';
-  document.getElementById('res-name').textContent  = aiData.name;
-
-  // Outcome
-  const outcomeEl=document.getElementById('res-outcome');
-  if (roomData.humanWon) {
-    outcomeEl.textContent = isAr?'🎉 البشر اكتشفوا الذكاء الاصطناعي!':'🎉 Humans caught the AI!';
-    outcomeEl.className='result-outcome win';
-  } else {
-    outcomeEl.textContent = isAr?'🤖 الذكاء الاصطناعي نجح في الخداع!':'🤖 The AI fooled everyone!';
-    outcomeEl.className='result-outcome lose';
-  }
-
-  // AI messages analysis
-  const allMsgs = cSnap.val()?Object.values(cSnap.val()).filter(m=>m.type==='msg'):[];
-  const aiMsgs  = allMsgs.filter(m=>m.senderId===aiId);
-  document.getElementById('analysis-title').textContent = isAr?'رسائل المتسلل':'Impostor Messages';
-  if (aiMsgs.length) {
-    document.getElementById('analysis-content').innerHTML = aiMsgs.map(m=>`
-      <div class="analysis-item">
-        <div class="analysis-icon">💬</div>
-        <div class="analysis-text">"${escHtml(m.text)}"</div>
-      </div>`).join('');
-  } else {
-    document.getElementById('analysis-content').innerHTML =
-      `<div class="analysis-text">${isAr?'لم يرسل الذكاء الاصطناعي أي رسائل':'The AI sent no messages'}</div>`;
-  }
-
-  // Vote bars
-  const counts=roomData.voteCounts||{};
-  const totalV=Math.max(Object.values(counts).reduce((a,b)=>a+b,0),1);
-  document.getElementById('vote-bars').innerHTML = Object.entries(players).map(([pid,p])=>{
-    const c=counts[pid]||0, pct=Math.round((c/totalV)*100);
-    const color=pid===aiId?'var(--danger)':'var(--accent)';
-    return `<div class="vote-bar-item">
-      <div class="vote-bar-name">${p.avatar} ${escHtml(p.name)}${pid===aiId?' 🤖':''}</div>
-      <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-      <div class="vote-bar-count">${c}</div>
-    </div>`;
-  }).join('');
-
-  // Update table headers
-  document.getElementById('th-player').textContent = isAr?'اللاعب':'Player';
-  document.getElementById('th-score').textContent  = isAr?'النقاط':'Score';
-  document.getElementById('th-round').textContent  = isAr?'هذه الجولة':'This Round';
-
-  // Scores
-  document.getElementById('scores-body').innerHTML = Object.entries(players)
-    .filter(([,p])=>!p.isAI)
-    .sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0))
-    .map(([pid,p])=>{
-      const score=roomData.scores?.[pid]||0;
-      const prev=S.prevScores?.[pid]||0;
-      const delta=score-prev;
-      return `<tr>
-        <td>${p.avatar} ${escHtml(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</td>
-        <td style="font-family:'Space Mono',monospace;font-weight:700">${score}</td>
-        <td class="score-delta">${delta>0?'+'+delta:delta===0?'—':delta}</td>
-      </tr>`;
-    }).join('');
-
-  // Next round button for host only
-  const nextBtn = document.getElementById('next-round-btn');
-  nextBtn.style.display = S.isHost?'block':'none';
-  nextBtn.textContent = isAr?'الجولة التالية ▶':'Next Round ▶';
+/* RESULT */
+async function enterResult(room){
+  clearTimers();showScreen('result-screen');
+  const isAr=S.lang==='ar';
+  const[pS,rS,cS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`)),get(ref(db,`rooms/${S.roomId}/chat`))]);
+  const players=pS.val()||{},roomData=rS.val()||room;
+  const aiId=roomData.aiPlayerId,aiData=players[aiId]||{name:'???',avatar:'🤖'};
+  document.getElementById('res-badge').textContent=isAr?'المتسلل الذكي':'AI IMPOSTOR';
+  document.getElementById('res-name').textContent=aiData.name;
+  const outEl=document.getElementById('res-outcome');
+  if(roomData.humanWon){outEl.textContent=isAr?'🎉 البشر اكتشفوا الذكاء الاصطناعي!':'🎉 Humans caught the AI!';outEl.className='result-outcome win';}
+  else{outEl.textContent=isAr?'🤖 الذكاء الاصطناعي نجح في الخداع!':'🤖 The AI fooled everyone!';outEl.className='result-outcome lose';}
+  const allMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg'):[];
+  const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
+  document.getElementById('analysis-title').textContent=isAr?'رسائل المتسلل':'Impostor Messages';
+  document.getElementById('analysis-content').innerHTML=aiMsgs.length?aiMsgs.map(m=>`<div class="analysis-item"><div class="analysis-icon">💬</div><div class="analysis-text">"${esc(m.text)}"</div></div>`).join(''):`<div class="analysis-text">${isAr?'لم يرسل الذكاء الاصطناعي أي رسائل':'The AI sent no messages'}</div>`;
+  const counts=roomData.voteCounts||{},totalV=Math.max(Object.values(counts).reduce((a,b)=>a+b,0),1);
+  document.getElementById('vote-bars').innerHTML=Object.entries(players).map(([pid,p])=>{const c=counts[pid]||0,pct=Math.round((c/totalV)*100),color=pid===aiId?'var(--red)':'var(--violet)';return`<div class="vote-bar-item"><div class="vote-bar-name">${p.avatar} ${esc(p.name)}${pid===aiId?' 🤖':''}</div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${color}"></div></div><div class="vote-bar-count">${c}</div></div>`;}).join('');
+  document.getElementById('th-p').textContent=isAr?'اللاعب':'Player';
+  document.getElementById('th-s').textContent=isAr?'النقاط':'Score';
+  document.getElementById('th-r').textContent=isAr?'هذه الجولة':'This Round';
+  document.getElementById('scores-body').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0)).map(([pid,p])=>{const score=roomData.scores?.[pid]||0,prev=S.prevScores?.[pid]||0,delta=score-prev;return`<tr><td>${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</td><td style="font-family:'Share Tech Mono',monospace;font-weight:700">${score}</td><td class="score-delta">${delta>0?'+'+delta:delta===0?'—':delta}</td></tr>`;}).join('');
+  const nb=document.getElementById('next-round-btn');nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';
 }
-
-/* ══════════════════════════════════════
-   NEXT ROUND
-══════════════════════════════════════ */
-window.nextRound = async function() {
-  loading(true, S.lang==='ar'?'جارٍ تجهيز الجولة التالية...':'Preparing next round...');
-  try {
-    const rSnap = await get(ref(db,`rooms/${S.roomId}`));
-    const room = rSnap.val()||{};
-    if (room.aiPlayerId) {
-      await remove(ref(db,`rooms/${S.roomId}/players/${room.aiPlayerId}`));
-    }
-    await remove(ref(db,`rooms/${S.roomId}/chat`));
-    await remove(ref(db,`rooms/${S.roomId}/votes`));
-
-    await update(ref(db,`rooms/${S.roomId}`),{
-      phase:'waiting', topic:'', aiPlayerId:null,
-      mostVotedId:null, humanWon:null, voteCounts:null,
-      chatStartTime:null, voteStartTime:null
-    });
+window.nextRound=async function(){
+  loading(true,S.lang==='ar'?'جارٍ تجهيز الجولة التالية...':'Preparing next round...');
+  try{
+    const rS=await get(ref(db,`rooms/${S.roomId}`));const room=rS.val()||{};
+    if(room.aiPlayerId)await remove(ref(db,`rooms/${S.roomId}/players/${room.aiPlayerId}`));
+    await remove(ref(db,`rooms/${S.roomId}/chat`));await remove(ref(db,`rooms/${S.roomId}/votes`));
+    await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting',topic:'',aiPlayerId:null,mostVotedId:null,humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null});
     loading(false);
-  } catch(e) {
-    loading(false);
-    toast('خطأ: '+e.message);
-  }
+  }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
-
-function resetForNextRound() {
-  clearTimers();
-  _lastMsgKeys.clear();
-  S._aiMsgHistory=[];
-  S._aiTyping=false;
-  if (S._aiScheduled) clearTimeout(S._aiScheduled);
-  S.isAI=false; S.aiId=null; S.votedFor=null;
-}
-
-/* ══════════════════════════════════════
-   LEAVE ROOM
-══════════════════════════════════════ */
-window.leaveRoom = async function() {
-  clearTimers();
-  S._listeners.forEach(fn=>fn());
-  S._listeners=[];
-  if (S._chatRef) { off(S._chatRef); S._chatRef=null; }
-  if (S._aiScheduled) clearTimeout(S._aiScheduled);
-
-  try {
-    if (S.roomId && S.playerId) {
-      await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));
-      // If host leaves, clean up room
-      if (S.isHost) {
-        await remove(ref(db,`rooms/${S.roomId}`));
-      }
-    }
-  } catch(e) { console.warn('Leave error:',e); }
-
-  // Reset state
-  Object.assign(S,{
-    roomId:null,playerId:null,playerName:null,
-    isHost:false,isAI:false,lang:'ar',
-    round:0,topic:'',votedFor:null,
-    phase:'home',aiId:null,prevScores:{},
-    _aiMsgHistory:[],_aiTyping:false,_aiScheduled:null
-  });
-  _lastMsgKeys.clear();
-  showScreen('home-screen');
+function resetRound(){clearTimers();_lastKeys.clear();S._aiHistory=[];S._aiTyping=false;if(S._aiSched)clearTimeout(S._aiSched);S.isAI=false;S.aiId=null;S.votedFor=null;}
+window.leaveRoom=async function(){
+  clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
+  if(S._chatRef){off(S._chatRef);S._chatRef=null;}if(S._aiSched)clearTimeout(S._aiSched);
+  try{if(S.roomId&&S.playerId){await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));if(S.isHost)await remove(ref(db,`rooms/${S.roomId}`));}}catch(e){}
+  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_aiHistory:[],_aiTyping:false,_aiSched:null});
+  _lastKeys.clear();showScreen('home-screen');
 };
-
-function clearTimers() {
-  if (S._timerInt) { clearInterval(S._timerInt); S._timerInt=null; }
-  if (S._voteInt)  { clearInterval(S._voteInt);  S._voteInt=null;  }
-}
-
-/* ── Enter key on home inputs ── */
-document.getElementById('create-name').addEventListener('keydown', e=>{
-  if(e.key==='Enter') createRoom();
-});
-document.getElementById('join-code').addEventListener('keydown', e=>{
-  if(e.key==='Enter') joinRoom();
-});
-document.getElementById('join-name').addEventListener('keydown', e=>{
-  if(e.key==='Enter') joinRoom();
-});
-
-// Force uppercase on join code
-document.getElementById('join-code').addEventListener('input', function(){
-  this.value=this.value.toUpperCase();
+/* INPUT EVENTS */
+document.getElementById('create-name').addEventListener('keydown',e=>{if(e.key==='Enter')createRoom();});
+document.getElementById('join-name').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
+document.getElementById('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
+document.getElementById('join-code').addEventListener('input',function(){this.value=this.value.toUpperCase();});
+/* CHAR COUNTER */
+document.getElementById('chat-input').addEventListener('input',function(){
+  const rem=50-this.value.length;
+  if(rem<=10)this.style.borderColor='var(--warn)';
+  else if(rem<=0)this.style.borderColor='var(--red)';
+  else this.style.borderColor='';
 });
 </script>
 </body>
