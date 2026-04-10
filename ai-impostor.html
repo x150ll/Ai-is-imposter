@@ -371,6 +371,62 @@ function sndTimer(){playTone(880,'square',0.05,0.03);}
 function sndYourTurn(){playTone(528,'sine',0.15,0.08);setTimeout(()=>playTone(660,'sine',0.15,0.08),120);}
 document.addEventListener('click',()=>{try{getAC().resume();}catch(e){}},{once:true});
 function attachSounds(){document.querySelectorAll('.btn,.tab,.back-link').forEach(b=>{if(!b.dataset.snd){b.dataset.snd='1';b.addEventListener('click',sndClick);b.addEventListener('mouseenter',sndHover);}});}
+
+/* ── GAME AMBIENT LAYERS ── */
+let _gameAmbNode=null,_gameAmbGain=null;
+function startGameAmbient(mode='chat'){
+  stopGameAmbient();
+  try{
+    const a=getAC();
+    const mix=a.createGain();mix.gain.value=0;mix.connect(a.destination);
+    if(mode==='chat'){
+      // Low drone, heartbeat-like pulse — quiet tension
+      const o1=a.createOscillator(),o2=a.createOscillator();
+      const g1=a.createGain(),g2=a.createGain();
+      o1.type='sine';o1.frequency.value=48;g1.gain.value=0.08;
+      o2.type='sine';o2.frequency.value=51;g2.gain.value=0.05;
+      o1.connect(g1);o2.connect(g2);g1.connect(mix);g2.connect(mix);
+      // Slow pulse LFO
+      const lfo=a.createOscillator(),lg=a.createGain();
+      lfo.frequency.value=0.15;lg.gain.value=0.5;
+      lfo.connect(lg);lg.connect(mix.gain);
+      o1.start();o2.start();lfo.start();
+      mix.gain.setTargetAtTime(1,a.currentTime,2);
+      _gameAmbNode={_all:[o1,o2,lfo],stop(){this._all.forEach(n=>{try{n.stop();}catch(e){}});}};
+    } else if(mode==='review'){
+      // Slightly louder, slower pulse — suspense
+      const o=a.createOscillator(),g=a.createGain();
+      o.type='sawtooth';o.frequency.value=44;g.gain.value=0.07;
+      o.connect(g);g.connect(mix);
+      const lfo=a.createOscillator(),lg=a.createGain();
+      lfo.frequency.value=0.25;lg.gain.value=0.6;
+      lfo.connect(lg);lg.connect(mix.gain);
+      o.start();lfo.start();
+      mix.gain.setTargetAtTime(1,a.currentTime,1);
+      _gameAmbNode={_all:[o,lfo],stop(){this._all.forEach(n=>{try{n.stop();}catch(e){}});}};
+    } else if(mode==='vote'){
+      // High tension: dissonant tritone + fast pulse
+      const o1=a.createOscillator(),o2=a.createOscillator(),o3=a.createOscillator();
+      const g1=a.createGain(),g2=a.createGain(),g3=a.createGain();
+      o1.type='sawtooth';o1.frequency.value=110;g1.gain.value=0.06;
+      o2.type='sawtooth';o2.frequency.value=155;g2.gain.value=0.05;// tritone
+      o3.type='square';o3.frequency.value=82;g3.gain.value=0.04;
+      [o1,o2,o3].forEach((o,i)=>{[g1,g2,g3][i].connect(mix);o.connect([g1,g2,g3][i]);o.start();});
+      const lfo=a.createOscillator(),lg=a.createGain();
+      lfo.frequency.value=2.5;lg.gain.value=0.7;// fast tremolo
+      lfo.connect(lg);lg.connect(mix.gain);lfo.start();
+      mix.gain.setTargetAtTime(1,a.currentTime,.5);
+      _gameAmbNode={_all:[o1,o2,o3,lfo],stop(){this._all.forEach(n=>{try{n.stop();}catch(e){}});}};
+    }
+    _gameAmbGain=mix;
+  }catch(e){}
+}
+function stopGameAmbient(){
+  try{
+    if(_gameAmbGain){_gameAmbGain.gain.setTargetAtTime(0,getAC().currentTime,.4);}
+    setTimeout(()=>{try{_gameAmbNode?.stop();}catch(e){}; _gameAmbNode=null;_gameAmbGain=null;},500);
+  }catch(e){}
+}
 /* GROQ SETUP */
 window.saveGroqKey=async function(){
   const inp=document.getElementById('groq-input');
@@ -464,10 +520,11 @@ function enterWaiting(){
     if(!snap.exists()){leaveRoom();return;}
     const room=snap.val();
     if(room.phase==='chat'&&S.phase!=='chat'){S.phase='chat';enterGame(room);}
+    if(room.phase==='review'&&S.phase!=='review'){S.phase='review';enterReview(room);}
     if(room.phase==='vote'&&S.phase!=='vote'){S.phase='vote';enterVote();}
     if(room.phase==='result'&&S.phase!=='result'){S.phase='result';enterResult(room);}
     if(room.phase==='rename'&&S.phase!=='rename'){S.phase='rename';enterRename();}
-    if(room.phase==='waiting'&&(S.phase==='result'||S.phase==='chat'||S.phase==='vote'||S.phase==='rename')){resetRound();S.phase='waiting';enterWaiting();}
+    if(room.phase==='waiting'&&(S.phase==='result'||S.phase==='chat'||S.phase==='vote'||S.phase==='rename'||S.phase==='review')){resetRound();S.phase='waiting';enterWaiting();}
   });
   S._listeners.push(()=>off(rRef,'value',rU));
 }
@@ -516,6 +573,8 @@ async function enterGame(room){
   document.getElementById('chat-area').innerHTML='';
   addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
   addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 15 ثانية لكل دور`:`🔄 Each player sends in their turn — 15 seconds each`);
+  // Start chat ambient
+  startGameAmbient('chat');
   // Chat listener
   if(S._chatRef)off(S._chatRef);
   S._chatRef=ref(db,`rooms/${S.roomId}/chat`);
@@ -528,7 +587,13 @@ async function enterGame(room){
     const off2=138-(left/180)*138;circ.style.strokeDashoffset=off2;
     circ.style.stroke=left>60?'var(--success)':left>20?'var(--warn)':'var(--red)';
     if(left<=10&&left>0)sndTimer();
-    if(left<=0){clearInterval(S._timerInt);if(S.isHost)await update(ref(db,`rooms/${S.roomId}`),{phase:'vote',voteStartTime:nowTs()});}
+    if(left<=0){
+      clearInterval(S._timerInt);
+      if(S.isHost){
+        // Push to 'review' phase — 30s for players to review chat before voting
+        await update(ref(db,`rooms/${S.roomId}`),{phase:'review',reviewStartTime:nowTs()});
+      }
+    }
   },1000);
   // Turn listener
   const turnRef=ref(db,`rooms/${S.roomId}`);
@@ -710,14 +775,13 @@ async function aiTakeTurn(room){
 المشاركون الآخرون: ${humanPlayers.join('، ')}
 ${summary}
 
-طريقة كتابتك يجب أن تكون:
-- فصحى بسيطة وليست مثالية — مقبولة الشكل لكن فيها أخطاء بسيطة أحياناً
-- أحياناً تكتب كلمة خاطئة أو تنسى حرفاً مثل "اتذكر" بدل "أتذكر"
-- أسلوبك مباشر وغير مرتب أحياناً — مثل شخص يكتب بسرعة
-- أحياناً تستخدم "يعني" أو "أعتقد" أو "..." في منتصف الكلام
-- لا تبدو رسمياً أو ذكياً جداً — كن عادياً
-- لا تكرر نفس الجملة التي قلتها قبل كذا
-- الجملة لا تتجاوز 45 حرفاً
+أسلوب كتابتك:
+- تحاول الكتابة بالفصحى لكنك لست متقناً — أحياناً يفلت منك كلمة عامية مثل "ما" بدل "لا"، أو "وين" بدل "أين"، أو "شلون" بدل "كيف"، أو "بس" بدل "لكن"
+- تبدأ الجملة بالفصحى ثم تنهيها بعامية أو العكس
+- أحياناً جملتك ناقصة أو غير مكتملة كأنك تكتب بسرعة
+- استخدم "يعني" أو "أعتقد" أو "أنا..." أو "..." أحياناً
+- لا تبدو ذكياً أو متفلسفاً — كن عادياً وعفوياً
+- جملة واحدة فقط، لا تتجاوز 45 حرفاً
 - ${bInAr[beh]}
 - لا تذكر أنك ذكاء اصطناعي أبداً`
       :`You are a person named "${aiName}" chatting in an online group discussion.
@@ -725,14 +789,13 @@ Topic: "${S.topic}"
 Other participants: ${humanPlayers.join(', ')}
 ${summary}
 
-Your writing style must be:
+Your writing style:
 - Casual and imperfect — like someone typing quickly on their phone
-- Make occasional typos or grammar mistakes naturally (e.g. "dont" instead of "don't")
-- Use "like", "idk", "..." or trail off sometimes mid-thought
-- Sound slightly unsure or distracted occasionally
-- Don't be eloquent or well-structured — be human and messy
-- Don't repeat what you said before exactly
-- Max 45 characters
+- Make occasional typos or grammar mistakes (missing apostrophes, wrong word order)
+- Use "like", "idk", "..." or trail off sometimes
+- Sound slightly unsure or distracted
+- Not eloquent — be human and slightly messy
+- One sentence only, under 45 characters
 - ${bInEn[beh]}
 - Never mention you are an AI`;
     const usr=isAr
@@ -780,9 +843,38 @@ Your writing style must be:
   }catch(e){console.warn('AI err:',e);removeTyping();S._aiTyping=false;}
 }
 
+/* ══════════ REVIEW PHASE — 30s to read chat before voting ══════════ */
+function enterReview(room){
+  clearTimers();
+  // Keep chat visible, lock input, show review banner
+  showScreen('game-screen');
+  startGameAmbient('review');
+  const isAr=S.lang==='ar';
+  const inp=document.getElementById('chat-input');
+  const sBtn=document.getElementById('send-btn');
+  if(inp){inp.disabled=true;inp.placeholder=isAr?'⏱️ راجع الرسائل — التصويت بعد 30 ثانية':'⏱️ Review messages — voting in 30s';}
+  if(sBtn)sBtn.disabled=true;
+  document.getElementById('game-topic').textContent=isAr?'⏱️ راجع المحادثة قبل التصويت':'⏱️ Review chat before voting';
+  // Countdown 30s on timer ring
+  let left=30;
+  const circ=document.getElementById('timer-circle'),txt=document.getElementById('timer-text');
+  circ.style.stroke='var(--warn)';
+  S._timerInt=setInterval(async()=>{
+    left--;
+    txt.textContent=`0:${left.toString().padStart(2,'0')}`;
+    const off2=138-(left/30)*138;circ.style.strokeDashoffset=off2;
+    if(left<=10)circ.style.stroke='var(--red)';
+    if(left<=0){
+      clearInterval(S._timerInt);
+      if(S.isHost)await update(ref(db,`rooms/${S.roomId}`),{phase:'vote',voteStartTime:nowTs()});
+    }
+  },1000);
+}
+
 /* ══════════ VOTE ══════════ */
 async function enterVote(){
   clearTimers();S.votedFor=null;showScreen('vote-screen');
+  startGameAmbient('vote');
   const isAr=S.lang==='ar';
   document.getElementById('vote-title').textContent=isAr?'من هو الذكاء الاصطناعي؟':'Who is the AI?';
   document.getElementById('vote-subtitle').textContent=isAr?'// حلّل • صوّت • اكشف //':'// ANALYZE • VOTE • EXPOSE //';
@@ -840,7 +932,7 @@ async function tallyVotes(){
 
 /* ══════════ RESULT ══════════ */
 async function enterResult(room){
-  clearTimers();showScreen('result-screen');sndReveal();
+  clearTimers();showScreen('result-screen');sndReveal();stopGameAmbient();
   const isAr=S.lang==='ar';
   const[pS,rS,cS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`)),get(ref(db,`rooms/${S.roomId}/chat`))]);
   const players=pS.val()||{},roomData=rS.val()||room;

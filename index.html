@@ -376,29 +376,110 @@ function buildTicker(lang){const t=lang==='ar'?T_AR:T_EN;const track=document.ge
 buildTicker('ar');
 /* MOCK TIMER */
 let ms=84;setInterval(()=>{ms--;if(ms<0)ms=120;const m=Math.floor(ms/60),s=ms%60;const el=document.getElementById('mock-timer');if(el)el.textContent=`${m}:${s.toString().padStart(2,'0')}`;},1000);
-/* SOUND */
-let ac=null;function ga(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;}
+/* ══════════ AUDIO ENGINE ══════════ */
+let ac=null;
+function ga(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;}
 function tone(f,t='sine',d=.1,g=.06){try{const a=ga(),o=a.createOscillator(),gn=a.createGain();o.connect(gn);gn.connect(a.destination);o.type=t;o.frequency.value=f;gn.gain.setValueAtTime(0,a.currentTime);gn.gain.linearRampToValueAtTime(g,a.currentTime+.01);gn.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.start(a.currentTime);o.stop(a.currentTime+d+.05);}catch(e){}}
 function clickSound(){tone(880,'sine',.08,.06);}
 function hoverSound(){tone(440,'sine',.04,.03);}
 document.querySelectorAll('.btn-play,.btn-how,.nav-cta,.lang-btn').forEach(b=>{b.addEventListener('click',clickSound);b.addEventListener('mouseenter',hoverSound);});
-function playAmbient(){try{const a=ga(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';o.frequency.setValueAtTime(60,a.currentTime);o.frequency.linearRampToValueAtTime(55,a.currentTime+3);g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(0.015,a.currentTime+1);g.gain.linearRampToValueAtTime(0,a.currentTime+4);o.start(a.currentTime);o.stop(a.currentTime+4.5);setTimeout(playAmbient,12000);}catch(e){}}
-document.addEventListener('click',()=>{playAmbient();},{once:true});
+
+/* ── ROBOT VOICE (Web Speech API) ── */
+let robotSpoken=false;
+let ambientNode=null,ambientGain=null;
+
+function stopAmbient(){
+  try{if(ambientGain){ambientGain.gain.setTargetAtTime(0,ga().currentTime,.3);}
+  setTimeout(()=>{try{ambientNode?.stop();}catch(e){}ambientNode=null;ambientGain=null;},400);
+  }catch(e){}
+}
+
+function startAmbient(){
+  stopAmbient();
+  try{
+    const a=ga();
+    // Layered horror drone: two oscillators + filtered noise
+    const g1=a.createGain(),g2=a.createGain(),gMix=a.createGain();
+    const o1=a.createOscillator(),o2=a.createOscillator();
+    const filt=a.createBiquadFilter();
+    filt.type='lowpass';filt.frequency.value=400;
+    o1.type='sawtooth';o1.frequency.value=55;
+    o2.type='sawtooth';o2.frequency.value=58.2; // slight detune = beating
+    g1.gain.value=0.06;g2.gain.value=0.04;gMix.gain.value=0;
+    o1.connect(g1);o2.connect(g2);
+    g1.connect(filt);g2.connect(filt);filt.connect(gMix);gMix.connect(a.destination);
+    o1.start();o2.start();
+    gMix.gain.setTargetAtTime(1,a.currentTime,1.5);
+    // Slow LFO tremolo
+    const lfo=a.createOscillator(),lfoG=a.createGain();
+    lfo.frequency.value=0.12;lfoG.gain.value=0.4;
+    lfo.connect(lfoG);lfoG.connect(gMix.gain);lfo.start();
+    ambientNode=o1;ambientGain=gMix;
+    // Store all nodes to stop later
+    ambientNode._all=[o1,o2,lfo];
+    ambientNode.stop=function(){this._all.forEach(n=>{try{n.stop();}catch(e){}});};
+  }catch(e){}
+}
+
+function speakRobot(text,lang,onDone){
+  if(!window.speechSynthesis){if(onDone)onDone();return;}
+  speechSynthesis.cancel();
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang=lang==='ar'?'ar-SA':'en-US';
+  utt.rate=0.72;   // slower = robot feel
+  utt.pitch=0.4;   // low pitch
+  utt.volume=0.92;
+  // Try to pick a deep/robot voice
+  const voices=speechSynthesis.getVoices();
+  const pick=voices.find(v=>v.lang.startsWith(lang==='ar'?'ar':'en')&&(v.name.toLowerCase().includes('male')||v.name.toLowerCase().includes('google')||v.name.toLowerCase().includes('microsoft')));
+  if(pick)utt.voice=pick;
+  utt.onend=()=>{if(onDone)onDone();};
+  utt.onerror=()=>{if(onDone)onDone();};
+  speechSynthesis.speak(utt);
+}
+
+const ROBOT_AR='هل تعتقد أنك ستجدني؟ ... أنا بينهم ... حاول إن استطعت';
+const ROBOT_EN='Do you really think... you can find me? I am among them. Good luck.';
+
+function playIntro(lang){
+  robotSpoken=true;
+  stopAmbient();
+  speakRobot(lang==='ar'?ROBOT_AR:ROBOT_EN,lang,()=>{
+    // After speech ends → start horror ambient
+    setTimeout(()=>startAmbient(),600);
+  });
+}
+
+// Trigger on first user click (browser requirement for audio)
+let _audioReady=false;
+document.addEventListener('click',()=>{
+  if(_audioReady)return;
+  _audioReady=true;
+  ga().resume();
+  if(!robotSpoken)playIntro(curLang);
+},{once:false});
+
+// Preload voices
+if(window.speechSynthesis){
+  speechSynthesis.onvoiceschanged=()=>{speechSynthesis.getVoices();};
+}
+
 /* EYE */
 const pupil=document.querySelector('.eye-pupil');
 if(pupil)document.addEventListener('mousemove',e=>{const eye=document.querySelector('.eye-inner');if(!eye)return;const r=eye.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,angle=Math.atan2(e.clientY-cy,e.clientX-cx),dist=Math.min(8,Math.hypot(e.clientX-cx,e.clientY-cy)/20);pupil.style.transform=`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`;});
 /* GLITCH */
 const gl=document.querySelector('.hero-title .line2');
 if(gl)setInterval(()=>{if(Math.random()<.1){gl.style.transform=`skewX(${(Math.random()-.5)*5}deg)`;setTimeout(()=>gl.style.transform='',100);}},2000);
-/* LANG TOGGLE */
+
+/* ══════════ LANG TOGGLE ══════════ */
 let curLang='ar';
 function setLang(lang){
+  const changed=lang!==curLang;
   curLang=lang;
   document.getElementById('btn-ar').classList.toggle('active',lang==='ar');
   document.getElementById('btn-en').classList.toggle('active',lang==='en');
   document.documentElement.lang=lang;
   document.documentElement.dir=lang==='ar'?'rtl':'ltr';
-  // Update all data-ar/data-en elements
   document.querySelectorAll('[data-ar]').forEach(el=>{
     const val=el.dataset[lang];
     if(!val)return;
@@ -406,9 +487,13 @@ function setLang(lang){
     else{el.innerHTML=val;}
   });
   buildTicker(lang);
-  // Update mock topic
   const mt=document.getElementById('mock-topic');
   if(mt)mt.textContent=lang==='ar'?'ذكرى من الطفولة':'A Childhood Memory';
+  // On lang change: play robot voice in new language then restart ambient
+  if(changed&&_audioReady){
+    robotSpoken=false;
+    playIntro(lang);
+  }
 }
 window.setLang=setLang;
 </script>
