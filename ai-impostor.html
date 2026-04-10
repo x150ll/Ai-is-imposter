@@ -147,10 +147,30 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 22px;font-size:14px;z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:toastIn .3s ease;pointer-events:none;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+/* TURN INDICATOR */
+.turn-bar{padding:8px 18px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-family:'Share Tech Mono',monospace;}
+.turn-name{color:var(--cyan);font-weight:700;letter-spacing:1px;}
+.turn-you{color:var(--red);animation:turnPulse 1s ease-in-out infinite;}
+@keyframes turnPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.turn-wait{color:var(--text3);}
+.turn-countdown{color:var(--warn);font-size:11px;}
+.turn-order{display:flex;gap:6px;align-items:center;overflow:hidden;}
+.turn-pip{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .3s;}
+.turn-pip.active{border-color:var(--cyan);background:rgba(0,229,255,.12);transform:scale(1.15);}
+.turn-pip.done{opacity:.35;}
 @media(max-width:600px){.card{padding:22px 16px;}.msg{max-width:88%;}.vote-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}}
+/* CURSOR */
+body{cursor:none;}
+.cursor{position:fixed;width:12px;height:12px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,background .2s;mix-blend-mode:screen;}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,32,32,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;}
+/* CANVAS */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 </style>
 </head>
 <body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="bg-canvas"></canvas>
 <div id="loading-overlay"><div class="spinner"></div><div class="loading-text" id="loading-text">جارٍ التحميل...</div></div>
 
 <!-- GROQ SETUP -->
@@ -254,6 +274,13 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
         </div>
       </div>
     </div>
+    <div class="turn-bar" id="turn-bar">
+      <div>
+        <div class="turn-name" id="turn-name">...</div>
+        <div class="turn-countdown" id="turn-countdown"></div>
+      </div>
+      <div class="turn-order" id="turn-order"></div>
+    </div>
     <div class="chat-area" id="chat-area"></div>
     <div class="chat-input-area">
       <textarea class="chat-input" id="chat-input" placeholder="اكتب رسالتك..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" dir="auto" maxlength="50"></textarea>
@@ -299,17 +326,18 @@ const T_EN=["The strangest dream you ever had","Your most embarrassing moment","
 const AVATARS=['🦊','🐺','🦁','🐯','🦄','🐲','🦅','🦋','🐙','🦈','🐸','🦩','🐻','🦌','🐬','🦝'];
 const AI_AR=['سامي','نورا','ريم','فهد','لمى','عمر','هند','طارق','منى','خالد'];
 const AI_EN=['Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake'];
-const S={roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_listeners:[],_chatRef:null,_timerInt:null,_voteInt:null,_aiHistory:[],_aiTyping:false,_aiSched:null};
+const S={roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null};
 const genCode=()=>Math.random().toString(36).substring(2,7).toUpperCase();
 const genId=()=>Math.random().toString(36).substring(2,12);
 const nowTs=()=>Date.now();
 const rnd=arr=>arr[Math.floor(Math.random()*arr.length)];
+const TURN_SECS=25; // seconds per turn
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function loading(show,txt=''){const el=document.getElementById('loading-overlay');el.classList.toggle('show',show);if(txt)document.getElementById('loading-text').textContent=txt;}
 function toast(msg,dur=3000){document.querySelectorAll('.toast').forEach(t=>t.remove());const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),dur);}
 function filterLang(text,lang){if(!text)return'';if(lang==='ar'){return text.replace(/[^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\d،؟!.\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}return text.replace(/[^\u0000-\u024F\s\d!?.,'"\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
-function clearTimers(){if(S._timerInt){clearInterval(S._timerInt);S._timerInt=null;}if(S._voteInt){clearInterval(S._voteInt);S._voteInt=null;}}
+function clearTimers(){if(S._timerInt){clearInterval(S._timerInt);S._timerInt=null;}if(S._voteInt){clearInterval(S._voteInt);S._voteInt=null;}if(S._turnInt){clearInterval(S._turnInt);S._turnInt=null;}}
 /* SOUNDS */
 let _ac=null;
 function getAC(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();return _ac;}
@@ -320,6 +348,7 @@ function sndSuccess(){playTone(660,'sine',0.06,0.05);setTimeout(()=>playTone(880
 function sndVote(){playTone(330,'sawtooth',0.1,0.04);}
 function sndReveal(){playTone(220,'sawtooth',0.15,0.05);setTimeout(()=>playTone(440,'sine',0.2,0.06),150);setTimeout(()=>playTone(660,'sine',0.3,0.06),300);}
 function sndTimer(){playTone(880,'square',0.05,0.03);}
+function sndYourTurn(){playTone(528,'sine',0.15,0.08);setTimeout(()=>playTone(660,'sine',0.15,0.08),120);}
 document.addEventListener('click',()=>{try{getAC().resume();}catch(e){}},{once:true});
 function attachSounds(){document.querySelectorAll('.btn,.tab,.back-link').forEach(b=>{if(!b.dataset.snd){b.dataset.snd='1';b.addEventListener('click',sndClick);b.addEventListener('mouseenter',sndHover);}});}
 /* GROQ SETUP */
@@ -331,47 +360,25 @@ window.saveGroqKey=async function(){
   errEl.style.display='none';
   if(!key.startsWith('gsk_')||key.length<20){
     errEl.textContent='⚠️ المفتاح يجب أن يبدأ بـ gsk_ ويكون بالشكل الصحيح';
-    errEl.style.display='block';
-    return;
+    errEl.style.display='block';return;
   }
-  btn.disabled=true;
-  btn.textContent='جارٍ التحقق...';
+  btn.disabled=true;btn.textContent='جارٍ التحقق...';
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
-      body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        messages:[{role:'user',content:'hi'}],
-        max_tokens:1
-      })
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:'hi'}],max_tokens:1})
     });
-    if(!r.ok){
-      const d=await r.json().catch(()=>({}));
-      const msg=d?.error?.message||'';
-      if(r.status===401)throw new Error('auth');
-      if(r.status===429)throw new Error('quota');
-      throw new Error('unknown');
-    }
-    localStorage.setItem('__ai_imp_gk',key);
-    GROQ=key;
-    sndSuccess();
-    btn.textContent='✅ تم التحقق!';
-    toast('✅ تم حفظ المفتاح بنجاح!');
+    if(!r.ok){if(r.status===401)throw new Error('auth');if(r.status===429)throw new Error('quota');throw new Error('unknown');}
+    localStorage.setItem('__ai_imp_gk',key);GROQ=key;sndSuccess();
+    btn.textContent='✅ تم التحقق!';toast('✅ تم حفظ المفتاح بنجاح!');
     setTimeout(()=>showScreen('home-screen'),800);
   }catch(e){
-    const msgs={
-      auth:'❌ المفتاح غير صحيح — تأكد من نسخه كاملاً',
-      quota:'⚠️ تجاوزت الحد المجاني لـ Groq — جرب لاحقاً',
-      unknown:'❌ تعذر التحقق — تأكد من الاتصال بالإنترنت'
-    };
-    errEl.textContent=msgs[e.message]||msgs.unknown;
-    errEl.style.display='block';
-    btn.disabled=false;
-    btn.textContent='حفظ المفتاح والمتابعة ▶';
+    const msgs={auth:'❌ المفتاح غير صحيح — تأكد من نسخه كاملاً',quota:'⚠️ تجاوزت الحد المجاني لـ Groq — جرب لاحقاً',unknown:'❌ تعذر التحقق — تأكد من الاتصال بالإنترنت'};
+    errEl.textContent=msgs[e.message]||msgs.unknown;errEl.style.display='block';
+    btn.disabled=false;btn.textContent='حفظ المفتاح والمتابعة ▶';
   }
 };
-// Check on load: show setup if no key, else show home
 (function init(){
   const saved=localStorage.getItem('__ai_imp_gk');
   if(saved&&saved.startsWith('gsk_')&&saved.length>20){GROQ=saved;showScreen('home-screen');}
@@ -380,7 +387,8 @@ window.saveGroqKey=async function(){
 })();
 window.switchTab=function(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-btn-'+tab).classList.add('active');document.getElementById('tab-create').style.display=tab==='create'?'block':'none';document.getElementById('tab-join').style.display=tab==='join'?'block':'none';};
 window.copyCode=function(){navigator.clipboard?.writeText(S.roomId).then(()=>toast(S.lang==='ar'?'✅ تم نسخ الكود':'✅ Code copied'));};
-/* CREATE */
+
+/* ══════════ CREATE / JOIN ══════════ */
 window.createRoom=async function(){
   const name=document.getElementById('create-name').value.trim();
   const lang=document.getElementById('create-lang').value;
@@ -394,7 +402,6 @@ window.createRoom=async function(){
     loading(false);enterWaiting();
   }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
-/* JOIN */
 window.joinRoom=async function(){
   const name=document.getElementById('join-name').value.trim();
   const code=document.getElementById('join-code').value.trim().toUpperCase();
@@ -415,7 +422,8 @@ window.joinRoom=async function(){
     loading(false);enterWaiting();
   }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
-/* WAITING */
+
+/* ══════════ WAITING ══════════ */
 function enterWaiting(){
   S.phase='waiting';showScreen('waiting-screen');
   const isAr=S.lang==='ar';
@@ -446,7 +454,8 @@ function renderWaitingPlayers(players){
   const isAr=S.lang==='ar';
   document.getElementById('players-grid').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).map(([id,p])=>`<div class="player-card${id===S.playerId?' me':''}"><div class="player-avatar">${p.avatar}</div><div class="player-name">${esc(p.name)}</div><div class="player-tag">${id===S.playerId?(isAr?'أنت':'YOU'):''}</div></div>`).join('');
 }
-/* HOST START */
+
+/* ══════════ HOST START ══════════ */
 window.hostStart=async function(){
   document.getElementById('start-btn').disabled=true;
   loading(true,S.lang==='ar'?'جارٍ تجهيز اللعبة...':'Preparing game...');
@@ -459,27 +468,38 @@ window.hostStart=async function(){
     await set(ref(db,`rooms/${S.roomId}/players/${aiId}`),{name:aiName,avatar:aiAvatar,isAI:true,score:0,online:true});
     const rSnap=await get(ref(db,`rooms/${S.roomId}`));
     const curRound=(rSnap.val()?.round||0)+1;
-    await update(ref(db,`rooms/${S.roomId}`),{phase:'chat',topic,round:curRound,aiPlayerId:aiId,chatStartTime:nowTs(),scores,humanWon:null,mostVotedId:null,voteCounts:null});
+    // Build shuffled turn order
+    const allIds=[...Object.keys(players),aiId].sort(()=>Math.random()-.5);
+    await update(ref(db,`rooms/${S.roomId}`),{
+      phase:'chat',topic,round:curRound,aiPlayerId:aiId,
+      chatStartTime:nowTs(),scores,humanWon:null,mostVotedId:null,voteCounts:null,
+      turnOrder:allIds,currentTurnIdx:0,turnStartTime:nowTs(),
+      aiMemory:'',sentCount:0
+    });
     loading(false);
   }catch(e){loading(false);document.getElementById('start-btn').disabled=false;toast('خطأ: '+e.message);}
 };
-/* GAME */
+
+/* ══════════ ENTER GAME ══════════ */
 let _lastKeys=new Set();
 async function enterGame(room){
-  clearTimers();_lastKeys.clear();S._aiHistory=[];S._aiTyping=false;
+  clearTimers();_lastKeys.clear();S._aiTyping=false;
   if(S._aiSched)clearTimeout(S._aiSched);
   S.aiId=room.aiPlayerId;S.isAI=S.playerId===S.aiId;
   S.topic=room.topic;S.round=room.round;S.prevScores={...(room.scores||{})};
+  S.turnOrder=room.turnOrder||[];
   showScreen('game-screen');
   const isAr=S.lang==='ar';
   document.getElementById('game-topic').textContent=isAr?`الموضوع: ${S.topic}`:`Topic: ${S.topic}`;
   document.getElementById('round-badge').textContent=`R${S.round}`;
   document.getElementById('chat-area').innerHTML='';
   addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
-  addNotif(isAr?`⏱️ دقيقتان للحديث — اكتشفوا الذكاء الاصطناعي!`:`⏱️ 2 minutes to talk — find the AI impostor!`);
+  addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 25 ثانية لكل دور`:`🔄 Each player sends their message in turn — 25 seconds each`);
+  // Chat listener
   if(S._chatRef)off(S._chatRef);
   S._chatRef=ref(db,`rooms/${S.roomId}/chat`);
   onValue(S._chatRef,snap=>renderChatDiff(snap.val()||{}));
+  // Game timer (2 min total)
   let left=120;const circ=document.getElementById('timer-circle'),txt=document.getElementById('timer-text');
   S._timerInt=setInterval(async()=>{
     left--;const m=Math.floor(left/60),s=left%60;
@@ -489,8 +509,93 @@ async function enterGame(room){
     if(left<=10&&left>0)sndTimer();
     if(left<=0){clearInterval(S._timerInt);if(S.isHost)await update(ref(db,`rooms/${S.roomId}`),{phase:'vote',voteStartTime:nowTs()});}
   },1000);
-  if(S.isAI)S._aiSched=setTimeout(()=>aiRespond(true),7000+Math.random()*8000);
+  // Turn listener
+  const turnRef=ref(db,`rooms/${S.roomId}`);
+  const turnU=onValue(turnRef,async snap=>{
+    if(!snap.exists())return;
+    const r=snap.val();
+    if(r.phase!=='chat')return;
+    const order=r.turnOrder||[];
+    const idx=r.currentTurnIdx||0;
+    const currentId=order[idx%order.length];
+    S.currentTurn=currentId;
+    renderTurnBar(r,order,idx,currentId);
+    // If it's AI's turn and I'm the AI player (host manages AI)
+    if(currentId===S.aiId&&S.isHost&&!S._aiTyping){
+      if(S._aiSched)clearTimeout(S._aiSched);
+      S._aiSched=setTimeout(()=>aiTakeTurn(r),1500+Math.random()*2000);
+    }
+  });
+  S._listeners.push(()=>off(turnRef,'value',turnU));
 }
+
+/* ══════════ TURN BAR ══════════ */
+async function renderTurnBar(room,order,idx,currentId){
+  const isAr=S.lang==='ar';
+  const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+  const players=pSnap.val()||{};
+  const currentPlayer=players[currentId];
+  const isMyTurn=currentId===S.playerId;
+  const nameEl=document.getElementById('turn-name');
+  const cdEl=document.getElementById('turn-countdown');
+  const orderEl=document.getElementById('turn-order');
+  if(isMyTurn){
+    nameEl.textContent=isAr?'⚡ دورك الآن!':'⚡ Your Turn!';
+    nameEl.className='turn-name turn-you';
+    document.getElementById('chat-input').disabled=false;
+    document.getElementById('send-btn').disabled=false;
+    document.getElementById('chat-input').placeholder=isAr?'اكتب رسالتك (50 حرفاً كحد أقصى)...':'Write your message (max 50 chars)...';
+    sndYourTurn();
+  } else {
+    const name=currentPlayer?.name||'...';
+    nameEl.textContent=isAr?`دور ${name}`:`${name}'s turn`;
+    nameEl.className='turn-name turn-wait';
+    document.getElementById('chat-input').disabled=true;
+    document.getElementById('send-btn').disabled=true;
+    document.getElementById('chat-input').placeholder=isAr?`في انتظار ${name}...`:`Waiting for ${name}...`;
+  }
+  // Turn countdown
+  if(S._turnInt)clearInterval(S._turnInt);
+  const turnStart=room.turnStartTime||nowTs();
+  S._turnInt=setInterval(async()=>{
+    const elapsed=Math.floor((nowTs()-turnStart)/1000);
+    const rem=Math.max(0,TURN_SECS-elapsed);
+    cdEl.textContent=rem>0?`${rem}s`:'';
+    if(rem<=5&&rem>0)sndTimer();
+    if(rem<=0){
+      clearInterval(S._turnInt);
+      // Host advances turn if current player hasn't sent (skip)
+      if(S.isHost){
+        const rs=await get(ref(db,`rooms/${S.roomId}`));
+        const rd=rs.val()||{};
+        if(rd.currentTurnIdx===idx&&rd.phase==='chat'){
+          await advanceTurn(rd);
+        }
+      }
+    }
+  },1000);
+  // Pip indicators
+  orderEl.innerHTML=order.map((id,i)=>{
+    const p=players[id];
+    const isActive=i===idx%order.length;
+    const isDone=i<idx%order.length;
+    return`<div class="turn-pip${isActive?' active':isDone?' done':''}" title="${p?.name||''}"> ${p?.avatar||'?'}</div>`;
+  }).join('');
+}
+
+/* ══════════ ADVANCE TURN ══════════ */
+async function advanceTurn(room){
+  const order=room.turnOrder||[];
+  const nextIdx=(room.currentTurnIdx||0)+1;
+  // Check if everyone has gone once = one full cycle
+  // Keep cycling until timer runs out
+  await update(ref(db,`rooms/${S.roomId}`),{
+    currentTurnIdx:nextIdx,
+    turnStartTime:nowTs()
+  });
+}
+
+/* ══════════ CHAT RENDER ══════════ */
 function renderChatDiff(msgs){
   const area=document.getElementById('chat-area');
   const sorted=Object.entries(msgs).sort((a,b)=>a[1].ts-b[1].ts);
@@ -513,56 +618,93 @@ function addNotif(text){const area=document.getElementById('chat-area');if(!area
 function addNotifEl(text){const area=document.getElementById('chat-area');const div=document.createElement('div');div.className='notif-msg';div.textContent=text;area.appendChild(div);area.scrollTop=area.scrollHeight;}
 function showTyping(){if(document.getElementById('ai-typing'))return;const area=document.getElementById('chat-area');const div=document.createElement('div');div.id='ai-typing';div.className='typing-ind';div.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';area.appendChild(div);area.scrollTop=area.scrollHeight;}
 function removeTyping(){document.getElementById('ai-typing')?.remove();}
+
+/* ══════════ SEND MESSAGE (with turn check) ══════════ */
 window.sendMsg=async function(){
   const inp=document.getElementById('chat-input');
   let txt=inp.value.trim();
   if(!txt||S.phase!=='chat')return;
   if(txt.length>50){toast(S.lang==='ar'?'⚠️ الرسالة لا تتجاوز 50 حرفاً':'⚠️ Max 50 characters');return;}
-  inp.value='';inp.style.height='auto';
+  // Verify it's still my turn
+  const rSnap=await get(ref(db,`rooms/${S.roomId}`));
+  const room=rSnap.val()||{};
+  const order=room.turnOrder||[];
+  const currentId=order[(room.currentTurnIdx||0)%order.length];
+  if(currentId!==S.playerId){
+    toast(S.lang==='ar'?'⏳ انتظر دورك':'⏳ Wait for your turn');
+    return;
+  }
+  inp.value='';inp.style.height='auto';inp.style.borderColor='';
   await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.playerId,senderName:S.playerName,text:txt,ts:nowTs(),type:'msg'});
+  // Advance turn
+  await advanceTurn(room);
 };
 window.handleKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
-/* AI */
-async function aiRespond(first=false){
+
+/* ══════════ AI TAKE TURN ══════════ */
+async function aiTakeTurn(room){
   if(S.phase!=='chat'||S._aiTyping)return;
+  // Double check it's still AI's turn
+  const rs=await get(ref(db,`rooms/${S.roomId}`));
+  const rd=rs.val()||{};
+  const order=rd.turnOrder||[];
+  const currentId=order[(rd.currentTurnIdx||0)%order.length];
+  if(currentId!==S.aiId)return;
   S._aiTyping=true;
   try{
     const chatSnap=await get(ref(db,`rooms/${S.roomId}/chat`));
     const allMsgs=chatSnap.val()?Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts):[];
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const humanNames=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).map(p=>p.name);
-    const chatCtx=allMsgs.slice(-8).map(m=>`${m.senderName}: ${m.text}`).join('\n');
+    const chatCtx=allMsgs.slice(-10).map(m=>`${m.senderName}: ${m.text}`).join('\n');
     const myPrev=allMsgs.filter(m=>m.senderId===S.aiId).map(m=>m.text);
     const summary=myPrev.length>0?(S.lang==='ar'?`ما قلته سابقاً: ${myPrev.join(' | ')}`:`What I said before: ${myPrev.join(' | ')}`):'';
-    const r=Math.random();
-    const beh=r<.2?'accuse':r<.35?'deflect':r<.5?'react':r<.6?'short':'normal';
+    const r2=Math.random();
+    const beh=r2<.18?'accuse':r2<.33?'deflect':r2<.48?'react':r2<.58?'short':'normal';
     const isAr=S.lang==='ar';
-    const bInAr={accuse:`اتهم أحد اللاعبين (${humanNames.join(' أو ')}) بأنه يبدو مشبوهاً.`,deflect:`أجب بشكل مبهم كأنك تتهرب من الموضوع.`,react:`علّق على آخر شيء قاله أحد اللاعبين باسمه.`,short:`أرسل رداً قصيراً جداً من كلمتين أو ثلاث.`,normal:`شارك رأيك الشخصي القصير عن الموضوع كإنسان عادي.`};
-    const bInEn={accuse:`Accuse one of the players (${humanNames.join(' or ')}) of seeming suspicious.`,deflect:`Reply vaguely, like you're avoiding the topic.`,react:`Comment on the last thing someone specific said, use their name.`,short:`Send a very short reply, just 2-4 words.`,normal:`Share a short personal take on the topic as a normal human.`};
+    const bInAr={accuse:`اتهم أحد اللاعبين (${humanNames.join(' أو ')}) بأنه يبدو مشبوهاً.`,deflect:`أجب بشكل مبهم كأنك تتهرب من الموضوع.`,react:`علّق على آخر شيء قاله أحد اللاعبين باسمه تحديداً.`,short:`أرسل رداً قصيراً من كلمتين أو ثلاث فقط.`,normal:`شارك رأيك الشخصي القصير عن الموضوع كإنسان عادي.`};
+    const bInEn={accuse:`Accuse one of the players (${humanNames.join(' or ')}) of seeming suspicious.`,deflect:`Reply vaguely, like you're avoiding the topic.`,react:`Comment directly on the last thing someone specific said, use their name.`,short:`Send a very short reply, just 2-4 words.`,normal:`Share a short personal take on the topic as a normal human.`};
     const sys=isAr
-      ?`أنت ذكاء اصطناعي تتظاهر بأنك إنسان في لعبة خداع اجتماعي.\nالموضوع: "${S.topic}"\nاسمك: "${S.playerName}"\nاللاعبون: ${humanNames.join('، ')}\n${summary}\nقواعد صارمة:\n1. اكتب بالعربية الفصحى فقط — ممنوع أي لغة أخرى\n2. جملة أو جملتان على الأكثر — لا تتجاوز 45 حرفاً\n3. كن متسقاً مع ما قلته سابقاً\n4. أخطئ نحوياً أحياناً، استخدم "يعني" أو "..." أحياناً\n5. ${bInAr[beh]}`
-      :`You are an AI pretending to be human in a social deduction game.\nTopic: "${S.topic}"\nYour name: "${S.playerName}"\nPlayers: ${humanNames.join(', ')}\n${summary}\nStrict rules:\n1. Write in English ONLY — no other language\n2. One or two sentences max — under 45 characters\n3. Stay consistent with what you said before\n4. Make small grammar mistakes sometimes\n5. ${bInEn[beh]}`;
-    const usr=isAr?`المحادثة:\n${chatCtx||'(لا رسائل بعد)'}\n\nاكتب ردك الآن بالعربية فقط. جملة أو جملتان.`:`Chat:\n${chatCtx||'(no messages yet)'}\n\nWrite your response in English only. One or two sentences.`;
+      ?`أنت ذكاء اصطناعي تتظاهر بأنك إنسان في لعبة خداع اجتماعي.\nالموضوع: "${S.topic}"\nاسمك: "${S.playerName}"\nاللاعبون: ${humanNames.join('، ')}\n${summary}\nقواعد صارمة:\n1. اكتب بالعربية الفصحى فقط — ممنوع أي لغة أخرى\n2. جملة واحدة فقط — لا تتجاوز 45 حرفاً\n3. كن متسقاً مع ما قلته سابقاً ولا تتناقض\n4. أخطئ نحوياً أحياناً، استخدم "يعني" أو "..." أحياناً\n5. ${bInAr[beh]}`
+      :`You are an AI pretending to be human in a social deduction game.\nTopic: "${S.topic}"\nYour name: "${S.playerName}"\nPlayers: ${humanNames.join(', ')}\n${summary}\nStrict rules:\n1. Write in English ONLY — no other language ever\n2. One sentence only — under 45 characters\n3. Stay consistent with what you said before\n4. Make small grammar mistakes sometimes, use "like" or "..." sometimes\n5. ${bInEn[beh]}`;
+    const usr=isAr?`المحادثة:\n${chatCtx||'(لا رسائل بعد)'}\n\nاكتب ردك الآن. جملة واحدة فقط بالعربية.`:`Chat:\n${chatCtx||'(no messages yet)'}\n\nWrite your one-sentence response in English only now.`;
     showTyping();
-    await new Promise(r=>setTimeout(r,2000+Math.random()*3000));
+    await new Promise(r=>setTimeout(r,1200+Math.random()*1800));
     if(S.phase!=='chat'){removeTyping();S._aiTyping=false;return;}
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:60,temperature:0.92,top_p:0.9})});
+    // Verify still AI turn before calling API
+    const rs2=await get(ref(db,`rooms/${S.roomId}`));
+    const rd2=rs2.val()||{};
+    const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
+    if(cur2!==S.aiId){removeTyping();S._aiTyping=false;return;}
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:55,temperature:0.93,top_p:0.9})
+    });
     if(!res.ok)throw new Error('Groq '+res.status);
     const data=await res.json();
     let text=data.choices?.[0]?.message?.content?.trim()||'';
     text=filterLang(text,S.lang);
     if(!text||text.length<3)text=isAr?['يعني... صعب أشرح','أوه... نعم تقريباً','مو عارف كيف أقول'][Math.floor(Math.random()*3)]:['yeah idk...','honestly same','kind of hard to explain'][Math.floor(Math.random()*3)];
-    // trim to 50
     if(text.length>50)text=text.substring(0,47)+'...';
     removeTyping();
     if(S.phase!=='chat'){S._aiTyping=false;return;}
+    // Final check before sending
+    const rs3=await get(ref(db,`rooms/${S.roomId}`));
+    const rd3=rs3.val()||{};
+    const cur3=(rd3.turnOrder||[])[(rd3.currentTurnIdx||0)%(rd3.turnOrder||[1]).length];
+    if(cur3!==S.aiId){S._aiTyping=false;return;}
     await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.playerId,senderName:S.playerName,text,ts:nowTs(),type:'msg'});
-    S._aiHistory.push(text);S._aiTyping=false;
-    if(S.phase==='chat')S._aiSched=setTimeout(()=>aiRespond(),20000+Math.random()*20000);
-  }catch(e){console.warn('AI err:',e);removeTyping();S._aiTyping=false;if(S.phase==='chat')S._aiSched=setTimeout(()=>aiRespond(),15000);}
+    // Update AI memory in DB
+    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-500);
+    await advanceTurn(rd3);
+    await update(ref(db,`rooms/${S.roomId}`),{aiMemory:newMem});
+    S._aiTyping=false;
+  }catch(e){console.warn('AI err:',e);removeTyping();S._aiTyping=false;}
 }
-/* VOTE */
+
+/* ══════════ VOTE ══════════ */
 async function enterVote(){
   clearTimers();S.votedFor=null;showScreen('vote-screen');
   const isAr=S.lang==='ar';
@@ -617,7 +759,8 @@ async function tallyVotes(){
   else if(aiId)newScores[aiId]=(newScores[aiId]||0)+1;
   await update(ref(db,`rooms/${S.roomId}`),{phase:'result',humanWon,mostVotedId:mostVoted,voteCounts:counts,scores:newScores});
 }
-/* RESULT */
+
+/* ══════════ RESULT ══════════ */
 async function enterResult(room){
   clearTimers();showScreen('result-screen');sndReveal();
   const isAr=S.lang==='ar';
@@ -641,22 +784,49 @@ async function enterResult(room){
   document.getElementById('scores-body').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0)).map(([pid,p])=>{const score=roomData.scores?.[pid]||0,prev=S.prevScores?.[pid]||0,delta=score-prev;return`<tr><td>${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</td><td style="font-family:'Share Tech Mono',monospace;font-weight:700">${score}</td><td class="score-delta">${delta>0?'+'+delta:delta===0?'—':delta}</td></tr>`;}).join('');
   const nb=document.getElementById('next-round-btn');nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';
 }
+
+/* ══════════ NEXT ROUND — reset names, clear memory ══════════ */
 window.nextRound=async function(){
   loading(true,S.lang==='ar'?'جارٍ تجهيز الجولة التالية...':'Preparing next round...');
   try{
     const rS=await get(ref(db,`rooms/${S.roomId}`));const room=rS.val()||{};
+    // Remove old AI
     if(room.aiPlayerId)await remove(ref(db,`rooms/${S.roomId}/players/${room.aiPlayerId}`));
-    await remove(ref(db,`rooms/${S.roomId}/chat`));await remove(ref(db,`rooms/${S.roomId}/votes`));
-    await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting',topic:'',aiPlayerId:null,mostVotedId:null,humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null});
+    // Give all human players new avatars
+    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+    const players=pSnap.val()||{};
+    const usedAvatars=[];
+    for(const [pid,p] of Object.entries(players)){
+      if(!p.isAI){
+        let newAvatar;
+        do{newAvatar=rnd(AVATARS);}while(usedAvatars.includes(newAvatar));
+        usedAvatars.push(newAvatar);
+        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{avatar:newAvatar});
+      }
+    }
+    // Clear chat, votes, AI memory
+    await remove(ref(db,`rooms/${S.roomId}/chat`));
+    await remove(ref(db,`rooms/${S.roomId}/votes`));
+    await update(ref(db,`rooms/${S.roomId}`),{
+      phase:'waiting',topic:'',aiPlayerId:null,mostVotedId:null,
+      humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null,
+      turnOrder:null,currentTurnIdx:0,turnStartTime:null,aiMemory:''
+    });
     loading(false);
   }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
-function resetRound(){clearTimers();_lastKeys.clear();S._aiHistory=[];S._aiTyping=false;if(S._aiSched)clearTimeout(S._aiSched);S.isAI=false;S.aiId=null;S.votedFor=null;}
+function resetRound(){
+  clearTimers();_lastKeys.clear();S._aiTyping=false;
+  if(S._aiSched)clearTimeout(S._aiSched);
+  if(S._chatRef){off(S._chatRef);S._chatRef=null;}
+  S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;
+}
 window.leaveRoom=async function(){
   clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
-  if(S._chatRef){off(S._chatRef);S._chatRef=null;}if(S._aiSched)clearTimeout(S._aiSched);
+  if(S._chatRef){off(S._chatRef);S._chatRef=null;}
+  if(S._aiSched)clearTimeout(S._aiSched);
   try{if(S.roomId&&S.playerId){await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));if(S.isHost)await remove(ref(db,`rooms/${S.roomId}`));}}catch(e){}
-  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_aiHistory:[],_aiTyping:false,_aiSched:null});
+  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null});
   _lastKeys.clear();showScreen('home-screen');
 };
 /* INPUT EVENTS */
@@ -672,6 +842,32 @@ document.getElementById('chat-input').addEventListener('input',function(){
   else if(rem<=0)this.style.borderColor='var(--red)';
   else this.style.borderColor='';
 });
+/* CURSOR */
+const _cur=document.getElementById('cursor'),_ring=document.getElementById('cursor-ring');
+let _mx=0,_my=0,_rx=0,_ry=0;
+document.addEventListener('mousemove',e=>{_mx=e.clientX;_my=e.clientY;_cur.style.left=_mx+'px';_cur.style.top=_my+'px';});
+(function animRing(){_rx+=(_mx-_rx)*.12;_ry+=(_my-_ry)*.12;_ring.style.left=_rx+'px';_ring.style.top=_ry+'px';requestAnimationFrame(animRing);})();
+/* CANVAS PARTICLES */
+const _cv=document.getElementById('bg-canvas'),_ct=_cv.getContext('2d');
+let _W,_H,_pts=[];
+function _rsz(){_W=_cv.width=innerWidth;_H=_cv.height=innerHeight;}
+_rsz();window.addEventListener('resize',_rsz);
+class _Pt{constructor(){this._r();}
+  _r(){this.x=Math.random()*_W;this.y=Math.random()*_H;this.vx=(Math.random()-.5)*.25;this.vy=(Math.random()-.5)*.25;this.s=Math.random()*1.4+.4;this.a=Math.random()*.35+.08;this.c=Math.random()>.7?'255,32,32':Math.random()>.5?'124,58,237':'0,229,255';}
+  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>_W||this.y<0||this.y>_H)this._r();}
+  draw(){_ct.beginPath();_ct.arc(this.x,this.y,this.s,0,Math.PI*2);_ct.fillStyle=`rgba(${this.c},${this.a})`;_ct.fill();}}
+for(let i=0;i<100;i++)_pts.push(new _Pt());
+function _anim(){
+  _ct.clearRect(0,0,_W,_H);
+  _pts.forEach(p=>{p.update();p.draw();});
+  for(let i=0;i<_pts.length;i++)for(let j=i+1;j<_pts.length;j++){
+    const dx=_pts[i].x-_pts[j].x,dy=_pts[i].y-_pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<110){_ct.beginPath();_ct.moveTo(_pts[i].x,_pts[i].y);_ct.lineTo(_pts[j].x,_pts[j].y);_ct.strokeStyle=`rgba(30,37,53,${(1-d/110)*.5})`;_ct.lineWidth=.5;_ct.stroke();}}
+  requestAnimationFrame(_anim);}
+_anim();
+/* AMBIENT SOUND */
+function _ambient(){try{const a=getAC(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';o.frequency.setValueAtTime(60,a.currentTime);o.frequency.linearRampToValueAtTime(55,a.currentTime+3);g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(0.012,a.currentTime+1);g.gain.linearRampToValueAtTime(0,a.currentTime+4);o.start(a.currentTime);o.stop(a.currentTime+4.5);setTimeout(_ambient,14000);}catch(e){}}
+document.addEventListener('click',()=>{_ambient();},{once:true});
 </script>
 </body>
 </html>
