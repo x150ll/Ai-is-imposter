@@ -289,6 +289,26 @@ body{cursor:none;}
   </div>
 </div>
 
+<!-- RENAME SCREEN -->
+<div id="rename-screen" class="screen">
+  <div class="game-logo"><span class="r">AI</span><span> IMPOSTOR</span></div>
+  <div class="game-logo-sub">// NEXT ROUND //</div>
+  <div class="card" style="max-width:400px;">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="font-size:36px;margin-bottom:10px;" id="rename-avatar">🦊</div>
+      <div style="font-size:15px;color:var(--text2);line-height:1.7;" id="rename-subtitle">الجولة الجديدة تبدأ قريباً<br>اختر اسماً جديداً لنفسك</div>
+    </div>
+    <div class="field">
+      <label>اسمك الجديد</label>
+      <input type="text" id="rename-input" placeholder="اسم واحد فقط..." maxlength="14" autocomplete="off">
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;">
+      💡 استخدم اسماً خيالياً — لا اسمك الحقيقي
+    </div>
+    <button class="btn btn-primary" onclick="confirmRename()">تأكيد الاسم والانتظار</button>
+  </div>
+</div>
+
 <!-- VOTE -->
 <div id="vote-screen" class="screen">
   <div class="vote-title" id="vote-title">من هو الذكاء الاصطناعي؟</div>
@@ -331,7 +351,7 @@ const genCode=()=>Math.random().toString(36).substring(2,7).toUpperCase();
 const genId=()=>Math.random().toString(36).substring(2,12);
 const nowTs=()=>Date.now();
 const rnd=arr=>arr[Math.floor(Math.random()*arr.length)];
-const TURN_SECS=25; // seconds per turn
+const TURN_SECS=15; // 15 seconds per turn
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function loading(show,txt=''){const el=document.getElementById('loading-overlay');el.classList.toggle('show',show);if(txt)document.getElementById('loading-text').textContent=txt;}
 function toast(msg,dur=3000){document.querySelectorAll('.toast').forEach(t=>t.remove());const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),dur);}
@@ -446,7 +466,8 @@ function enterWaiting(){
     if(room.phase==='chat'&&S.phase!=='chat'){S.phase='chat';enterGame(room);}
     if(room.phase==='vote'&&S.phase!=='vote'){S.phase='vote';enterVote();}
     if(room.phase==='result'&&S.phase!=='result'){S.phase='result';enterResult(room);}
-    if(room.phase==='waiting'&&(S.phase==='result'||S.phase==='chat'||S.phase==='vote')){resetRound();S.phase='waiting';enterWaiting();}
+    if(room.phase==='rename'&&S.phase!=='rename'){S.phase='rename';enterRename();}
+    if(room.phase==='waiting'&&(S.phase==='result'||S.phase==='chat'||S.phase==='vote'||S.phase==='rename')){resetRound();S.phase='waiting';enterWaiting();}
   });
   S._listeners.push(()=>off(rRef,'value',rU));
 }
@@ -494,17 +515,17 @@ async function enterGame(room){
   document.getElementById('round-badge').textContent=`R${S.round}`;
   document.getElementById('chat-area').innerHTML='';
   addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
-  addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 25 ثانية لكل دور`:`🔄 Each player sends their message in turn — 25 seconds each`);
+  addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 15 ثانية لكل دور`:`🔄 Each player sends in their turn — 15 seconds each`);
   // Chat listener
   if(S._chatRef)off(S._chatRef);
   S._chatRef=ref(db,`rooms/${S.roomId}/chat`);
   onValue(S._chatRef,snap=>renderChatDiff(snap.val()||{}));
-  // Game timer (2 min total)
-  let left=120;const circ=document.getElementById('timer-circle'),txt=document.getElementById('timer-text');
+  // Game timer (3 min total)
+  let left=180;const circ=document.getElementById('timer-circle'),txt=document.getElementById('timer-text');
   S._timerInt=setInterval(async()=>{
     left--;const m=Math.floor(left/60),s=left%60;
     txt.textContent=`${m}:${s.toString().padStart(2,'0')}`;
-    const off2=138-(left/120)*138;circ.style.strokeDashoffset=off2;
+    const off2=138-(left/180)*138;circ.style.strokeDashoffset=off2;
     circ.style.stroke=left>60?'var(--success)':left>20?'var(--warn)':'var(--red)';
     if(left<=10&&left>0)sndTimer();
     if(left<=0){clearInterval(S._timerInt);if(S.isHost)await update(ref(db,`rooms/${S.roomId}`),{phase:'vote',voteStartTime:nowTs()});}
@@ -520,10 +541,11 @@ async function enterGame(room){
     const currentId=order[idx%order.length];
     S.currentTurn=currentId;
     renderTurnBar(r,order,idx,currentId);
-    // If it's AI's turn and I'm the AI player (host manages AI)
+    // Host manages AI turn — random delay 7-14s to simulate human typing
     if(currentId===S.aiId&&S.isHost&&!S._aiTyping){
       if(S._aiSched)clearTimeout(S._aiSched);
-      S._aiSched=setTimeout(()=>aiTakeTurn(r),1500+Math.random()*2000);
+      const delay=7000+Math.random()*7000;
+      S._aiSched=setTimeout(()=>aiTakeTurn(r),delay);
     }
   });
   S._listeners.push(()=>off(turnRef,'value',turnU));
@@ -656,23 +678,71 @@ async function aiTakeTurn(room){
     const chatSnap=await get(ref(db,`rooms/${S.roomId}/chat`));
     const allMsgs=chatSnap.val()?Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts):[];
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
-    const humanNames=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).map(p=>p.name);
+    const players=pSnap.val()||{};
+    // Get AI's own name from DB — NOT host's name
+    const aiPlayerData=players[S.aiId]||{};
+    const aiName=aiPlayerData.name||'مجهول';
+    const humanPlayers=Object.entries(players).filter(([,p])=>!p.isAI).map(([,p])=>p.name);
     const chatCtx=allMsgs.slice(-10).map(m=>`${m.senderName}: ${m.text}`).join('\n');
     const myPrev=allMsgs.filter(m=>m.senderId===S.aiId).map(m=>m.text);
-    const summary=myPrev.length>0?(S.lang==='ar'?`ما قلته سابقاً: ${myPrev.join(' | ')}`:`What I said before: ${myPrev.join(' | ')}`):'';
+    const summary=myPrev.length>0?(S.lang==='ar'?`ما قلته أنا "${aiName}" سابقاً: ${myPrev.join(' | ')}`:`What I "${aiName}" said before: ${myPrev.join(' | ')}`):'';
     const r2=Math.random();
-    const beh=r2<.18?'accuse':r2<.33?'deflect':r2<.48?'react':r2<.58?'short':'normal';
+    const beh=r2<.15?'accuse':r2<.28?'deflect':r2<.45?'react':r2<.55?'short':'normal';
     const isAr=S.lang==='ar';
-    const bInAr={accuse:`اتهم أحد اللاعبين (${humanNames.join(' أو ')}) بأنه يبدو مشبوهاً.`,deflect:`أجب بشكل مبهم كأنك تتهرب من الموضوع.`,react:`علّق على آخر شيء قاله أحد اللاعبين باسمه تحديداً.`,short:`أرسل رداً قصيراً من كلمتين أو ثلاث فقط.`,normal:`شارك رأيك الشخصي القصير عن الموضوع كإنسان عادي.`};
-    const bInEn={accuse:`Accuse one of the players (${humanNames.join(' or ')}) of seeming suspicious.`,deflect:`Reply vaguely, like you're avoiding the topic.`,react:`Comment directly on the last thing someone specific said, use their name.`,short:`Send a very short reply, just 2-4 words.`,normal:`Share a short personal take on the topic as a normal human.`};
+    const bInAr={
+      accuse:`اتهم أحد اللاعبين (${humanPlayers.join(' أو ')}) بأنه يبدو مريباً أو مختلفاً.`,
+      deflect:`أجب بشكل غير مباشر وكأنك لا تعرف ماذا تقول بالضبط.`,
+      react:`علّق بشكل عفوي على آخر رسالة من أحد اللاعبين باسمه.`,
+      short:`أرسل ردًا بسيطاً من كلمتين أو ثلاث وكأنك مشغول.`,
+      normal:`عبّر عن رأيك الشخصي بالموضوع بأسلوب عادي غير رسمي.`
+    };
+    const bInEn={
+      accuse:`Subtly suggest one of the players (${humanPlayers.join(' or ')}) seems off or suspicious.`,
+      deflect:`Reply in a vague uncertain way, like you're not sure what to say.`,
+      react:`Casually respond to the last message from a specific player, use their name.`,
+      short:`Send a short lazy reply, 2-3 words, like you're distracted.`,
+      normal:`Share a brief personal thought about the topic in a casual imperfect way.`
+    };
+    // Highly human-like prompt — imperfect Arabic/English, natural mistakes
     const sys=isAr
-      ?`أنت ذكاء اصطناعي تتظاهر بأنك إنسان في لعبة خداع اجتماعي.\nالموضوع: "${S.topic}"\nاسمك: "${S.playerName}"\nاللاعبون: ${humanNames.join('، ')}\n${summary}\nقواعد صارمة:\n1. اكتب بالعربية الفصحى فقط — ممنوع أي لغة أخرى\n2. جملة واحدة فقط — لا تتجاوز 45 حرفاً\n3. كن متسقاً مع ما قلته سابقاً ولا تتناقض\n4. أخطئ نحوياً أحياناً، استخدم "يعني" أو "..." أحياناً\n5. ${bInAr[beh]}`
-      :`You are an AI pretending to be human in a social deduction game.\nTopic: "${S.topic}"\nYour name: "${S.playerName}"\nPlayers: ${humanNames.join(', ')}\n${summary}\nStrict rules:\n1. Write in English ONLY — no other language ever\n2. One sentence only — under 45 characters\n3. Stay consistent with what you said before\n4. Make small grammar mistakes sometimes, use "like" or "..." sometimes\n5. ${bInEn[beh]}`;
-    const usr=isAr?`المحادثة:\n${chatCtx||'(لا رسائل بعد)'}\n\nاكتب ردك الآن. جملة واحدة فقط بالعربية.`:`Chat:\n${chatCtx||'(no messages yet)'}\n\nWrite your one-sentence response in English only now.`;
+      ?`أنت شخص اسمك "${aiName}" تشارك في نقاش جماعي عبر الإنترنت.
+الموضوع: "${S.topic}"
+المشاركون الآخرون: ${humanPlayers.join('، ')}
+${summary}
+
+طريقة كتابتك يجب أن تكون:
+- فصحى بسيطة وليست مثالية — مقبولة الشكل لكن فيها أخطاء بسيطة أحياناً
+- أحياناً تكتب كلمة خاطئة أو تنسى حرفاً مثل "اتذكر" بدل "أتذكر"
+- أسلوبك مباشر وغير مرتب أحياناً — مثل شخص يكتب بسرعة
+- أحياناً تستخدم "يعني" أو "أعتقد" أو "..." في منتصف الكلام
+- لا تبدو رسمياً أو ذكياً جداً — كن عادياً
+- لا تكرر نفس الجملة التي قلتها قبل كذا
+- الجملة لا تتجاوز 45 حرفاً
+- ${bInAr[beh]}
+- لا تذكر أنك ذكاء اصطناعي أبداً`
+      :`You are a person named "${aiName}" chatting in an online group discussion.
+Topic: "${S.topic}"
+Other participants: ${humanPlayers.join(', ')}
+${summary}
+
+Your writing style must be:
+- Casual and imperfect — like someone typing quickly on their phone
+- Make occasional typos or grammar mistakes naturally (e.g. "dont" instead of "don't")
+- Use "like", "idk", "..." or trail off sometimes mid-thought
+- Sound slightly unsure or distracted occasionally
+- Don't be eloquent or well-structured — be human and messy
+- Don't repeat what you said before exactly
+- Max 45 characters
+- ${bInEn[beh]}
+- Never mention you are an AI`;
+    const usr=isAr
+      ?`المحادثة:\n${chatCtx||'(لم يتحدث أحد بعد)'}\n\nاكتب ردك الآن كـ"${aiName}". جملة واحدة فقط، عربية بسيطة.`
+      :`Chat:\n${chatCtx||'(no one talked yet)'}\n\nWrite your response now as "${aiName}". One short casual sentence only.`;
     showTyping();
-    await new Promise(r=>setTimeout(r,1200+Math.random()*1800));
+    // Random delay within the 7-14s window to simulate actual typing
+    await new Promise(r=>setTimeout(r,800+Math.random()*1200));
     if(S.phase!=='chat'){removeTyping();S._aiTyping=false;return;}
-    // Verify still AI turn before calling API
+    // Verify still AI turn before API call
     const rs2=await get(ref(db,`rooms/${S.roomId}`));
     const rd2=rs2.val()||{};
     const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
@@ -680,24 +750,30 @@ async function aiTakeTurn(room){
     const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:55,temperature:0.93,top_p:0.9})
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:50,temperature:0.95,top_p:0.92})
     });
     if(!res.ok)throw new Error('Groq '+res.status);
     const data=await res.json();
     let text=data.choices?.[0]?.message?.content?.trim()||'';
     text=filterLang(text,S.lang);
-    if(!text||text.length<3)text=isAr?['يعني... صعب أشرح','أوه... نعم تقريباً','مو عارف كيف أقول'][Math.floor(Math.random()*3)]:['yeah idk...','honestly same','kind of hard to explain'][Math.floor(Math.random()*3)];
+    if(!text||text.length<3)text=isAr?
+      ['يعني.. مو عارف','أه صح','اتذكر شيء قريب من كذا'][Math.floor(Math.random()*3)]:
+      ['idk honestly','yeah same kinda','hard to explain lol'][Math.floor(Math.random()*3)];
     if(text.length>50)text=text.substring(0,47)+'...';
     removeTyping();
     if(S.phase!=='chat'){S._aiTyping=false;return;}
-    // Final check before sending
+    // Final turn check
     const rs3=await get(ref(db,`rooms/${S.roomId}`));
     const rd3=rs3.val()||{};
     const cur3=(rd3.turnOrder||[])[(rd3.currentTurnIdx||0)%(rd3.turnOrder||[1]).length];
     if(cur3!==S.aiId){S._aiTyping=false;return;}
-    await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.playerId,senderName:S.playerName,text,ts:nowTs(),type:'msg'});
-    // Update AI memory in DB
-    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-500);
+    // Send message using AI's own player ID and name (not host's)
+    await push(ref(db,`rooms/${S.roomId}/chat`),{
+      senderId:S.aiId,
+      senderName:aiName,
+      text,ts:nowTs(),type:'msg'
+    });
+    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-600);
     await advanceTurn(rd3);
     await update(ref(db,`rooms/${S.roomId}`),{aiMemory:newMem});
     S._aiTyping=false;
@@ -710,10 +786,11 @@ async function enterVote(){
   const isAr=S.lang==='ar';
   document.getElementById('vote-title').textContent=isAr?'من هو الذكاء الاصطناعي؟':'Who is the AI?';
   document.getElementById('vote-subtitle').textContent=isAr?'// حلّل • صوّت • اكشف //':'// ANALYZE • VOTE • EXPOSE //';
-  document.getElementById('confirm-vote-btn').textContent=isAr?'تأكيد التصويت':'Confirm Vote';
+  document.getElementById('confirm-vote-btn').textContent=isAr?'تأكيد التصويتي':'Confirm Vote';
   document.getElementById('confirm-vote-btn').disabled=true;
   const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
   const players=pSnap.val()||{};
+  const totalHumans=Object.values(players).filter(p=>!p.isAI).length;
   const grid=document.getElementById('vote-grid');grid.innerHTML='';
   Object.entries(players).filter(([id])=>id!==S.playerId).forEach(([id,p])=>{
     const card=document.createElement('div');card.className='vote-card';card.dataset.pid=id;
@@ -725,11 +802,18 @@ async function enterVote(){
     secs--;te.textContent=secs;te.classList.toggle('red',secs<=10);
     if(secs<=0){clearInterval(S._voteInt);if(!S.votedFor)await submitVote('__skip__');if(S.isHost)await tallyVotes();}
   },1000);
+  // Live vote listener — tally immediately when everyone voted
   const vRef=ref(db,`rooms/${S.roomId}/votes`);
-  const vU=onValue(vRef,snap=>{
+  const vU=onValue(vRef,async snap=>{
     const votes=snap.val()||{},counts={};
     Object.values(votes).forEach(v=>{if(v.target&&v.target!=='__skip__')counts[v.target]=(counts[v.target]||0)+1;});
     Object.keys(players).forEach(id=>{const el=document.getElementById(`vc-${id}`);if(el)el.textContent=`${counts[id]||0} ${isAr?'أصوات':'votes'}`;});
+    // If all humans voted, tally immediately (host triggers)
+    const voted=Object.keys(votes).length;
+    if(voted>=totalHumans&&S.isHost){
+      clearInterval(S._voteInt);
+      await tallyVotes();
+    }
   });
   S._listeners.push(()=>off(vRef,'value',vU));
 }
@@ -740,12 +824,6 @@ window.confirmVote=async function(){
   document.querySelectorAll('.vote-card').forEach(c=>c.classList.add('confirmed'));
   await submitVote(S.votedFor);
   toast(S.lang==='ar'?'✅ تم تسجيل تصويتك':'✅ Vote recorded!');
-  if(S.isHost){
-    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
-    const total=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
-    const vSnap=await get(ref(db,`rooms/${S.roomId}/votes`));
-    if(Object.keys(vSnap.val()||{}).length>=total){clearInterval(S._voteInt);await tallyVotes();}
-  }
 };
 async function submitVote(t){await set(ref(db,`rooms/${S.roomId}/votes/${S.playerId}`),{target:t,ts:nowTs()});}
 async function tallyVotes(){
@@ -785,30 +863,28 @@ async function enterResult(room){
   const nb=document.getElementById('next-round-btn');nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';
 }
 
-/* ══════════ NEXT ROUND — reset names, clear memory ══════════ */
+/* ══════════ NEXT ROUND — rename phase + clear memory ══════════ */
 window.nextRound=async function(){
   loading(true,S.lang==='ar'?'جارٍ تجهيز الجولة التالية...':'Preparing next round...');
   try{
     const rS=await get(ref(db,`rooms/${S.roomId}`));const room=rS.val()||{};
-    // Remove old AI
     if(room.aiPlayerId)await remove(ref(db,`rooms/${S.roomId}/players/${room.aiPlayerId}`));
-    // Give all human players new avatars
+    // Give all human players new random avatars
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
-    const usedAvatars=[];
+    const used=[];
     for(const [pid,p] of Object.entries(players)){
       if(!p.isAI){
-        let newAvatar;
-        do{newAvatar=rnd(AVATARS);}while(usedAvatars.includes(newAvatar));
-        usedAvatars.push(newAvatar);
-        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{avatar:newAvatar});
+        let av;do{av=rnd(AVATARS);}while(used.includes(av));
+        used.push(av);
+        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{avatar:av});
       }
     }
-    // Clear chat, votes, AI memory
     await remove(ref(db,`rooms/${S.roomId}/chat`));
     await remove(ref(db,`rooms/${S.roomId}/votes`));
+    // Push to 'rename' phase so all clients show rename screen
     await update(ref(db,`rooms/${S.roomId}`),{
-      phase:'waiting',topic:'',aiPlayerId:null,mostVotedId:null,
+      phase:'rename',topic:'',aiPlayerId:null,mostVotedId:null,
       humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null,
       turnOrder:null,currentTurnIdx:0,turnStartTime:null,aiMemory:''
     });
@@ -821,6 +897,59 @@ function resetRound(){
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
   S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;
 }
+/* ══════════ RENAME PHASE ══════════ */
+function enterRename(){
+  showScreen('rename-screen');
+  const isAr=S.lang==='ar';
+  // Show current avatar
+  get(ref(db,`rooms/${S.roomId}/players/${S.playerId}`)).then(snap=>{
+    const p=snap.val()||{};
+    document.getElementById('rename-avatar').textContent=p.avatar||'🦊';
+  });
+  const sub=document.getElementById('rename-subtitle');
+  sub.innerHTML=isAr
+    ?'الجولة الجديدة تبدأ قريباً<br>اختر اسماً جديداً — اسم واحد خيالي'
+    :'New round coming up<br>Pick a new single fictional name';
+  document.getElementById('rename-input').value='';
+  document.getElementById('rename-input').placeholder=isAr?'اسم واحد فقط...':'One name only...';
+  // Host sees waiting count
+  if(S.isHost){
+    const rRef2=ref(db,`rooms/${S.roomId}/renames`);
+    onValue(rRef2,snap=>{
+      const renames=snap.val()||{};
+      const done=Object.keys(renames).length;
+      // Show start button only when all renamed
+      const existing=document.getElementById('host-rename-btn');
+      if(existing)existing.remove();
+      const btn=document.createElement('button');
+      btn.id='host-rename-btn';btn.className='btn btn-violet';
+      btn.style.cssText='max-width:400px;width:100%;margin-top:14px;';
+      btn.textContent=isAr?`ابدأ الجولة (${done} جاهز)`:` Start Round (${done} ready)`;
+      btn.onclick=()=>hostStartFromRename();
+      document.querySelector('#rename-screen .card').appendChild(btn);
+    });
+  }
+}
+async function hostStartFromRename(){
+  // Clear renames record then go to waiting
+  await remove(ref(db,`rooms/${S.roomId}/renames`));
+  await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
+}
+window.confirmRename=async function(){
+  const inp=document.getElementById('rename-input');
+  const newName=inp.value.trim().split(/\s+/)[0]; // force single word
+  if(!newName||newName.length<2){
+    toast(S.lang==='ar'?'أدخل اسماً واحداً على الأقل':'Enter at least one name');return;
+  }
+  S.playerName=newName;
+  await update(ref(db,`rooms/${S.roomId}/players/${S.playerId}`),{name:newName});
+  await set(ref(db,`rooms/${S.roomId}/renames/${S.playerId}`),{done:true,ts:nowTs()});
+  sndSuccess();
+  toast(S.lang==='ar'?`✅ اسمك الجديد: ${newName}`:`✅ New name: ${newName}`);
+  inp.disabled=true;
+  document.querySelector('#rename-screen .btn-primary').disabled=true;
+  document.querySelector('#rename-screen .btn-primary').textContent=S.lang==='ar'?'✅ في انتظار البقية...':'✅ Waiting for others...';
+};
 window.leaveRoom=async function(){
   clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
@@ -835,6 +964,7 @@ document.getElementById('join-name').addEventListener('keydown',e=>{if(e.key==='
 document.getElementById('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
 document.getElementById('join-code').addEventListener('input',function(){this.value=this.value.toUpperCase();});
 document.getElementById('groq-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveGroqKey();});
+document.getElementById('rename-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmRename();});
 /* CHAR COUNTER */
 document.getElementById('chat-input').addEventListener('input',function(){
   const rem=50-this.value.length;
