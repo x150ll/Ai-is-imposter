@@ -153,8 +153,42 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <body>
 <div id="loading-overlay"><div class="spinner"></div><div class="loading-text" id="loading-text">جارٍ التحميل...</div></div>
 
+<!-- GROQ SETUP -->
+<div id="groq-screen" class="screen">
+  <div class="game-logo"><span class="r">AI</span><span> IMPOSTOR</span></div>
+  <div class="game-logo-sub">// SETUP REQUIRED //</div>
+  <div class="card" style="max-width:520px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+      <div style="width:42px;height:42px;background:rgba(255,32,32,.08);border:1px solid rgba(255,32,32,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🔑</div>
+      <div>
+        <div style="font-size:17px;font-weight:800;margin-bottom:3px;">مفتاح Groq API</div>
+        <div style="font-size:11px;color:var(--red);font-family:'Share Tech Mono',monospace;letter-spacing:1px;">هذه العملية لمرة واحدة فقط</div>
+      </div>
+    </div>
+    <div style="background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:18px;margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:12px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;">// كيف تحصل على المفتاح — خطوات بسيطة</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.7;"><span style="color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:10px;background:rgba(0,229,255,.08);padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;">01</span><span>روح لموقع <a href="https://console.groq.com" target="_blank" style="color:var(--text);font-weight:700;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);">console.groq.com</a> وسجّل حساب مجاني (يكفي حساب Google)</span></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.7;"><span style="color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:10px;background:rgba(0,229,255,.08);padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;">02</span><span>بعد تسجيل الدخول اضغط على <strong style="color:var(--text);">API Keys</strong> من القائمة اليسرى</span></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.7;"><span style="color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:10px;background:rgba(0,229,255,.08);padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;">03</span><span>اضغط <strong style="color:var(--text);">Create API Key</strong> واكتب أي اسم تريده</span></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--text2);line-height:1.7;"><span style="color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:10px;background:rgba(0,229,255,.08);padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;">04</span><span>انسخ المفتاح الذي يبدأ بـ <strong style="color:var(--text);font-family:'Share Tech Mono',monospace;">gsk_</strong> والصقه في الحقل أدناه</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;background:rgba(255,32,32,.04);border:1px solid rgba(255,32,32,.1);border-radius:8px;padding:12px 14px;margin-bottom:20px;">
+      <span style="font-size:18px;flex-shrink:0;">🔒</span>
+      <div style="font-size:12px;color:var(--text2);line-height:1.75;">المفتاح يُحفظ <strong style="color:var(--text);">محلياً على جهازك فقط</strong> (localStorage) — لا يُرسل لأي خادم أو قاعدة بيانات. حتى مطوّر الموقع لا يستطيع رؤيته.</div>
+    </div>
+    <div class="field">
+      <label>مفتاح Groq API</label>
+      <input type="password" id="groq-input" placeholder="gsk_..." autocomplete="off" style="font-family:'Share Tech Mono',monospace;letter-spacing:1px;font-size:14px;">
+    </div>
+    <div id="groq-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:14px;padding:8px 12px;background:rgba(255,32,32,.06);border-radius:6px;font-family:'Share Tech Mono',monospace;"></div>
+    <button class="btn btn-primary" id="groq-save-btn" onclick="saveGroqKey()">حفظ المفتاح والمتابعة ▶</button>
+  </div>
+</div>
+
 <!-- HOME -->
-<div id="home-screen" class="screen active">
+<div id="home-screen" class="screen">
   <a href="index.html" class="back-link">◀ &nbsp;العودة للرئيسية</a>
   <div class="game-logo"><span class="r">AI</span><span> IMPOSTOR</span></div>
   <div class="game-logo-sub">// SOCIAL DEDUCTION GAME //</div>
@@ -257,7 +291,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getDatabase,ref,set,get,onValue,update,push,remove,off}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 const FB={apiKey:"AIzaSyBlxlmfQCaaXJJ0LA08JBDTl0wmZN-qyxk",authDomain:"ai-is-imposter.firebaseapp.com",databaseURL:"https://ai-is-imposter-default-rtdb.firebaseio.com",projectId:"ai-is-imposter",storageBucket:"ai-is-imposter.firebasestorage.app",messagingSenderId:"536417721792",appId:"1:536417721792:web:b2ab7d7f19b89a9e76fc25"};
-const GROQ="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";
+// GROQ KEY — stored locally only, never sent to any server
+let GROQ = localStorage.getItem('__ai_imp_gk') || '';
 const fbApp=initializeApp(FB);const db=getDatabase(fbApp);
 const T_AR=["أغرب حلم رأيته","أكثر لحظة خجلت فيها","شيء تندم أنك لم تفعله","أكثر شخص أثّر في حياتك","لحظة شعرت فيها بالخوف الحقيقي","ذكرى من الطفولة لا تنساها","أغرب شيء أكلته","لو عدت لعمر العشر سنوات","شيء يغضبك بشدة","أكثر كذبة قلتها","لحظة فخر حقيقية","شيء تخاف يعرفه الناس عنك","أصعب قرار اتخذته","شيء تتمنى لو تعلمته مبكراً","أغرب إنسان قابلته","لحظة بكيت فيها بشدة","شيء تحبه ولا أحد يفهم لماذا","موقف غيّر نظرتك للحياة","أكثر شيء تخشى خسارته","لو كان لديك يوم واحد بلا قواعد","شيء تشعر بالذنب تجاهه","أكثر لحظة شعرت فيها بالوحدة","ما الذي يجعلك تضحك حتى البكاء","شيء قلته وتمنيت لو لم تقله","أغرب عادة تملكها","لحظة أدركت فيها أنك كبرت","أصعب وداع في حياتك","لو كنت تعيش في زمن آخر","شيء تفعله حين تكون وحيداً فقط","أكثر سؤال يؤرقك","لحظة شعرت فيها بالغدر","شيء تتمنى أن تقوله لطفلك الصغير","أغرب تزامن حدث معك","لو كان بإمكانك نسيان شيء واحد","شيء تفعله لتهدئ نفسك","أكثر شخص اشتقت له","لحظة أدركت فيها أنك مختلف","شيء كنت مقتنعاً به وتغيرت قناعتك","أغرب سؤال طرحته على نفسك","لو أُتيح لك تغيير شيء في ماضيك","شيء يجعلك تشعر بالأمان","أكثر لحظة شعرت فيها بالحرية","شيء تخشى الاعتراف به لنفسك","لو عرفت موعد نهايتك","أغرب قرار اتخذته بشكل عفوي","شيء تفتقده من طفولتك","لحظة أحببت فيها الصمت","ما الذي تريد أن يُذكر عنك","لو كان بإمكانك إرسال رسالة لنفسك قبل عشر سنوات","أكثر موقف غيّر مفهومك عن نفسك"];
 const T_EN=["The strangest dream you ever had","Your most embarrassing moment","Something you regret not doing","The person who influenced you most","A moment you felt genuine fear","A childhood memory you'll never forget","The weirdest thing you've eaten","If you could go back to age 10","Something that makes you furious","The biggest lie you ever told","A moment of genuine pride","Something you fear others knowing about you","The hardest decision you've made","Something you wish you learned earlier","The strangest person you've met","A time you cried deeply","Something you love that no one understands","A moment that changed your worldview","The thing you most fear losing","If you had one day with no rules","Something you feel guilty about","Your loneliest moment","What makes you laugh until you cry","Something you said and wish you hadn't","Your strangest habit","The moment you realized you'd grown up","The hardest goodbye of your life","If you could live in another era","What you only do when completely alone","The question that haunts you most","A moment you felt betrayed","Something you'd tell your younger self","The strangest coincidence in your life","If you could forget one thing","What you do to calm yourself down","The person you miss most","When you realized you were different","A belief you held that completely changed","The strangest question you've asked yourself","If you could change one thing in your past","What makes you feel safe","Your most liberating moment","Something you're afraid to admit to yourself","If you knew when your life would end","The most spontaneous decision you ever made","Something you miss from childhood","A moment you truly loved silence","What you want to be remembered for","If you could send a message to yourself 10 years ago","A moment that completely changed how you see yourself"];
@@ -275,6 +310,49 @@ function toast(msg,dur=3000){document.querySelectorAll('.toast').forEach(t=>t.re
 function filterLang(text,lang){if(!text)return'';if(lang==='ar'){return text.replace(/[^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\d،؟!.\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}return text.replace(/[^\u0000-\u024F\s\d!?.,'"\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 function clearTimers(){if(S._timerInt){clearInterval(S._timerInt);S._timerInt=null;}if(S._voteInt){clearInterval(S._voteInt);S._voteInt=null;}}
+/* SOUNDS */
+let _ac=null;
+function getAC(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();return _ac;}
+function playTone(freq,type='sine',dur=0.1,gain=0.06){try{const ac=getAC(),o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(gain,ac.currentTime+0.01);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+dur);o.start(ac.currentTime);o.stop(ac.currentTime+dur+0.05);}catch(e){}}
+function sndClick(){playTone(880,'sine',0.08,0.06);}
+function sndHover(){playTone(440,'sine',0.04,0.02);}
+function sndSuccess(){playTone(660,'sine',0.06,0.05);setTimeout(()=>playTone(880,'sine',0.12,0.05),80);}
+function sndVote(){playTone(330,'sawtooth',0.1,0.04);}
+function sndReveal(){playTone(220,'sawtooth',0.15,0.05);setTimeout(()=>playTone(440,'sine',0.2,0.06),150);setTimeout(()=>playTone(660,'sine',0.3,0.06),300);}
+function sndTimer(){playTone(880,'square',0.05,0.03);}
+document.addEventListener('click',()=>{try{getAC().resume();}catch(e){}},{once:true});
+function attachSounds(){document.querySelectorAll('.btn,.tab,.back-link').forEach(b=>{if(!b.dataset.snd){b.dataset.snd='1';b.addEventListener('click',sndClick);b.addEventListener('mouseenter',sndHover);}});}
+/* GROQ SETUP */
+window.saveGroqKey=async function(){
+  const inp=document.getElementById('groq-input');
+  const key=inp.value.trim();
+  const errEl=document.getElementById('groq-error');
+  errEl.style.display='none';
+  if(!key.startsWith('gsk_')||key.length<20){errEl.textContent='⚠️ المفتاح يجب أن يبدأ بـ gsk_ ويكون صحيحاً';errEl.style.display='block';return;}
+  const btn=document.getElementById('groq-save-btn');
+  btn.disabled=true;btn.textContent='جارٍ التحقق...';
+  // Quick validation call
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/models',{headers:{'Authorization':`Bearer ${key}`}});
+    if(!r.ok)throw new Error('invalid');
+    localStorage.setItem('__ai_imp_gk',key);
+    GROQ=key;
+    sndSuccess();
+    toast('✅ تم حفظ المفتاح بنجاح!');
+    setTimeout(()=>showScreen('home-screen'),800);
+  }catch(e){
+    errEl.textContent='❌ المفتاح غير صحيح أو منتهي الصلاحية — تأكد وأعد المحاولة';
+    errEl.style.display='block';
+    btn.disabled=false;btn.textContent='حفظ المفتاح والمتابعة ▶';
+  }
+};
+// Check on load: show setup if no key, else show home
+(function init(){
+  const saved=localStorage.getItem('__ai_imp_gk');
+  if(saved&&saved.startsWith('gsk_')&&saved.length>20){GROQ=saved;showScreen('home-screen');}
+  else{showScreen('groq-screen');}
+  setTimeout(attachSounds,100);
+})();
 window.switchTab=function(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-btn-'+tab).classList.add('active');document.getElementById('tab-create').style.display=tab==='create'?'block':'none';document.getElementById('tab-join').style.display=tab==='join'?'block':'none';};
 window.copyCode=function(){navigator.clipboard?.writeText(S.roomId).then(()=>toast(S.lang==='ar'?'✅ تم نسخ الكود':'✅ Code copied'));};
 /* CREATE */
@@ -383,6 +461,7 @@ async function enterGame(room){
     txt.textContent=`${m}:${s.toString().padStart(2,'0')}`;
     const off2=138-(left/120)*138;circ.style.strokeDashoffset=off2;
     circ.style.stroke=left>60?'var(--success)':left>20?'var(--warn)':'var(--red)';
+    if(left<=10&&left>0)sndTimer();
     if(left<=0){clearInterval(S._timerInt);if(S.isHost)await update(ref(db,`rooms/${S.roomId}`),{phase:'vote',voteStartTime:nowTs()});}
   },1000);
   if(S.isAI)S._aiSched=setTimeout(()=>aiRespond(true),7000+Math.random()*8000);
@@ -487,7 +566,7 @@ async function enterVote(){
   });
   S._listeners.push(()=>off(vRef,'value',vU));
 }
-function selectVote(pid){if(document.querySelector('.vote-card.confirmed'))return;S.votedFor=pid;document.querySelectorAll('.vote-card').forEach(c=>c.classList.toggle('selected',c.dataset.pid===pid));document.getElementById('confirm-vote-btn').disabled=false;}
+function selectVote(pid){if(document.querySelector('.vote-card.confirmed'))return;S.votedFor=pid;sndVote();document.querySelectorAll('.vote-card').forEach(c=>c.classList.toggle('selected',c.dataset.pid===pid));document.getElementById('confirm-vote-btn').disabled=false;}
 window.confirmVote=async function(){
   if(!S.votedFor)return;
   document.getElementById('confirm-vote-btn').disabled=true;
@@ -515,7 +594,7 @@ async function tallyVotes(){
 }
 /* RESULT */
 async function enterResult(room){
-  clearTimers();showScreen('result-screen');
+  clearTimers();showScreen('result-screen');sndReveal();
   const isAr=S.lang==='ar';
   const[pS,rS,cS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`)),get(ref(db,`rooms/${S.roomId}/chat`))]);
   const players=pS.val()||{},roomData=rS.val()||room;
@@ -560,6 +639,7 @@ document.getElementById('create-name').addEventListener('keydown',e=>{if(e.key==
 document.getElementById('join-name').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
 document.getElementById('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
 document.getElementById('join-code').addEventListener('input',function(){this.value=this.value.toUpperCase();});
+document.getElementById('groq-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveGroqKey();});
 /* CHAR COUNTER */
 document.getElementById('chat-input').addEventListener('input',function(){
   const rem=50-this.value.length;

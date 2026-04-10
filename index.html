@@ -161,8 +161,8 @@ section{position:relative;z-index:1;}
 .ticker-item::before{content:'◆';color:var(--red);font-size:8px;}
 @keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 /* CTA */
-#cta{background:var(--black);}
-.cta-inner{max-width:800px;margin:0 auto;padding:120px 24px;text-align:center;}
+#cta{background:var(--black);position:relative;}
+.cta-inner{max-width:800px;margin:0 auto;padding:120px 24px;text-align:center;position:relative;z-index:1;}
 .cta-glow{position:absolute;inset:0;background:radial-gradient(ellipse 600px 300px at 50% 50%,rgba(255,32,32,0.06),transparent);pointer-events:none;}
 .cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);line-height:.95;margin-bottom:24px;}
 .cta-title span{color:var(--red);text-shadow:0 0 40px var(--glow-r);}
@@ -172,24 +172,24 @@ section{position:relative;z-index:1;}
 footer{background:var(--surface);border-top:1px solid var(--border);padding:36px 48px;position:relative;z-index:1;}
 .footer-main{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
 .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
-.footer-logo .r{color:var(--red);}
+.footer-logo .r{color:var(--red);text-shadow:0 0 15px var(--glow-r);}
 .footer-links{display:flex;gap:24px;}
-.footer-links a{font-size:13px;color:var(--text2);text-decoration:none;transition:color .2s;}
+.footer-links a{font-size:13px;color:var(--text2);text-decoration:none;transition:color .2s;letter-spacing:.3px;}
 .footer-links a:hover{color:var(--text);}
-.footer-divider{height:1px;background:var(--border);margin-bottom:20px;}
+.footer-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin-bottom:20px;}
 .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-.footer-copy{font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;}
+.footer-copy{font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .footer-dev{display:flex;align-items:center;gap:10px;}
-.footer-dev-label{font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
-.footer-dev-badge{display:flex;align-items:center;gap:6px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:6px;padding:5px 12px;text-decoration:none;transition:all .2s;}
-.footer-dev-badge:hover{background:rgba(124,58,237,0.15);border-color:rgba(124,58,237,0.4);}
-.footer-dev-badge span{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);}
+.footer-dev-label{font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:2px;text-transform:uppercase;}
+.footer-dev-badge{display:flex;align-items:center;gap:7px;background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.18);border-radius:6px;padding:6px 13px;text-decoration:none;transition:all .25s;}
+.footer-dev-badge:hover{background:rgba(124,58,237,0.14);border-color:rgba(124,58,237,0.38);transform:translateY(-1px);box-shadow:0 4px 16px rgba(124,58,237,0.15);}
+.footer-dev-badge span{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);letter-spacing:.5px;}
 .footer-dev-badge .at{color:var(--violet);}
-.footer-dev-dot{width:5px;height:5px;background:var(--violet);border-radius:50%;animation:pulse 2s infinite;}
+.footer-dev-dot{width:5px;height:5px;background:var(--violet);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;}
 /* ANIMS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.live-badge{top:80px;right:20px;}footer{padding:28px 20px;}.footer-main,.footer-bottom{flex-direction:column;text-align:center;}.footer-links{justify-content:center;}.footer-dev{justify-content:center;}}
+@media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.live-badge{top:80px;right:20px;}.stat-float{display:none;}footer{padding:28px 20px;}.footer-main,.footer-bottom{flex-direction:column;text-align:center;}.footer-links{justify-content:center;}.footer-dev{justify-content:center;}}
 </style>
 </head>
 <body>
@@ -379,7 +379,11 @@ let ms=84;setInterval(()=>{ms--;if(ms<0)ms=120;const m=Math.floor(ms/60),s=ms%60
 /* SOUND */
 let ac=null;function ga(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;}
 function tone(f,t='sine',d=.1,g=.06){try{const a=ga(),o=a.createOscillator(),gn=a.createGain();o.connect(gn);gn.connect(a.destination);o.type=t;o.frequency.value=f;gn.gain.setValueAtTime(0,a.currentTime);gn.gain.linearRampToValueAtTime(g,a.currentTime+.01);gn.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.start(a.currentTime);o.stop(a.currentTime+d+.05);}catch(e){}}
-document.querySelectorAll('.btn-play,.btn-how,.nav-cta').forEach(b=>{b.addEventListener('click',()=>tone(880,'sine',.08,.06));b.addEventListener('mouseenter',()=>tone(440,'sine',.04,.03));});
+function clickSound(){tone(880,'sine',.08,.06);}
+function hoverSound(){tone(440,'sine',.04,.03);}
+document.querySelectorAll('.btn-play,.btn-how,.nav-cta,.lang-btn').forEach(b=>{b.addEventListener('click',clickSound);b.addEventListener('mouseenter',hoverSound);});
+function playAmbient(){try{const a=ga(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';o.frequency.setValueAtTime(60,a.currentTime);o.frequency.linearRampToValueAtTime(55,a.currentTime+3);g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(0.015,a.currentTime+1);g.gain.linearRampToValueAtTime(0,a.currentTime+4);o.start(a.currentTime);o.stop(a.currentTime+4.5);setTimeout(playAmbient,12000);}catch(e){}}
+document.addEventListener('click',()=>{playAmbient();},{once:true});
 /* EYE */
 const pupil=document.querySelector('.eye-pupil');
 if(pupil)document.addEventListener('mousemove',e=>{const eye=document.querySelector('.eye-inner');if(!eye)return;const r=eye.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,angle=Math.atan2(e.clientY-cy,e.clientX-cx),dist=Math.min(8,Math.hypot(e.clientX-cx,e.clientY-cy)/20);pupil.style.transform=`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`;});
