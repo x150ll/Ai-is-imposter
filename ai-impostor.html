@@ -180,7 +180,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     </div>
     <div class="field">
       <label>مفتاح Groq API</label>
-      <input type="password" id="groq-input" placeholder="gsk_..." autocomplete="off" style="font-family:'Share Tech Mono',monospace;letter-spacing:1px;font-size:14px;">
+      <input type="password" id="groq-input" placeholder="gsk_..." autocomplete="off" dir="ltr" style="font-family:'Share Tech Mono',monospace;letter-spacing:1px;font-size:14px;text-align:left;">
     </div>
     <div id="groq-error" style="display:none;color:var(--red);font-size:12px;margin-bottom:14px;padding:8px 12px;background:rgba(255,32,32,.06);border-radius:6px;font-family:'Share Tech Mono',monospace;"></div>
     <button class="btn btn-primary" id="groq-save-btn" onclick="saveGroqKey()">حفظ المفتاح والمتابعة ▶</button>
@@ -325,19 +325,51 @@ function attachSounds(){document.querySelectorAll('.btn,.tab,.back-link').forEac
 /* GROQ SETUP */
 window.saveGroqKey=async function(){
   const inp=document.getElementById('groq-input');
-  const key=inp.value.trim();
+  const key=inp.value.replace(/[^\x20-\x7E]/g,'').trim();
   const errEl=document.getElementById('groq-error');
+  const btn=document.getElementById('groq-save-btn');
   errEl.style.display='none';
   if(!key.startsWith('gsk_')||key.length<20){
-    errEl.textContent='⚠️ المفتاح يجب أن يبدأ بـ gsk_ ويكون صحيحاً';
+    errEl.textContent='⚠️ المفتاح يجب أن يبدأ بـ gsk_ ويكون بالشكل الصحيح';
     errEl.style.display='block';
     return;
   }
-  localStorage.setItem('__ai_imp_gk',key);
-  GROQ=key;
-  sndSuccess();
-  toast('✅ تم حفظ المفتاح بنجاح!');
-  setTimeout(()=>showScreen('home-screen'),600);
+  btn.disabled=true;
+  btn.textContent='جارٍ التحقق...';
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'user',content:'hi'}],
+        max_tokens:1
+      })
+    });
+    if(!r.ok){
+      const d=await r.json().catch(()=>({}));
+      const msg=d?.error?.message||'';
+      if(r.status===401)throw new Error('auth');
+      if(r.status===429)throw new Error('quota');
+      throw new Error('unknown');
+    }
+    localStorage.setItem('__ai_imp_gk',key);
+    GROQ=key;
+    sndSuccess();
+    btn.textContent='✅ تم التحقق!';
+    toast('✅ تم حفظ المفتاح بنجاح!');
+    setTimeout(()=>showScreen('home-screen'),800);
+  }catch(e){
+    const msgs={
+      auth:'❌ المفتاح غير صحيح — تأكد من نسخه كاملاً',
+      quota:'⚠️ تجاوزت الحد المجاني لـ Groq — جرب لاحقاً',
+      unknown:'❌ تعذر التحقق — تأكد من الاتصال بالإنترنت'
+    };
+    errEl.textContent=msgs[e.message]||msgs.unknown;
+    errEl.style.display='block';
+    btn.disabled=false;
+    btn.textContent='حفظ المفتاح والمتابعة ▶';
+  }
 };
 // Check on load: show setup if no key, else show home
 (function init(){
