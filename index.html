@@ -4,16 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI IMPOSTOR | كاشف الذكاء</title>
+<meta name="description" content="لعبة اجتماعية مثيرة — ذكاء اصطناعي يختبئ بينكم ويتظاهر بأنه إنسان. اكشفه قبل الآخرين واجمع النقاط للفوز.">
+<meta property="og:title" content="AI IMPOSTOR | كاشف الذكاء">
+<meta property="og:description" content="ذكاء اصطناعي يختبئ بينكم — تحدثوا، حللوا، صوّتوا. من يكشفه أولاً يفوز.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://x150ll.github.io/pinfinder/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI IMPOSTOR | كاشف الذكاء">
+<meta name="twitter:description" content="ذكاء اصطناعي يختبئ بينكم — تحدثوا، حللوا، صوّتوا. من يكشفه أولاً يفوز.">
+<meta name="theme-color" content="#ff2020">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{--black:#030407;--dark:#080b12;--surface:#0d1117;--surface2:#131820;--border:#1e2535;--red:#ff2020;--red-dim:#8b0000;--violet:#7c3aed;--violet2:#4f1fad;--cyan:#00e5ff;--cyan-dim:#005f6b;--text:#e2e8f4;--text2:#7a8aa8;--text3:#3d4d68;--glow-r:rgba(255,32,32,0.35);--glow-v:rgba(124,58,237,0.35);--glow-c:rgba(0,229,255,0.2);}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{font-family:'Tajawal',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;cursor:none;}
+body{font-family:'Tajawal',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;}
+@media(pointer:fine){body{cursor:none;}}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9000;opacity:.5;}
-.cursor{position:fixed;width:12px;height:12px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,background .2s;mix-blend-mode:screen;}
-.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,32,32,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;}
+.cursor{position:fixed;width:12px;height:12px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,background .2s;mix-blend-mode:screen;display:none;}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,32,32,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;display:none;}
+@media(pointer:fine){.cursor,.cursor-ring{display:block;}}
 body:has(a:hover) .cursor,body:has(button:hover) .cursor{transform:translate(-50%,-50%) scale(2);background:var(--cyan);}
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 /* NAV */
@@ -27,7 +38,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:fl
 .nav-cta:hover{background:#ff4040!important;transform:translateY(-1px);box-shadow:0 0 30px var(--glow-r)!important;}
 /* LANG TOGGLE */
 .lang-toggle{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0;}
-.lang-btn{background:transparent;border:none;color:var(--text2);padding:7px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:none;transition:all .2s;letter-spacing:1px;}
+.lang-btn{background:transparent;border:none;color:var(--text2);padding:7px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1px;}
 .lang-btn.active{background:var(--violet);color:#fff;}
 .lang-btn:hover:not(.active){background:var(--surface2);color:var(--text);}
 /* HERO */
@@ -137,7 +148,7 @@ section{position:relative;z-index:1;}
 .ai-suspect-badge{align-self:center;background:rgba(255,32,32,0.08);border:1px solid rgba(255,32,32,0.2);color:var(--red);padding:4px 12px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;}
 /* FEATURES */
 #features{background:linear-gradient(180deg,var(--black) 0%,var(--dark) 100%);}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:60px;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:60px;}
 .feat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 24px;transition:all .3s;position:relative;overflow:hidden;opacity:0;transform:scale(.96);}
 .feat-card.visible{opacity:1;transform:scale(1);transition:opacity .5s ease,transform .5s ease;}
 .feat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent-color),transparent);transform:scaleX(0);transition:transform .3s;}

@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI IMPOSTOR | كاشف الذكاء</title>
+<meta name="description" content="لعبة AI IMPOSTOR — ذكاء اصطناعي يختبئ بينكم ويتظاهر بأنه إنسان. اكشفه قبل الآخرين.">
+<meta property="og:title" content="AI IMPOSTOR | العب الآن">
+<meta property="og:description" content="ذكاء اصطناعي يختبئ بينكم — اكشفه قبل الآخرين واجمع النقاط.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#ff2020">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{--black:#030407;--dark:#080b12;--surface:#0d1117;--surface2:#131820;--border:#1e2535;--red:#ff2020;--red-dim:#8b0000;--violet:#7c3aed;--violet2:#4f1fad;--cyan:#00e5ff;--text:#e2e8f4;--text2:#7a8aa8;--text3:#3d4d68;--glow-r:rgba(255,32,32,0.3);--glow-v:rgba(124,58,237,0.3);--success:#22c55e;--warn:#f59e0b;}
@@ -14,7 +19,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* SCREENS */
 .screen{display:none;min-height:100vh;position:relative;z-index:1;}
 .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-#waiting-screen.active,#result-screen.active{justify-content:flex-start;padding-top:24px;}
+#waiting-screen.active,#result-screen.active{justify-content:flex-start;padding-top:24px;overflow-y:auto;}
 #game-screen{padding:0;}
 #game-screen.active{justify-content:flex-start;align-items:stretch;padding:0;}
 #vote-screen.active{padding:24px;}
@@ -66,7 +71,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 @keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
 .host-area{width:100%;max-width:700px;margin:16px auto 0;}
 /* GAME */
-.game-layout{display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh;max-width:820px;margin:0 auto;width:100%;}
+.game-layout{display:grid;grid-template-rows:auto auto 1fr auto;height:100vh;height:100dvh;max-width:820px;margin:0 auto;width:100%;}
 .game-header{padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .topic-pill{background:linear-gradient(135deg,var(--violet),var(--violet2));padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 0 16px var(--glow-v);}
 .game-header-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
@@ -104,7 +109,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .vote-subtitle{color:var(--text2);font-size:14px;text-align:center;margin-bottom:18px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
 .vote-timer-big{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--warn);text-align:center;margin-bottom:20px;line-height:1;text-shadow:0 0 20px rgba(245,158,11,.4);transition:color .3s;}
 .vote-timer-big.red{color:var(--red);text-shadow:0 0 20px var(--glow-r);}
-.vote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;width:100%;max-width:580px;margin:0 auto 20px;}
+.vote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;width:100%;max-width:580px;margin:0 auto 20px;}
 .vote-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .22s;user-select:none;}
 .vote-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
 .vote-card.selected{border-color:var(--red);background:rgba(255,32,32,.06);box-shadow:0 0 20px var(--glow-r);}
@@ -164,9 +169,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .turn-pip.done{opacity:.35;}
 @media(max-width:600px){.card{padding:22px 16px;}.msg{max-width:88%;}.vote-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}}
 /* CURSOR */
-body{cursor:none;}
-.cursor{position:fixed;width:12px;height:12px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,background .2s;mix-blend-mode:screen;}
-.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,32,32,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;}
+@media(pointer:fine){body{cursor:none;}}
+.cursor{position:fixed;width:12px;height:12px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,background .2s;mix-blend-mode:screen;display:none;}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,32,32,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;display:none;}
+@media(pointer:fine){.cursor,.cursor-ring{display:block;}}
 /* CANVAS */
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 </style>
@@ -222,7 +228,9 @@ body{cursor:none;}
       <button class="tab" id="tab-btn-join" onclick="switchTab('join')">الانضمام</button>
     </div>
     <div id="tab-create">
-      <div class="field"><label>الاسم في اللعبة</label><input type="text" id="create-name" placeholder="أدخل اسمك..." maxlength="18" autocomplete="off"></div>
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.8;">
+        🎭 <strong style="color:var(--cyan);">اسمك سيُعطى لك تلقائياً</strong> — يتغير في كل جولة لزيادة الغموض
+      </div>
       <div class="field"><label>لغة الغرفة</label>
         <select id="create-lang">
           <option value="ar">🇸🇦 العربية</option>
@@ -239,7 +247,9 @@ body{cursor:none;}
       <button class="btn btn-primary" onclick="createRoom()">إنشاء الغرفة</button>
     </div>
     <div id="tab-join" style="display:none">
-      <div class="field"><label>الاسم في اللعبة</label><input type="text" id="join-name" placeholder="أدخل اسمك..." maxlength="18" autocomplete="off"></div>
+      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.8;">
+        🎭 <strong style="color:var(--cyan);">اسمك سيُعطى لك تلقائياً</strong> — يتغير في كل جولة
+      </div>
       <div class="field"><label>كود الغرفة</label><input type="text" id="join-code" placeholder="XXXXX" maxlength="6" style="letter-spacing:4px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;font-size:22px;" autocomplete="off"></div>
       <button class="btn btn-primary" onclick="joinRoom()">انضمام للغرفة</button>
     </div>
@@ -286,7 +296,7 @@ body{cursor:none;}
             <circle class="timer-bg" cx="24" cy="24" r="22"/>
             <circle class="timer-prog" id="timer-circle" cx="24" cy="24" r="22"/>
           </svg>
-          <div class="timer-text" id="timer-text">2:00</div>
+          <div class="timer-text" id="timer-text">3:00</div>
         </div>
       </div>
     </div>
@@ -305,23 +315,23 @@ body{cursor:none;}
   </div>
 </div>
 
-<!-- RENAME SCREEN -->
+<!-- NAME REVEAL SCREEN -->
 <div id="rename-screen" class="screen">
   <div class="game-logo"><span class="r">AI</span><span> IMPOSTOR</span></div>
   <div class="game-logo-sub">// NEXT ROUND //</div>
-  <div class="card" style="max-width:400px;">
-    <div style="text-align:center;margin-bottom:22px;">
-      <div style="font-size:36px;margin-bottom:10px;" id="rename-avatar">🦊</div>
-      <div style="font-size:15px;color:var(--text2);line-height:1.7;" id="rename-subtitle">الجولة الجديدة تبدأ قريباً<br>اختر اسماً جديداً لنفسك</div>
+  <div class="card" style="max-width:400px;text-align:center;">
+    <div style="font-size:13px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;" id="rename-round-label">الجولة القادمة</div>
+    <div style="font-size:48px;margin-bottom:16px;" id="rename-avatar">🦊</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:10px;" id="rename-label-text">اسمك في هذه الجولة</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--cyan);text-shadow:0 0 24px rgba(0,229,255,.4);letter-spacing:2px;margin-bottom:8px;line-height:1;" id="rename-name-display">---</div>
+    <div style="font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:.5px;margin-bottom:24px;" id="rename-hint">تذكر هذا الاسم — هو هويتك في الجولة</div>
+    <div style="background:rgba(255,32,32,.04);border:1px solid rgba(255,32,32,.1);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--text3);line-height:1.7;font-family:'Share Tech Mono',monospace;">
+      🤖 <span id="rename-ai-hint">الذكاء الاصطناعي يأخذ اسماً مختلفاً أيضاً — لا أحد يعرف من هو</span>
     </div>
-    <div class="field">
-      <label>اسمك الجديد</label>
-      <input type="text" id="rename-input" placeholder="اسم واحد فقط..." maxlength="14" autocomplete="off">
+    <div id="rename-waiting-msg" style="font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span class="pulse-dot"></span><span id="rename-wait-text">في انتظار بقية اللاعبين...</span>
     </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;">
-      💡 استخدم اسماً خيالياً — لا اسمك الحقيقي
-    </div>
-    <button class="btn btn-primary" onclick="confirmRename()">تأكيد الاسم والانتظار</button>
+    <div id="rename-host-area" style="display:none;margin-top:16px;"></div>
   </div>
 </div>
 
@@ -375,10 +385,53 @@ const fbApp=initializeApp(FB);const db=getDatabase(fbApp);
 const T_AR=["أغرب حلم رأيته","أكثر لحظة خجلت فيها","شيء تندم أنك لم تفعله","أكثر شخص أثّر في حياتك","لحظة شعرت فيها بالخوف الحقيقي","ذكرى من الطفولة لا تنساها","أغرب شيء أكلته","لو عدت لعمر العشر سنوات","شيء يغضبك بشدة","أكثر كذبة قلتها","لحظة فخر حقيقية","شيء تخاف يعرفه الناس عنك","أصعب قرار اتخذته","شيء تتمنى لو تعلمته مبكراً","أغرب إنسان قابلته","لحظة بكيت فيها بشدة","شيء تحبه ولا أحد يفهم لماذا","موقف غيّر نظرتك للحياة","أكثر شيء تخشى خسارته","لو كان لديك يوم واحد بلا قواعد","شيء تشعر بالذنب تجاهه","أكثر لحظة شعرت فيها بالوحدة","ما الذي يجعلك تضحك حتى البكاء","شيء قلته وتمنيت لو لم تقله","أغرب عادة تملكها","لحظة أدركت فيها أنك كبرت","أصعب وداع في حياتك","لو كنت تعيش في زمن آخر","شيء تفعله حين تكون وحيداً فقط","أكثر سؤال يؤرقك","لحظة شعرت فيها بالغدر","شيء تتمنى أن تقوله لطفلك الصغير","أغرب تزامن حدث معك","لو كان بإمكانك نسيان شيء واحد","شيء تفعله لتهدئ نفسك","أكثر شخص اشتقت له","لحظة أدركت فيها أنك مختلف","شيء كنت مقتنعاً به وتغيرت قناعتك","أغرب سؤال طرحته على نفسك","لو أُتيح لك تغيير شيء في ماضيك","شيء يجعلك تشعر بالأمان","أكثر لحظة شعرت فيها بالحرية","شيء تخشى الاعتراف به لنفسك","لو عرفت موعد نهايتك","أغرب قرار اتخذته بشكل عفوي","شيء تفتقده من طفولتك","لحظة أحببت فيها الصمت","ما الذي تريد أن يُذكر عنك","لو كان بإمكانك إرسال رسالة لنفسك قبل عشر سنوات","أكثر موقف غيّر مفهومك عن نفسك"];
 const T_EN=["The strangest dream you ever had","Your most embarrassing moment","Something you regret not doing","The person who influenced you most","A moment you felt genuine fear","A childhood memory you'll never forget","The weirdest thing you've eaten","If you could go back to age 10","Something that makes you furious","The biggest lie you ever told","A moment of genuine pride","Something you fear others knowing about you","The hardest decision you've made","Something you wish you learned earlier","The strangest person you've met","A time you cried deeply","Something you love that no one understands","A moment that changed your worldview","The thing you most fear losing","If you had one day with no rules","Something you feel guilty about","Your loneliest moment","What makes you laugh until you cry","Something you said and wish you hadn't","Your strangest habit","The moment you realized you'd grown up","The hardest goodbye of your life","If you could live in another era","What you only do when completely alone","The question that haunts you most","A moment you felt betrayed","Something you'd tell your younger self","The strangest coincidence in your life","If you could forget one thing","What you do to calm yourself down","The person you miss most","When you realized you were different","A belief you held that completely changed","The strangest question you've asked yourself","If you could change one thing in your past","What makes you feel safe","Your most liberating moment","Something you're afraid to admit to yourself","If you knew when your life would end","The most spontaneous decision you ever made","Something you miss from childhood","A moment you truly loved silence","What you want to be remembered for","If you could send a message to yourself 10 years ago","A moment that completely changed how you see yourself"];
 const AVATARS=['🦊','🐺','🦁','🐯','🦄','🐲','🦅','🦋','🐙','🦈','🐸','🦩','🐻','🦌','🐬','🦝'];
-const AI_AR=['سامي','نورا','ريم','فهد','لمى','عمر','هند','طارق','منى','خالد'];
-const AI_EN=['Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake'];
+const AI_AR=[
+  // خليجي — سعودي / إماراتي / كويتي / بحريني / قطري / عماني
+  'سامي','فهد','خالد','طارق','عمر','ماجد','راشد','سلطان','عبدالله','حمد',
+  'جاسم','نواف','بندر','مشعل','فيصل','تركي','سعود','عبدالعزيز','منصور','زياد',
+  'نورا','ريم','لمى','هند','منى','شيخة','فاطمة','موزة','مريم','نجلاء',
+  'هيفاء','دانة','سارة','لولوة','ميثاء','عائشة','جواهر','بشاير','ريان','غادة',
+  // عراقي
+  'علي','حيدر','مصطفى','أحمد','محمد','حسن','حسين','كرار','عمار','باسل',
+  'ياسر','ليث','عدي','قاسم','جعفر','زينة','رنا','وسن','بتول','إيمان',
+  'نسرين','هديل','دنيا','سجى','بيان',
+  // مصري / شامي
+  'كريم','مازن','وائل','رامي','شادي','نادر','تامر','عمرو','هاني','سيف',
+  'ياسمين','نهى','رانيا','ميار','لين','دينا','روان','مي','نادين','سلمى',
+  // مغاربي — مغرب / تونس / الجزائر / ليبيا
+  'أمين','يوسف','إلياس','أيوب','أنس','حمزة','إبراهيم','إسماعيل','عثمان','يحيى',
+  'آية','إيناس','أسماء','خديجة','زينب','حفصة','إيمان','أميرة','سناء','ندى',
+  // أسماء مشتركة بين الدول
+  'عبدالرحمن','عبدالكريم','عبدالله','عبدالحميد','نور','ملك','لارا','جنى','تالا','رؤى'
+];
+const AI_EN=[
+  'Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake',
+  'Taylor','Skyler','Parker','Reese','Sage','River','Ash','Rowan','Finley','Emery',
+  'Charlie','Jamie','Jesse','Kai','Logan','Marley','Noel','Phoenix','Sloane','Spencer',
+  'Bailey','Camden','Ellis','Flynn','Gray','Harper','Indigo','Jules','Kendall','Lane'
+];
 
 /* ── AI PERSONAS ── */
+/* ── PLAYER NAME POOLS (auto-assigned, same source as AI) ── */
+const PLAYER_NAMES_AR=[
+  'سامي','فهد','خالد','طارق','عمر','ماجد','راشد','سلطان','عبدالله','حمد',
+  'جاسم','نواف','بندر','مشعل','فيصل','تركي','سعود','منصور','زياد','نورا',
+  'ريم','لمى','هند','منى','شيخة','فاطمة','مريم','سارة','غادة','دانة',
+  'علي','حيدر','مصطفى','أحمد','محمد','حسن','كرار','عمار','باسل','ياسر',
+  'ليث','زينة','رنا','وسن','بتول','إيمان','نسرين','هديل','دنيا','سجى',
+  'كريم','مازن','وائل','رامي','شادي','نادر','تامر','عمرو','هاني','سيف',
+  'ياسمين','نهى','رانيا','لين','دينا','روان','نادين','سلمى','أمين','يوسف',
+  'إلياس','أيوب','أنس','حمزة','إبراهيم','إسماعيل','عثمان','آية','إيناس',
+  'أسماء','خديجة','زينب','حفصة','أميرة','سناء','ندى','نور','ملك','لارا',
+  'جنى','تالا','رؤى','عبدالرحمن','مازن','ريان','لمار','جود','بيان','باسل'
+];
+const PLAYER_NAMES_EN=[
+  'Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake',
+  'Taylor','Skyler','Parker','Reese','Sage','River','Ash','Rowan','Finley','Emery',
+  'Charlie','Jamie','Jesse','Kai','Logan','Marley','Noel','Phoenix','Sloane','Spencer',
+  'Bailey','Camden','Ellis','Flynn','Gray','Harper','Jules','Kendall','Lane','Scout'
+];
+
 const PERSONAS_AR={
   shy:{label:'خجول ومتردد',desc:'قليل الكلام، يتردد كثيراً، يبدأ جمله بـ "مو متأكد" أو "يعني"، يتجنب الآراء الحاسمة، يكتب بشكل ناقص أحياناً'},
   sarcastic:{label:'ساخر وعفوي',desc:'يعلق بشكل ساخر وخفيف، يستخدم "خخخ" أو "والله ما أدري"، يقلل من الأمور، منفصل عاطفياً'},
@@ -439,7 +492,8 @@ function startGameAmbient(mode='chat'){
       lfo.frequency.value=0.15;lg.gain.value=0.5;
       lfo.connect(lg);lg.connect(mix.gain);
       o1.start();o2.start();lfo.start();
-      mix.gain.setTargetAtTime(1,a.currentTime,2);
+      mix.gain.setValueAtTime(0,a.currentTime);
+      mix.gain.linearRampToValueAtTime(0.85,a.currentTime+3);
       _gameAmbNode={_all:[o1,o2,lfo],stop(){this._all.forEach(n=>{try{n.stop();}catch(e){}});}};
     } else if(mode==='review'){
       // Slightly louder, slower pulse — suspense
@@ -515,13 +569,13 @@ window.copyCode=function(){navigator.clipboard?.writeText(S.roomId).then(()=>toa
 
 /* ══════════ CREATE / JOIN ══════════ */
 window.createRoom=async function(){
-  const name=document.getElementById('create-name').value.trim();
   const lang=document.getElementById('create-lang').value;
   const winTarget=parseInt(document.getElementById('create-wintarget')?.value)||WIN_TARGET_DEFAULT;
-  if(!name){toast(lang==='ar'?'أدخل اسمك أولاً':'Please enter your name');return;}
   loading(true,lang==='ar'?'جارٍ إنشاء الغرفة...':'Creating room...');
   try{
     const roomId=genCode(),playerId=genId(),avatar=rnd(AVATARS);
+    // Auto-assign name from pool
+    const name=rnd(lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN);
     S.roomId=roomId;S.playerId=playerId;S.playerName=name;S.isHost=true;S.lang=lang;S.isAI=false;S.winTarget=winTarget;
     await set(ref(db,`rooms/${roomId}`),{host:playerId,lang,phase:'waiting',round:0,topic:'',createdAt:nowTs(),aiPlayerId:null,winTarget});
     await set(ref(db,`rooms/${roomId}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
@@ -529,9 +583,7 @@ window.createRoom=async function(){
   }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
 window.joinRoom=async function(){
-  const name=document.getElementById('join-name').value.trim();
   const code=document.getElementById('join-code').value.trim().toUpperCase();
-  if(!name){toast('أدخل اسمك أولاً');return;}
   if(code.length<4){toast('أدخل كود الغرفة');return;}
   loading(true,'جارٍ الانضمام...');
   try{
@@ -540,8 +592,14 @@ window.joinRoom=async function(){
     const room=snap.val();
     if(room.phase!=='waiting'){loading(false);toast('اللعبة بدأت بالفعل 🚫');return;}
     const pSnap=await get(ref(db,`rooms/${code}/players`));
-    const humans=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
+    const players=pSnap.val()||{};
+    const humans=Object.values(players).filter(p=>!p.isAI).length;
     if(humans>=5){loading(false);toast('الغرفة ممتلئة 🚫');return;}
+    // Auto-assign unique name (avoid duplicates)
+    const usedNames=Object.values(players).map(p=>p.name);
+    const pool=room.lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN;
+    const available=pool.filter(n=>!usedNames.includes(n));
+    const name=rnd(available.length>0?available:pool);
     const playerId=genId(),avatar=rnd(AVATARS);
     S.roomId=code;S.playerId=playerId;S.playerName=name;S.isHost=false;S.lang=room.lang;S.isAI=false;S.winTarget=room.winTarget||WIN_TARGET_DEFAULT;
     await set(ref(db,`rooms/${code}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
@@ -572,10 +630,19 @@ function enterWaiting(){
     if(S._tipInt)clearInterval(S._tipInt);
     S._tipInt=setInterval(cycleTip,4500);
   }
+  let _prevCount=0;
   const pRef=ref(db,`rooms/${S.roomId}/players`);
   const pU=onValue(pRef,snap=>{
-    const pl=snap.val()||{};renderWaitingPlayers(pl);
-    const h=Object.values(pl).filter(p=>!p.isAI).length;
+    const pl=snap.val()||{};
+    const humans=Object.values(pl).filter(p=>!p.isAI);
+    const h=humans.length;
+    // Play join sound if new player arrived (count increased)
+    if(h>_prevCount&&_prevCount>0){
+      try{const a=getAC(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.value=440;g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(0.06,a.currentTime+0.01);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.12);o.start(a.currentTime);o.stop(a.currentTime+0.17);setTimeout(()=>{const o2=a.createOscillator(),g2=a.createGain();o2.connect(g2);g2.connect(a.destination);o2.type='sine';o2.frequency.value=550;g2.gain.setValueAtTime(0,a.currentTime);g2.gain.linearRampToValueAtTime(0.06,a.currentTime+0.01);g2.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.15);o2.start(a.currentTime);o2.stop(a.currentTime+0.2);},110);}catch(e){}
+      toast(isAr?`👤 انضم لاعب جديد (${h} لاعبين)`:`👤 New player joined (${h} players)`);
+    }
+    _prevCount=h;
+    renderWaitingPlayers(pl);
     const btn=document.getElementById('start-btn');
     if(btn){btn.disabled=h<3;btn.textContent=isAr?`ابدأ اللعبة (${h} لاعبين)`:`Start Game (${h} players)`;}
   });
@@ -597,7 +664,21 @@ function enterWaiting(){
 }
 function renderWaitingPlayers(players){
   const isAr=S.lang==='ar';
-  document.getElementById('players-grid').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).map(([id,p])=>`<div class="player-card${id===S.playerId?' me':''}"><div class="player-avatar">${p.avatar}</div><div class="player-name">${esc(p.name)}</div><div class="player-tag">${id===S.playerId?(isAr?'أنت':'YOU'):''}</div></div>`).join('');
+  const humanEntries=Object.entries(players).filter(([,p])=>!p.isAI);
+  document.getElementById('players-grid').innerHTML=humanEntries.map(([id,p])=>{
+    const isMe=id===S.playerId;
+    // Only show name/avatar for current player — others are anonymous
+    const avatar=isMe?p.avatar:'👤';
+    const name=isMe?esc(p.name):(isAr?'لاعب مجهول':'???');
+    const tag=isMe?(isAr?'أنت':'YOU'):'';
+    const scoreTag=(p.score||0)>0&&isMe?`<div class="player-score-tag">⭐ ${p.score}</div>`:'';
+    return`<div class="player-card${isMe?' me':''}">
+      <div class="player-avatar">${avatar}</div>
+      <div class="player-name" style="${isMe?'':'color:var(--text3);font-style:italic;'}">${name}</div>
+      <div class="player-tag">${tag}</div>
+      ${scoreTag}
+    </div>`;
+  }).join('');
 }
 
 /* ══════════ HOST START ══════════ */
@@ -612,6 +693,18 @@ window.hostStart=async function(){
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
     const scores={};Object.entries(players).forEach(([id,p])=>{if(!p.isAI)scores[id]=p.score||0;});
+    // Assign new random names to all human players — avoid AI name and duplicates
+    const pool=S.lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN;
+    const usedNames=[aiName];
+    for(const[pid,p] of Object.entries(players)){
+      if(!p.isAI){
+        const avail=pool.filter(n=>!usedNames.includes(n));
+        const newName=rnd(avail.length>0?avail:pool);
+        usedNames.push(newName);
+        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{name:newName});
+        if(pid===S.playerId)S.playerName=newName;
+      }
+    }
     await set(ref(db,`rooms/${S.roomId}/players/${aiId}`),{name:aiName,avatar:aiAvatar,isAI:true,score:0,online:true});
     const rSnap=await get(ref(db,`rooms/${S.roomId}`));
     const curRound=(rSnap.val()?.round||0)+1;
@@ -629,7 +722,7 @@ window.hostStart=async function(){
 /* ══════════ ENTER GAME ══════════ */
 let _lastKeys=new Set();
 async function enterGame(room){
-  clearTimers();_lastKeys.clear();S._aiTyping=false;
+  clearTimers();_lastKeys.clear();S._aiTyping=false;S._lastTurnId=null;
   if(S._aiSched)clearTimeout(S._aiSched);
   S.aiId=room.aiPlayerId;S.isAI=S.playerId===S.aiId;
   S.topic=room.topic;S.round=room.round;S.prevScores={...(room.scores||{})};
@@ -642,8 +735,16 @@ async function enterGame(room){
   const myScore=S.prevScores[S.playerId]||0;
   const scoreHdr=document.getElementById('my-score-header');
   if(scoreHdr)scoreHdr.textContent=`${myScore} ⭐`;
-  document.getElementById('chat-area').innerHTML='';
+  const chatArea=document.getElementById('chat-area');chatArea.innerHTML='';
+  // Show player's name as first notif — prominent
+  const nameNotif=document.createElement('div');
+  nameNotif.style.cssText='align-self:center;background:rgba(0,229,255,.08);border:2px solid rgba(0,229,255,.3);border-radius:14px;padding:14px 22px;text-align:center;margin-bottom:4px;max-width:90%;';
+  nameNotif.innerHTML=isAr
+    ?`<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;margin-bottom:6px;">اسمك في هذه الجولة</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 16px rgba(0,229,255,.4);">${S.playerName}</div>`
+    :`<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;margin-bottom:6px;">YOUR NAME THIS ROUND</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 16px rgba(0,229,255,.4);">${S.playerName}</div>`;
+  chatArea.appendChild(nameNotif);
   addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
+  setTimeout(()=>{chatArea.scrollTop=chatArea.scrollHeight;},100);
   addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 15 ثانية لكل دور`:`🔄 Each player sends in their turn — 15 seconds each`);
   // Start chat ambient
   startGameAmbient('chat');
@@ -661,8 +762,9 @@ async function enterGame(room){
     if(left<=10&&left>0)sndTimer();
     if(left<=0){
       clearInterval(S._timerInt);
+      // Play end-of-chat sound
+      try{const a=getAC();[440,330,220].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,a.currentTime+i*0.18);g.gain.linearRampToValueAtTime(0.07,a.currentTime+i*0.18+0.01);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+i*0.18+0.3);o.start(a.currentTime+i*0.18);o.stop(a.currentTime+i*0.18+0.35);});}catch(e){}
       if(S.isHost){
-        // Push to 'review' phase — 30s for players to review chat before voting
         await update(ref(db,`rooms/${S.roomId}`),{phase:'review',reviewStartTime:nowTs()});
       }
     }
@@ -999,7 +1101,7 @@ async function enterVote(){
   const isAr=S.lang==='ar';
   document.getElementById('vote-title').textContent=isAr?'من هو الذكاء الاصطناعي؟':'Who is the AI?';
   document.getElementById('vote-subtitle').textContent=isAr?'// حلّل • صوّت • اكشف //':'// ANALYZE • VOTE • EXPOSE //';
-  document.getElementById('confirm-vote-btn').textContent=isAr?'تأكيد التصويتي':'Confirm Vote';
+  document.getElementById('confirm-vote-btn').textContent=isAr?'تأكيد التصويت':'Confirm Vote';
   document.getElementById('confirm-vote-btn').disabled=true;
   const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
   const players=pSnap.val()||{};
@@ -1128,20 +1230,24 @@ window.nextRound=async function(){
   try{
     const rS=await get(ref(db,`rooms/${S.roomId}`));const room=rS.val()||{};
     if(room.aiPlayerId)await remove(ref(db,`rooms/${S.roomId}/players/${room.aiPlayerId}`));
-    // Give all human players new random avatars
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
-    const used=[];
-    for(const [pid,p] of Object.entries(players)){
+    // Pre-assign new names + avatars to all human players
+    const pool=S.lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN;
+    const usedNames=[],usedAvs=[];
+    for(const[pid,p] of Object.entries(players)){
       if(!p.isAI){
-        let av;do{av=rnd(AVATARS);}while(used.includes(av));
-        used.push(av);
-        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{avatar:av});
+        const availN=pool.filter(n=>!usedNames.includes(n));
+        const newName=rnd(availN.length>0?availN:pool);
+        usedNames.push(newName);
+        let av;do{av=rnd(AVATARS);}while(usedAvs.includes(av));
+        usedAvs.push(av);
+        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{name:newName,avatar:av});
+        if(pid===S.playerId)S.playerName=newName;
       }
     }
     await remove(ref(db,`rooms/${S.roomId}/chat`));
     await remove(ref(db,`rooms/${S.roomId}/votes`));
-    // Push to 'rename' phase so all clients show rename screen
     await update(ref(db,`rooms/${S.roomId}`),{
       phase:'rename',topic:'',aiPlayerId:null,mostVotedId:null,
       humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null,
@@ -1157,59 +1263,38 @@ function resetRound(){
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
   S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;S._lastTurnId=null;
 }
-/* ══════════ RENAME PHASE ══════════ */
+/* ══════════ RENAME PHASE — Auto name reveal ══════════ */
 function enterRename(){
   showScreen('rename-screen');
   const isAr=S.lang==='ar';
-  // Show current avatar
+  // Read player's already-assigned name from Firebase
   get(ref(db,`rooms/${S.roomId}/players/${S.playerId}`)).then(snap=>{
     const p=snap.val()||{};
+    S.playerName=p.name||S.playerName;
     document.getElementById('rename-avatar').textContent=p.avatar||'🦊';
+    document.getElementById('rename-name-display').textContent=p.name||'---';
   });
-  const sub=document.getElementById('rename-subtitle');
-  sub.innerHTML=isAr
-    ?'الجولة الجديدة تبدأ قريباً<br>اختر اسماً جديداً — اسم واحد خيالي'
-    :'New round coming up<br>Pick a new single fictional name';
-  document.getElementById('rename-input').value='';
-  document.getElementById('rename-input').placeholder=isAr?'اسم واحد فقط...':'One name only...';
-  // Host sees waiting count
-  if(S.isHost){
-    const rRef2=ref(db,`rooms/${S.roomId}/renames`);
-    onValue(rRef2,snap=>{
-      const renames=snap.val()||{};
-      const done=Object.keys(renames).length;
-      // Show start button only when all renamed
-      const existing=document.getElementById('host-rename-btn');
-      if(existing)existing.remove();
-      const btn=document.createElement('button');
-      btn.id='host-rename-btn';btn.className='btn btn-violet';
-      btn.style.cssText='max-width:400px;width:100%;margin-top:14px;';
-      btn.textContent=isAr?`ابدأ الجولة (${done} جاهز)`:` Start Round (${done} ready)`;
-      btn.onclick=()=>hostStartFromRename();
-      document.querySelector('#rename-screen .card').appendChild(btn);
-    });
-  }
-}
-async function hostStartFromRename(){
-  // Clear renames record then go to waiting
-  await remove(ref(db,`rooms/${S.roomId}/renames`));
-  await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
-}
-window.confirmRename=async function(){
-  const inp=document.getElementById('rename-input');
-  const newName=inp.value.trim().split(/\s+/)[0]; // force single word
-  if(!newName||newName.length<2){
-    toast(S.lang==='ar'?'أدخل اسماً واحداً على الأقل':'Enter at least one name');return;
-  }
-  S.playerName=newName;
-  await update(ref(db,`rooms/${S.roomId}/players/${S.playerId}`),{name:newName});
-  await set(ref(db,`rooms/${S.roomId}/renames/${S.playerId}`),{done:true,ts:nowTs()});
+  document.getElementById('rename-round-label').textContent=isAr?`الجولة القادمة`:`Next Round`;
+  document.getElementById('rename-label-text').textContent=isAr?'اسمك في هذه الجولة':'Your name this round';
+  document.getElementById('rename-hint').textContent=isAr?'تذكر هذا الاسم — هو هويتك الوحيدة':'Remember this name — it is your only identity';
+  document.getElementById('rename-ai-hint').textContent=isAr?'الذكاء الاصطناعي يأخذ اسماً مختلفاً أيضاً — لا أحد يعرف من هو':'The AI also gets a different name — no one knows who it is';
+  document.getElementById('rename-wait-text').textContent=isAr?'في انتظار اللاعبين الآخرين...':'Waiting for other players...';
+  // Play reveal sound
   sndSuccess();
-  toast(S.lang==='ar'?`✅ اسمك الجديد: ${newName}`:`✅ New name: ${newName}`);
-  inp.disabled=true;
-  document.querySelector('#rename-screen .btn-primary').disabled=true;
-  document.querySelector('#rename-screen .btn-primary').textContent=S.lang==='ar'?'✅ في انتظار البقية...':'✅ Waiting for others...';
-};
+  // Host area — show start button
+  const hostArea=document.getElementById('rename-host-area');
+  if(hostArea)hostArea.innerHTML='';
+  if(S.isHost){
+    const btn=document.createElement('button');
+    btn.className='btn btn-violet';btn.style.cssText='max-width:400px;width:100%;margin-top:4px;';
+    btn.textContent=isAr?'ابدأ الجولة ▶':'Start Round ▶';
+    btn.onclick=async()=>{
+      btn.disabled=true;
+      await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
+    };
+    if(hostArea)hostArea.appendChild(btn);
+  }
+}
 window.leaveRoom=async function(){
   clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
@@ -1220,12 +1305,10 @@ window.leaveRoom=async function(){
   _lastKeys.clear();showScreen('home-screen');
 };
 /* INPUT EVENTS */
-document.getElementById('create-name').addEventListener('keydown',e=>{if(e.key==='Enter')createRoom();});
-document.getElementById('join-name').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
 document.getElementById('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
 document.getElementById('join-code').addEventListener('input',function(){this.value=this.value.toUpperCase();});
 document.getElementById('groq-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveGroqKey();});
-document.getElementById('rename-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmRename();});
+// rename is now auto — no input needed
 /* CHAR COUNTER */
 document.getElementById('chat-input').addEventListener('input',function(){
   const rem=50-this.value.length;
