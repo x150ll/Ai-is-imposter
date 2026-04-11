@@ -62,7 +62,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:fl
 .btn-play:hover::before{opacity:1;}
 .btn-how{background:transparent;color:var(--text);border:1px solid var(--border);padding:18px 36px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:600;border-radius:8px;cursor:none;transition:all .25s;letter-spacing:.5px;text-decoration:none;display:inline-flex;align-items:center;}
 .btn-how:hover{border-color:var(--violet);color:var(--text);background:rgba(124,58,237,0.08);}
-.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeIn 1s ease 2s both;z-index:2;}
+.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeIn 1s ease 2s both;z-index:2;transition:opacity .5s ease;}
 .scroll-hint span{font-size:11px;color:var(--text3);letter-spacing:3px;font-family:'Share Tech Mono',monospace;}
 .scroll-arrow{width:20px;height:30px;border:1px solid var(--text3);border-radius:10px;position:relative;}
 .scroll-arrow::after{content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);width:3px;height:8px;background:var(--text3);border-radius:2px;animation:scrollBounce 2s ease infinite;}
@@ -223,7 +223,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
     <a href="ai-impostor.html" class="btn-play" data-ar="▶ &nbsp;العب الآن" data-en="▶ &nbsp;Play Now">▶ &nbsp;العب الآن</a>
     <a href="#how" class="btn-how" data-ar="كيف تلعب؟" data-en="How to Play?">كيف تلعب؟</a>
   </div>
-  <div class="scroll-hint"><div class="scroll-arrow"></div><span>SCROLL</span></div>
+  <div class="scroll-hint" id="scroll-hint"><div class="scroll-arrow"></div><span>SCROLL</span></div>
 </section>
 <div id="topics-ticker"><div class="ticker-track" id="ticker-track"></div></div>
 <section id="how">
@@ -236,6 +236,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
         <div class="how-step-num">01</div><span class="how-icon">🏠</span>
         <h3 class="how-title" data-ar="أنشئ غرفة وادخل باسم خيالي" data-en="Create a Room with a Fictional Name">أنشئ غرفة وادخل باسم خيالي</h3>
         <p class="how-desc" data-ar="أنشئ غرفة أو انضم بكود. اختر اسماً واحداً خيالياً — لا اسمك الحقيقي. من 3 إلى 5 لاعبين بشر + ذكاء اصطناعي مخفي بينهم." data-en="Create or join a room with a code. Choose a single fictional name. 3 to 5 human players plus a hidden AI among you.">أنشئ غرفة أو انضم بكود. اختر اسماً واحداً خيالياً — لا اسمك الحقيقي. من 3 إلى 5 لاعبين بشر + ذكاء اصطناعي مخفي بينهم.</p>
+        <div style="margin-top:12px;padding:8px 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:8px;font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;" data-ar="⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء الاصطناعي — خطوة واحدة عند أول دخول" data-en="⚠️ You need a free Groq API key to power the AI — one-time setup on first launch">⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء الاصطناعي — خطوة واحدة عند أول دخول</div>
         <span class="how-tag tag-cyan">3-5 Players</span>
       </div>
       <div class="how-card" data-delay="150">
@@ -263,8 +264,8 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
       <div class="rule-card" style="--rule-color:var(--cyan)" data-delay="0">
         <div class="rule-num">01</div>
         <span class="rule-icon">🌐</span>
-        <h3 class="rule-title" data-ar="الفصحى فقط — اسم خيالي" data-en="Formal Language — Fictional Name">الفصحى فقط — اسم خيالي</h3>
-        <p class="rule-desc" data-ar="تحدث بالعربية الفصحى أو الإنجليزية الرسمية حسب لغة الغرفة. اختر اسماً واحداً خيالياً — ليس اسمك الحقيقي. مثل: سامي، لمى، طارق." data-en="Speak in formal Arabic or standard English per the room language. Use a single fictional name — not your real one. E.g. Alex, Sam, Riley.">تحدث بالعربية الفصحى أو الإنجليزية الرسمية حسب لغة الغرفة. اختر اسماً واحداً خيالياً — ليس اسمك الحقيقي. مثل: سامي، لمى، طارق.</p>
+        <h3 class="rule-title" data-ar="اسم خيالي — لغة الغرفة" data-en="Fictional Name — Room Language">اسم خيالي — لغة الغرفة</h3>
+        <p class="rule-desc" data-ar="اختر اسماً واحداً خيالياً — ليس اسمك الحقيقي. تحدث بلغة الغرفة (عربي أو إنجليزي). يمكن خلط العامية بالفصحى — الذكاء الاصطناعي يفعل ذلك أيضاً." data-en="Pick a single fictional name — not your real one. Speak the room's language. Mixing casual and formal style is fine — the AI does it too.">اختر اسماً واحداً خيالياً — ليس اسمك الحقيقي. تحدث بلغة الغرفة. يمكن خلط العامية بالفصحى — الذكاء الاصطناعي يفعل ذلك أيضاً.</p>
         <span class="rule-badge" data-ar="إلزامي" data-en="Required">إلزامي</span>
       </div>
       <div class="rule-card" style="--rule-color:var(--violet)" data-delay="100">
@@ -292,7 +293,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
         <h2 class="section-title" data-ar="الذكاء الاصطناعي<br><span style='color:var(--cyan)'>يتظاهر</span>" data-en="The AI<br><span style='color:var(--cyan)'>Pretends</span>">الذكاء الاصطناعي<br><span style="color:var(--cyan)">يتظاهر</span></h2>
         <p class="section-sub" style="margin-bottom:36px" data-ar="يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً." data-en="It makes deliberate mistakes, hesitates, accuses others — all to seem perfectly human.">يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً.</p>
         <div class="demo-feature" data-delay="0"><div class="demo-feature-icon">🧠</div><div class="demo-feature-text"><h4 data-ar="ذاكرة سياقية" data-en="Contextual Memory">ذاكرة سياقية</h4><p data-ar="يتذكر ما قاله في الرسائل السابقة ويبني عليها." data-en="Remembers past messages and builds on them — no contradictions.">يتذكر ما قاله في الرسائل السابقة ويبني عليها.</p></div></div>
-        <div class="demo-feature" data-delay="150"><div class="demo-feature-icon">🎭</div><div class="demo-feature-text"><h4 data-ar="سلوكيات متعددة" data-en="Multiple Behaviors">سلوكيات متعددة</h4><p data-ar="يتهم، يتهرب، يعلّق، يرد بشكل قصير — لا يمكن التنبؤ به." data-en="Accuses, deflects, comments, gives short replies — completely unpredictable.">يتهم، يتهرب، يعلّق، يرد بشكل قصير — لا يمكن التنبؤ به.</p></div></div>
+        <div class="demo-feature" data-delay="150"><div class="demo-feature-icon">🎭</div><div class="demo-feature-text"><h4 data-ar="4 شخصيات + سلوك يتطور" data-en="4 Personas + Evolving Behavior">4 شخصيات + سلوك يتطور</h4><p data-ar="خجول في البداية، مهاجم في النهاية — سلوكه يتغير كلما اقترب الوقت من الانتهاء." data-en="Shy at the start, aggressive near the end — its behavior shifts as time runs out.">خجول في البداية، مهاجم في النهاية — سلوكه يتغير كلما اقترب الوقت من الانتهاء.</p></div></div>
         <div class="demo-feature" data-delay="300"><div class="demo-feature-icon">🌐</div><div class="demo-feature-text"><h4 data-ar="ثنائي اللغة" data-en="Bilingual">ثنائي اللغة</h4><p data-ar="يلعب بالعربية أو الإنجليزية — مع ضمان نقاء اللغة في كل رسالة." data-en="Plays in Arabic or English — with guaranteed language purity in every message.">يلعب بالعربية أو الإنجليزية — مع ضمان نقاء اللغة في كل رسالة.</p></div></div>
       </div>
       <div class="chat-mockup" id="chat-mockup">
@@ -316,8 +317,9 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
       <div class="feat-card" data-accent="red"><span class="feat-icon">⚡</span><h3 class="feat-title" data-ar="Real-Time كامل" data-en="Full Real-Time">Real-Time كامل</h3><p class="feat-desc" data-ar="كل رسالة تصل فورياً لجميع اللاعبين — تجربة سلسة ومتزامنة." data-en="Every message reaches all players instantly — seamless synchronized experience.">كل رسالة تصل فورياً لجميع اللاعبين — تجربة سلسة ومتزامنة.</p></div>
       <div class="feat-card" data-accent="cyan"><span class="feat-icon">🎯</span><h3 class="feat-title" data-ar="50 موضوع متنوع" data-en="50 Unique Topics">50 موضوع متنوع</h3><p class="feat-desc" data-ar="مواضيع عميقة وشخصية تجعل كل جولة مختلفة تماماً." data-en="Deep, personal topics that make every round feel completely different.">مواضيع عميقة وشخصية تجعل كل جولة مختلفة تماماً.</p></div>
       <div class="feat-card" data-accent="violet"><span class="feat-icon">🌐</span><h3 class="feat-title" data-ar="عربي وإنجليزي" data-en="Arabic & English">عربي وإنجليزي</h3><p class="feat-desc" data-ar="اختر لغة غرفتك — الذكاء الاصطناعي يلعب بنفس اللغة بدقة تامة." data-en="Choose your room language — the AI plays in the exact same language.">اختر لغة غرفتك — الذكاء الاصطناعي يلعب بنفس اللغة بدقة تامة.</p></div>
-      <div class="feat-card" data-accent="gold"><span class="feat-icon">🏆</span><h3 class="feat-title" data-ar="نظام نقاط" data-en="Scoring System">نظام نقاط</h3><p class="feat-desc" data-ar="اكسب نقاطاً على كل جولة — من يكشف الذكاء الاصطناعي أولاً يأخذ المجد." data-en="Earn points each round — whoever exposes the AI first takes the glory.">اكسب نقاطاً على كل جولة — من يكشف الذكاء الاصطناعي أولاً يأخذ المجد.</p></div>
+      <div class="feat-card" data-accent="gold"><span class="feat-icon">🏆</span><h3 class="feat-title" data-ar="نظام فوز بالنقاط" data-en="Win by Points">نظام فوز بالنقاط</h3><p class="feat-desc" data-ar="اكسب نقطة لكل جولة تكشف فيها الذكاء الاصطناعي — أول من يصل للهدف يفوز باللعبة كلها." data-en="Earn a point every round you catch the AI — first to reach the target wins the whole game.">اكسب نقطة لكل جولة تكشف فيها الذكاء الاصطناعي — أول من يصل للهدف يفوز باللعبة كلها.</p></div>
       <div class="feat-card" data-accent="red"><span class="feat-icon">👥</span><h3 class="feat-title" data-ar="3 إلى 5 لاعبين" data-en="3 to 5 Players">3 إلى 5 لاعبين</h3><p class="feat-desc" data-ar="العدد المثالي للتوتر الحقيقي — لا كثير يضيع فيه المتسلل، ولا قليل يكشفه بسهولة." data-en="The perfect number for real tension — not too many to hide in, not too few to be obvious.">العدد المثالي للتوتر الحقيقي — لا كثير يضيع فيه المتسلل، ولا قليل يكشفه بسهولة.</p></div>
+      <div class="feat-card" data-accent="violet"><span class="feat-icon">🎭</span><h3 class="feat-title" data-ar="شخصية مختلفة كل جولة" data-en="New Personality Every Round">شخصية مختلفة كل جولة</h3><p class="feat-desc" data-ar="الذكاء الاصطناعي يأخذ شخصية عشوائية كل جولة — خجول، ساخر، واثق، أو مشتت. تُكشف في النهاية." data-en="The AI gets a random personality each round — shy, sarcastic, confident, or distracted. Revealed at the end.">الذكاء الاصطناعي يأخذ شخصية عشوائية كل جولة — خجول، ساخر، واثق، أو مشتت. تُكشف في النهاية.</p></div>
       <div class="feat-card" data-accent="cyan"><span class="feat-icon">📊</span><h3 class="feat-title" data-ar="تحليل بعد الجولة" data-en="Post-Round Analysis">تحليل بعد الجولة</h3><p class="feat-desc" data-ar="شاهد رسائل المتسلل، نتائج التصويت، والنقاط — اعرف أين أخطأ أو نجح." data-en="See the impostor's messages, vote results, and scores — find where it failed or succeeded.">شاهد رسائل المتسلل، نتائج التصويت، والنقاط — اعرف أين أخطأ أو نجح.</p></div>
     </div>
   </div>
@@ -342,7 +344,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
   </div>
   <div class="footer-divider"></div>
   <div class="footer-bottom">
-    <div class="footer-copy">© 2025 AI IMPOSTOR • <span data-ar="كاشف الذكاء الاصطناعي" data-en="Detect the AI Among You">كاشف الذكاء الاصطناعي</span></div>
+    <div class="footer-copy">© 2025 AI IMPOSTOR • <span data-ar="اكشف الذكاء الاصطناعي" data-en="Expose the AI Among You">اكشف الذكاء الاصطناعي</span></div>
     <div class="footer-dev">
       <span class="footer-dev-label" data-ar="صُنع بواسطة" data-en="CRAFTED BY">صُنع بواسطة</span>
       <a href="https://github.com/x150ll" target="_blank" class="footer-dev-badge">
@@ -451,18 +453,21 @@ function playIntro(lang){
 }
 
 // Trigger on first user click (browser requirement for audio)
-let _audioReady=false;
 document.addEventListener('click',()=>{
-  if(_audioReady)return;
-  _audioReady=true;
   ga().resume();
   if(!robotSpoken)playIntro(curLang);
-},{once:false});
+},{once:true});
 
 // Preload voices
 if(window.speechSynthesis){
   speechSynthesis.onvoiceschanged=()=>{speechSynthesis.getVoices();};
 }
+
+/* SCROLL HINT — hide after first scroll */
+window.addEventListener('scroll',()=>{
+  const sh=document.getElementById('scroll-hint');
+  if(sh&&window.scrollY>60){sh.style.opacity='0';sh.style.pointerEvents='none';}
+},{once:true});
 
 /* EYE */
 const pupil=document.querySelector('.eye-pupil');

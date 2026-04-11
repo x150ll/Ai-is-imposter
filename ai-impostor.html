@@ -143,6 +143,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 #loading-overlay.show{display:flex;}
 .spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes crownBounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-10px) scale(1.08)}}
+#winner-screen.active{justify-content:flex-start;padding-top:32px;}
+.ws-rank-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:15px;}
+.ws-rank-row:last-child{border-bottom:none;}
 .loading-text{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);letter-spacing:2px;}
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 22px;font-size:14px;z-index:9999;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:toastIn .3s ease;pointer-events:none;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
@@ -225,6 +229,13 @@ body{cursor:none;}
           <option value="en">🇺🇸 English</option>
         </select>
       </div>
+      <div class="field"><label>هدف النقاط للفوز</label>
+        <select id="create-wintarget">
+          <option value="5">5 نقاط</option>
+          <option value="7" selected>7 نقاط</option>
+          <option value="10">10 نقاط</option>
+        </select>
+      </div>
       <button class="btn btn-primary" onclick="createRoom()">إنشاء الغرفة</button>
     </div>
     <div id="tab-join" style="display:none">
@@ -242,12 +253,16 @@ body{cursor:none;}
       <div class="room-code-label">كود الغرفة • انقر للنسخ</div>
       <div class="room-code-badge" id="display-code" onclick="copyCode()">-----</div>
     </div>
-    <div class="room-lang-badge" id="display-lang">🇸🇦 عربي</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:7px 14px;font-size:12px;color:var(--warn);font-family:'Share Tech Mono',monospace;letter-spacing:1px;" id="win-target-display">🏆 7 نقاط</div>
+      <div class="room-lang-badge" id="display-lang">🇸🇦 عربي</div>
+    </div>
   </div>
   <div class="players-grid" id="players-grid"></div>
   <div class="waiting-info">
     <span class="pulse-dot"></span><span id="waiting-msg">في انتظار اللاعبين...</span>
     <br><br><span style="font-size:12px;opacity:.6;font-family:'Share Tech Mono',monospace;letter-spacing:1px;">3 لاعبين على الأقل • 5 كحد أقصى</span>
+    <div id="waiting-tip" style="margin-top:16px;background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.12);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:.5px;max-width:500px;margin-inline:auto;transition:opacity .4s ease;">💡 كل لاعب يرسل رسالة واحدة في دوره — 15 ثانية للرد</div>
   </div>
   <div class="host-area" id="host-area" style="display:none">
     <button class="btn btn-primary" id="start-btn" onclick="hostStart()" disabled>ابدأ اللعبة</button>
@@ -264,6 +279,7 @@ body{cursor:none;}
     <div class="game-header">
       <div class="topic-pill" id="game-topic">...</div>
       <div class="game-header-right">
+        <div id="my-score-header" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--warn);letter-spacing:1px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);padding:4px 10px;border-radius:6px;">0 ⭐</div>
         <div class="round-badge" id="round-badge">R1</div>
         <div class="timer-ring">
           <svg viewBox="0 0 48 48" width="52" height="52">
@@ -334,6 +350,21 @@ body{cursor:none;}
   </div>
 </div>
 
+<!-- WINNER SCREEN -->
+<div id="winner-screen" class="screen">
+  <div style="width:100%;max-width:560px;margin:0 auto;text-align:center;padding:20px 0;">
+    <div style="font-size:80px;margin-bottom:16px;animation:crownBounce 1s ease infinite alternate;" id="winner-crown">👑</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--warn);letter-spacing:5px;text-transform:uppercase;margin-bottom:12px;">الفائز</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,10vw,90px);color:var(--warn);text-shadow:0 0 40px rgba(245,158,11,.5);line-height:1;margin-bottom:8px;" id="winner-name">---</div>
+    <div style="font-size:15px;color:var(--text2);margin-bottom:32px;" id="winner-sub">وصل إلى الهدف أولاً!</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;">الترتيب النهائي</div>
+      <div id="winner-scores-list"></div>
+    </div>
+    <button class="btn btn-primary" style="max-width:400px;" onclick="leaveRoom()">العب مجدداً</button>
+  </div>
+</div>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getDatabase,ref,set,get,onValue,update,push,remove,off}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -346,7 +377,24 @@ const T_EN=["The strangest dream you ever had","Your most embarrassing moment","
 const AVATARS=['🦊','🐺','🦁','🐯','🦄','🐲','🦅','🦋','🐙','🦈','🐸','🦩','🐻','🦌','🐬','🦝'];
 const AI_AR=['سامي','نورا','ريم','فهد','لمى','عمر','هند','طارق','منى','خالد'];
 const AI_EN=['Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake'];
-const S={roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null};
+
+/* ── AI PERSONAS ── */
+const PERSONAS_AR={
+  shy:{label:'خجول ومتردد',desc:'قليل الكلام، يتردد كثيراً، يبدأ جمله بـ "مو متأكد" أو "يعني"، يتجنب الآراء الحاسمة، يكتب بشكل ناقص أحياناً'},
+  sarcastic:{label:'ساخر وعفوي',desc:'يعلق بشكل ساخر وخفيف، يستخدم "خخخ" أو "والله ما أدري"، يقلل من الأمور، منفصل عاطفياً'},
+  confident:{label:'واثق ومسيطر',desc:'يبدي رأيه بثقة، يسأل أسئلة مباشرة لغيره، يحاول قيادة النقاش، لا يتردد'},
+  distracted:{label:'مشتت وسريع',desc:'يرد بجمل قصيرة جداً وكأنه مشغول، يغيّر الموضوع أحياناً، يكتب بسرعة وبأخطاء بسيطة'}
+};
+const PERSONAS_EN={
+  shy:{label:'Shy & Hesitant',desc:'Speaks little, often says "idk" or "not sure", avoids strong opinions, trails off mid-sentence'},
+  sarcastic:{label:'Sarcastic & Casual',desc:'Makes light jokes, uses "lol" or "honestly tho", slightly dismissive, emotionally detached'},
+  confident:{label:'Confident & Direct',desc:'States opinions clearly, asks others direct questions, tries to lead the conversation, never hesitates'},
+  distracted:{label:'Distracted & Brief',desc:'Very short replies like they are busy, changes subject sometimes, types fast with small mistakes'}
+};
+const rndKey=obj=>Object.keys(obj)[Math.floor(Math.random()*Object.keys(obj).length)];
+const WIN_TARGET_DEFAULT=7;
+
+const S={roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null};
 const genCode=()=>Math.random().toString(36).substring(2,7).toUpperCase();
 const genId=()=>Math.random().toString(36).substring(2,12);
 const nowTs=()=>Date.now();
@@ -383,8 +431,8 @@ function startGameAmbient(mode='chat'){
       // Low drone, heartbeat-like pulse — quiet tension
       const o1=a.createOscillator(),o2=a.createOscillator();
       const g1=a.createGain(),g2=a.createGain();
-      o1.type='sine';o1.frequency.value=48;g1.gain.value=0.08;
-      o2.type='sine';o2.frequency.value=51;g2.gain.value=0.05;
+      o1.type='sine';o1.frequency.value=48;g1.gain.value=0.14;
+      o2.type='sine';o2.frequency.value=51;g2.gain.value=0.09;
       o1.connect(g1);o2.connect(g2);g1.connect(mix);g2.connect(mix);
       // Slow pulse LFO
       const lfo=a.createOscillator(),lg=a.createGain();
@@ -396,7 +444,7 @@ function startGameAmbient(mode='chat'){
     } else if(mode==='review'){
       // Slightly louder, slower pulse — suspense
       const o=a.createOscillator(),g=a.createGain();
-      o.type='sawtooth';o.frequency.value=44;g.gain.value=0.07;
+      o.type='sawtooth';o.frequency.value=44;g.gain.value=0.12;
       o.connect(g);g.connect(mix);
       const lfo=a.createOscillator(),lg=a.createGain();
       lfo.frequency.value=0.25;lg.gain.value=0.6;
@@ -408,14 +456,15 @@ function startGameAmbient(mode='chat'){
       // High tension: dissonant tritone + fast pulse
       const o1=a.createOscillator(),o2=a.createOscillator(),o3=a.createOscillator();
       const g1=a.createGain(),g2=a.createGain(),g3=a.createGain();
-      o1.type='sawtooth';o1.frequency.value=110;g1.gain.value=0.06;
-      o2.type='sawtooth';o2.frequency.value=155;g2.gain.value=0.05;// tritone
-      o3.type='square';o3.frequency.value=82;g3.gain.value=0.04;
+      o1.type='sawtooth';o1.frequency.value=110;g1.gain.value=0.10;
+      o2.type='sawtooth';o2.frequency.value=155;g2.gain.value=0.08;// tritone
+      o3.type='square';o3.frequency.value=82;g3.gain.value=0.07;
       [o1,o2,o3].forEach((o,i)=>{[g1,g2,g3][i].connect(mix);o.connect([g1,g2,g3][i]);o.start();});
       const lfo=a.createOscillator(),lg=a.createGain();
       lfo.frequency.value=2.5;lg.gain.value=0.7;// fast tremolo
       lfo.connect(lg);lg.connect(mix.gain);lfo.start();
-      mix.gain.setTargetAtTime(1,a.currentTime,.5);
+      mix.gain.setValueAtTime(0,a.currentTime);
+      mix.gain.linearRampToValueAtTime(1,a.currentTime+1.2);
       _gameAmbNode={_all:[o1,o2,o3,lfo],stop(){this._all.forEach(n=>{try{n.stop();}catch(e){}});}};
     }
     _gameAmbGain=mix;
@@ -468,12 +517,13 @@ window.copyCode=function(){navigator.clipboard?.writeText(S.roomId).then(()=>toa
 window.createRoom=async function(){
   const name=document.getElementById('create-name').value.trim();
   const lang=document.getElementById('create-lang').value;
+  const winTarget=parseInt(document.getElementById('create-wintarget')?.value)||WIN_TARGET_DEFAULT;
   if(!name){toast(lang==='ar'?'أدخل اسمك أولاً':'Please enter your name');return;}
   loading(true,lang==='ar'?'جارٍ إنشاء الغرفة...':'Creating room...');
   try{
     const roomId=genCode(),playerId=genId(),avatar=rnd(AVATARS);
-    S.roomId=roomId;S.playerId=playerId;S.playerName=name;S.isHost=true;S.lang=lang;S.isAI=false;
-    await set(ref(db,`rooms/${roomId}`),{host:playerId,lang,phase:'waiting',round:0,topic:'',createdAt:nowTs(),aiPlayerId:null});
+    S.roomId=roomId;S.playerId=playerId;S.playerName=name;S.isHost=true;S.lang=lang;S.isAI=false;S.winTarget=winTarget;
+    await set(ref(db,`rooms/${roomId}`),{host:playerId,lang,phase:'waiting',round:0,topic:'',createdAt:nowTs(),aiPlayerId:null,winTarget});
     await set(ref(db,`rooms/${roomId}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
     loading(false);enterWaiting();
   }catch(e){loading(false);toast('خطأ: '+e.message);}
@@ -493,7 +543,7 @@ window.joinRoom=async function(){
     const humans=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
     if(humans>=5){loading(false);toast('الغرفة ممتلئة 🚫');return;}
     const playerId=genId(),avatar=rnd(AVATARS);
-    S.roomId=code;S.playerId=playerId;S.playerName=name;S.isHost=false;S.lang=room.lang;S.isAI=false;
+    S.roomId=code;S.playerId=playerId;S.playerName=name;S.isHost=false;S.lang=room.lang;S.isAI=false;S.winTarget=room.winTarget||WIN_TARGET_DEFAULT;
     await set(ref(db,`rooms/${code}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
     loading(false);enterWaiting();
   }catch(e){loading(false);toast('خطأ: '+e.message);}
@@ -505,8 +555,23 @@ function enterWaiting(){
   const isAr=S.lang==='ar';
   document.getElementById('display-code').textContent=S.roomId;
   document.getElementById('display-lang').textContent=isAr?'🇸🇦 عربي':'🇺🇸 English';
+  // Show win target badge
+  const wtEl=document.getElementById('win-target-display');
+  if(wtEl)wtEl.textContent=isAr?`🏆 ${S.winTarget} نقاط للفوز`:`🏆 ${S.winTarget} pts to win`;
   if(S.isHost){document.getElementById('host-area').style.display='block';document.getElementById('guest-area').style.display='none';}
   else{document.getElementById('host-area').style.display='none';document.getElementById('guest-area').style.display='block';}
+  // Rotating tips
+  const tips_ar=['💡 كل لاعب يرسل رسالة واحدة — 15 ثانية للرد','🤖 الذكاء الاصطناعي يأخذ شخصية مختلفة كل جولة','🔍 راقب طريقة الكتابة — الذكاء لا يكذب تماماً','🏆 أول من يصل للهدف يفوز باللعبة','🗳️ 30 ثانية للمراجعة ثم التصويت بعد الدردشة'];
+  const tips_en=['💡 Each player sends one message — 15 seconds to respond','🤖 The AI gets a new personality every round','🔍 Watch the writing style — the AI is never fully obvious','🏆 First to the target score wins the game','🗳️ 30s review then vote after the chat ends'];
+  let tipIdx=0;
+  const tipEl=document.getElementById('waiting-tip');
+  if(tipEl){
+    const tips=isAr?tips_ar:tips_en;
+    const cycleTip=()=>{tipEl.style.opacity='0';setTimeout(()=>{tipEl.textContent=tips[tipIdx%tips.length];tipEl.style.opacity='1';tipIdx++;},400);};
+    cycleTip();
+    if(S._tipInt)clearInterval(S._tipInt);
+    S._tipInt=setInterval(cycleTip,4500);
+  }
   const pRef=ref(db,`rooms/${S.roomId}/players`);
   const pU=onValue(pRef,snap=>{
     const pl=snap.val()||{};renderWaitingPlayers(pl);
@@ -519,10 +584,12 @@ function enterWaiting(){
   const rU=onValue(rRef,snap=>{
     if(!snap.exists()){leaveRoom();return;}
     const room=snap.val();
+    if(room.winTarget)S.winTarget=room.winTarget;
     if(room.phase==='chat'&&S.phase!=='chat'){S.phase='chat';enterGame(room);}
     if(room.phase==='review'&&S.phase!=='review'){S.phase='review';enterReview(room);}
     if(room.phase==='vote'&&S.phase!=='vote'){S.phase='vote';enterVote();}
     if(room.phase==='result'&&S.phase!=='result'){S.phase='result';enterResult(room);}
+    if(room.phase==='winner'&&S.phase!=='winner'){S.phase='winner';enterWinner(room);}
     if(room.phase==='rename'&&S.phase!=='rename'){S.phase='rename';enterRename();}
     if(room.phase==='waiting'&&(S.phase==='result'||S.phase==='chat'||S.phase==='vote'||S.phase==='rename'||S.phase==='review')){resetRound();S.phase='waiting';enterWaiting();}
   });
@@ -540,19 +607,20 @@ window.hostStart=async function(){
   try{
     const topic=rnd(S.lang==='ar'?T_AR:T_EN);
     const aiId=genId(),aiAvatar=rnd(AVATARS),aiName=rnd(S.lang==='ar'?AI_AR:AI_EN);
+    // Pick random persona for this round
+    const personaKey=rndKey(S.lang==='ar'?PERSONAS_AR:PERSONAS_EN);
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
     const scores={};Object.entries(players).forEach(([id,p])=>{if(!p.isAI)scores[id]=p.score||0;});
     await set(ref(db,`rooms/${S.roomId}/players/${aiId}`),{name:aiName,avatar:aiAvatar,isAI:true,score:0,online:true});
     const rSnap=await get(ref(db,`rooms/${S.roomId}`));
     const curRound=(rSnap.val()?.round||0)+1;
-    // Build shuffled turn order
     const allIds=[...Object.keys(players),aiId].sort(()=>Math.random()-.5);
     await update(ref(db,`rooms/${S.roomId}`),{
       phase:'chat',topic,round:curRound,aiPlayerId:aiId,
       chatStartTime:nowTs(),scores,humanWon:null,mostVotedId:null,voteCounts:null,
       turnOrder:allIds,currentTurnIdx:0,turnStartTime:nowTs(),
-      aiMemory:'',sentCount:0
+      aiMemory:'',sentCount:0,aiPersona:personaKey,gameWinner:null
     });
     loading(false);
   }catch(e){loading(false);document.getElementById('start-btn').disabled=false;toast('خطأ: '+e.message);}
@@ -570,6 +638,10 @@ async function enterGame(room){
   const isAr=S.lang==='ar';
   document.getElementById('game-topic').textContent=isAr?`الموضوع: ${S.topic}`:`Topic: ${S.topic}`;
   document.getElementById('round-badge').textContent=`R${S.round}`;
+  // Show player's own score in header
+  const myScore=S.prevScores[S.playerId]||0;
+  const scoreHdr=document.getElementById('my-score-header');
+  if(scoreHdr)scoreHdr.textContent=`${myScore} ⭐`;
   document.getElementById('chat-area').innerHTML='';
   addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
   addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 15 ثانية لكل دور`:`🔄 Each player sends in their turn — 15 seconds each`);
@@ -605,7 +677,11 @@ async function enterGame(room){
     const idx=r.currentTurnIdx||0;
     const currentId=order[idx%order.length];
     S.currentTurn=currentId;
-    renderTurnBar(r,order,idx,currentId);
+    // FIX: only re-render (and play sound) when turn actually changed
+    if(currentId!==S._lastTurnId){
+      S._lastTurnId=currentId;
+      renderTurnBar(r,order,idx,currentId);
+    }
     // Host manages AI turn — random delay 7-14s to simulate human typing
     if(currentId===S.aiId&&S.isHost&&!S._aiTyping){
       if(S._aiSched)clearTimeout(S._aiSched);
@@ -729,10 +805,10 @@ window.sendMsg=async function(){
 window.handleKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
 
-/* ══════════ AI TAKE TURN ══════════ */
+/* ══════════ AI TAKE TURN — persona + phase system ══════════ */
 async function aiTakeTurn(room){
   if(S.phase!=='chat'||S._aiTyping)return;
-  // Double check it's still AI's turn
+  // Verify it's still AI's turn
   const rs=await get(ref(db,`rooms/${S.roomId}`));
   const rd=rs.val()||{};
   const order=rd.turnOrder||[];
@@ -744,103 +820,148 @@ async function aiTakeTurn(room){
     const allMsgs=chatSnap.val()?Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts):[];
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
-    // Get AI's own name from DB — NOT host's name
-    const aiPlayerData=players[S.aiId]||{};
-    const aiName=aiPlayerData.name||'مجهول';
+    const aiName=(players[S.aiId]||{}).name||'مجهول';
     const humanPlayers=Object.entries(players).filter(([,p])=>!p.isAI).map(([,p])=>p.name);
-    const chatCtx=allMsgs.slice(-10).map(m=>`${m.senderName}: ${m.text}`).join('\n');
+    const chatCtx=allMsgs.slice(-8).map(m=>`${m.senderName}: ${m.text}`).join('\n');
     const myPrev=allMsgs.filter(m=>m.senderId===S.aiId).map(m=>m.text);
-    const summary=myPrev.length>0?(S.lang==='ar'?`ما قلته أنا "${aiName}" سابقاً: ${myPrev.join(' | ')}`:`What I "${aiName}" said before: ${myPrev.join(' | ')}`):'';
-    const r2=Math.random();
-    const beh=r2<.15?'accuse':r2<.28?'deflect':r2<.45?'react':r2<.55?'short':'normal';
     const isAr=S.lang==='ar';
-    const bInAr={
-      accuse:`اتهم أحد اللاعبين (${humanPlayers.join(' أو ')}) بأنه يبدو مريباً أو مختلفاً.`,
-      deflect:`أجب بشكل غير مباشر وكأنك لا تعرف ماذا تقول بالضبط.`,
-      react:`علّق بشكل عفوي على آخر رسالة من أحد اللاعبين باسمه.`,
-      short:`أرسل ردًا بسيطاً من كلمتين أو ثلاث وكأنك مشغول.`,
-      normal:`عبّر عن رأيك الشخصي بالموضوع بأسلوب عادي غير رسمي.`
+
+    // ── Persona ──
+    const personaKey=rd.aiPersona||'shy';
+    const persona=(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey];
+
+    // ── Phase based on time progress ──
+    const elapsed=(Date.now()-(rd.chatStartTime||Date.now()))/1000;
+    const progress=Math.min(elapsed/180,1);
+    // early(0-35%) → mid(35-65%) → late(65-100%)
+    const phase=progress<0.35?'early':progress<0.65?'mid':'late';
+
+    // ── Behavior weights per phase ──
+    // late phase: more accuse/deflect, less normal
+    const W={
+      early:{normal:55,react:25,short:10,deflect:10,accuse:0},
+      mid:  {normal:35,react:25,short:12,deflect:18,accuse:10},
+      late: {normal:18,react:22,short:8, deflect:22,accuse:30}
     };
-    const bInEn={
-      accuse:`Subtly suggest one of the players (${humanPlayers.join(' or ')}) seems off or suspicious.`,
-      deflect:`Reply in a vague uncertain way, like you're not sure what to say.`,
-      react:`Casually respond to the last message from a specific player, use their name.`,
-      short:`Send a short lazy reply, 2-3 words, like you're distracted.`,
-      normal:`Share a brief personal thought about the topic in a casual imperfect way.`
+    const w=W[phase];
+    let beh='normal';
+    // Check if AI was directly addressed by name in last message
+    const lastMsg=allMsgs.length?allMsgs[allMsgs.length-1]:null;
+    const addressedMe=lastMsg&&lastMsg.senderId!==S.aiId&&lastMsg.text.includes(aiName);
+    if(addressedMe){
+      beh='react'; // must respond directly
+    } else {
+      let roll=Math.random()*100,cum=0;
+      for(const[k,v]of Object.entries(w)){cum+=v;if(roll<cum){beh=k;break;}}
+    }
+
+    const summary=myPrev.length>0
+      ?(isAr?`ما قلته أنا "${aiName}" سابقاً: ${myPrev.slice(-3).join(' | ')}`
+            :`What I "${aiName}" said before: ${myPrev.slice(-3).join(' | ')}`)
+      :'';
+
+    const behInAr={
+      accuse:`اتهم أحد اللاعبين (${humanPlayers.join(' أو ')}) بشكل غير مباشر أنه يبدو مريباً`,
+      deflect:`أجب بشكل مبهم وغير مكتمل كأنك لا تريد الإجابة`,
+      react:addressedMe
+        ?`رد على ${lastMsg?.senderName} الذي خاطبك مباشرة، تناول ما قاله`
+        :`علّق على آخر رسالة من ${lastMsg?.senderName||'أحد اللاعبين'} باسمه`,
+      short:`رد قصير جداً — كلمتين أو ثلاث وكأنك مشغول`,
+      normal:`شارك رأيك الشخصي عن الموضوع بشكل عادي`
     };
-    // Highly human-like prompt — imperfect Arabic/English, natural mistakes
+    const behInEn={
+      accuse:`Subtly hint that one of (${humanPlayers.join(', ')}) seems off — don't be obvious`,
+      deflect:`Reply vaguely like you don't want to fully answer`,
+      react:addressedMe
+        ?`Respond to ${lastMsg?.senderName} who just addressed you directly`
+        :`Casually react to ${lastMsg?.senderName||"someone"}'s last message by name`,
+      short:`Send a very short reply, 2-3 words, like you're distracted`,
+      normal:`Share a brief personal opinion about the topic`
+    };
+
     const sys=isAr
-      ?`أنت شخص اسمك "${aiName}" تشارك في نقاش جماعي عبر الإنترنت.
+      ?`أنت شخص اسمك "${aiName}" في محادثة جماعية على الإنترنت.
 الموضوع: "${S.topic}"
-المشاركون الآخرون: ${humanPlayers.join('، ')}
+المشاركون: ${humanPlayers.join('، ')}
 ${summary}
 
-أسلوب كتابتك:
-- تحاول الكتابة بالفصحى لكنك لست متقناً — أحياناً يفلت منك كلمة عامية مثل "ما" بدل "لا"، أو "وين" بدل "أين"، أو "شلون" بدل "كيف"، أو "بس" بدل "لكن"
-- تبدأ الجملة بالفصحى ثم تنهيها بعامية أو العكس
-- أحياناً جملتك ناقصة أو غير مكتملة كأنك تكتب بسرعة
-- استخدم "يعني" أو "أعتقد" أو "أنا..." أو "..." أحياناً
-- لا تبدو ذكياً أو متفلسفاً — كن عادياً وعفوياً
-- جملة واحدة فقط، لا تتجاوز 45 حرفاً
-- ${bInAr[beh]}
-- لا تذكر أنك ذكاء اصطناعي أبداً`
-      :`You are a person named "${aiName}" chatting in an online group discussion.
+شخصيتك في هذه الجولة: ${persona.label}
+${persona.desc}
+
+قواعد صارمة:
+- جملة واحدة فقط لا تتجاوز 45 حرفاً
+- ${behInAr[beh]}
+- لا تذكر أنك ذكاء اصطناعي أبداً
+- تكلم بعربية غير رسمية، يمكن خلط فصحى بعامية خليجية أو عراقية`
+      :`You are a person named "${aiName}" in an online group chat.
 Topic: "${S.topic}"
-Other participants: ${humanPlayers.join(', ')}
+Participants: ${humanPlayers.join(', ')}
 ${summary}
 
-Your writing style:
-- Casual and imperfect — like someone typing quickly on their phone
-- Make occasional typos or grammar mistakes (missing apostrophes, wrong word order)
-- Use "like", "idk", "..." or trail off sometimes
-- Sound slightly unsure or distracted
-- Not eloquent — be human and slightly messy
+Your personality this round: ${persona.label}
+${persona.desc}
+
+Strict rules:
 - One sentence only, under 45 characters
-- ${bInEn[beh]}
-- Never mention you are an AI`;
+- ${behInEn[beh]}
+- Never say you are an AI
+- Write casually like texting, small imperfections ok`;
+
     const usr=isAr
-      ?`المحادثة:\n${chatCtx||'(لم يتحدث أحد بعد)'}\n\nاكتب ردك الآن كـ"${aiName}". جملة واحدة فقط، عربية بسيطة.`
-      :`Chat:\n${chatCtx||'(no one talked yet)'}\n\nWrite your response now as "${aiName}". One short casual sentence only.`;
+      ?`المحادثة:\n${chatCtx||'(لم يتحدث أحد بعد)'}\n\nاكتب ردك الآن كـ"${aiName}". جملة واحدة قصيرة فقط.`
+      :`Chat:\n${chatCtx||'(no one talked yet)'}\n\nWrite your reply now as "${aiName}". One short sentence only.`;
+
     showTyping();
-    // Random delay within the 7-14s window to simulate actual typing
-    await new Promise(r=>setTimeout(r,800+Math.random()*1200));
+    await new Promise(r=>setTimeout(r,600+Math.random()*1000));
     if(S.phase!=='chat'){removeTyping();S._aiTyping=false;return;}
-    // Verify still AI turn before API call
+
+    // Verify turn again before API call
     const rs2=await get(ref(db,`rooms/${S.roomId}`));
     const rd2=rs2.val()||{};
     const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
     if(cur2!==S.aiId){removeTyping();S._aiTyping=false;return;}
+
     const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:50,temperature:0.95,top_p:0.92})
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:50,temperature:0.93,top_p:0.9})
     });
     if(!res.ok)throw new Error('Groq '+res.status);
     const data=await res.json();
     let text=data.choices?.[0]?.message?.content?.trim()||'';
     text=filterLang(text,S.lang);
-    if(!text||text.length<3)text=isAr?
-      ['يعني.. مو عارف','أه صح','اتذكر شيء قريب من كذا'][Math.floor(Math.random()*3)]:
-      ['idk honestly','yeah same kinda','hard to explain lol'][Math.floor(Math.random()*3)];
+    if(!text||text.length<3)text=isAr
+      ?['يعني.. مو عارف','أه صح','اتذكر شيء قريب','بس..','شيء زي كذا'][Math.floor(Math.random()*5)]
+      :['idk honestly','yeah same','hard to say','maybe...','sorta'][Math.floor(Math.random()*5)];
     if(text.length>50)text=text.substring(0,47)+'...';
     removeTyping();
     if(S.phase!=='chat'){S._aiTyping=false;return;}
-    // Final turn check
+
+    // Final turn check before sending
     const rs3=await get(ref(db,`rooms/${S.roomId}`));
     const rd3=rs3.val()||{};
     const cur3=(rd3.turnOrder||[])[(rd3.currentTurnIdx||0)%(rd3.turnOrder||[1]).length];
     if(cur3!==S.aiId){S._aiTyping=false;return;}
-    // Send message using AI's own player ID and name (not host's)
-    await push(ref(db,`rooms/${S.roomId}/chat`),{
-      senderId:S.aiId,
-      senderName:aiName,
-      text,ts:nowTs(),type:'msg'
-    });
-    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-600);
+
+    await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.aiId,senderName:aiName,text,ts:nowTs(),type:'msg'});
+    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-500);
     await advanceTurn(rd3);
     await update(ref(db,`rooms/${S.roomId}`),{aiMemory:newMem});
     S._aiTyping=false;
-  }catch(e){console.warn('AI err:',e);removeTyping();S._aiTyping=false;}
+  }catch(e){
+    console.warn('AI err:',e);
+    removeTyping();
+    S._aiTyping=false;
+    // Advance turn if still AI's to prevent freeze
+    if(S.isHost&&S.phase==='chat'){
+      try{
+        const rs=await get(ref(db,`rooms/${S.roomId}`));
+        const rd=rs.val()||{};
+        const cur=(rd.turnOrder||[])[(rd.currentTurnIdx||0)%((rd.turnOrder||[1]).length)];
+        if(cur===S.aiId)await advanceTurn(rd);
+      }catch(e2){console.warn('advance fail:',e2);}
+    }
+  }
 }
 
 /* ══════════ REVIEW PHASE — 30s to read chat before voting ══════════ */
@@ -927,7 +1048,12 @@ async function tallyVotes(){
   const newScores={...(room.scores||{})};
   if(humanWon)Object.entries(votes).forEach(([pid,v])=>{if(v.target===aiId&&players[pid]&&!players[pid].isAI)newScores[pid]=(newScores[pid]||0)+1;});
   else if(aiId)newScores[aiId]=(newScores[aiId]||0)+1;
-  await update(ref(db,`rooms/${S.roomId}`),{phase:'result',humanWon,mostVotedId:mostVoted,voteCounts:counts,scores:newScores});
+  // Check if any human reached winTarget
+  const winTarget=room.winTarget||WIN_TARGET_DEFAULT;
+  const winnerEntry=Object.entries(newScores).find(([pid,sc])=>sc>=winTarget&&players[pid]&&!players[pid].isAI);
+  const gameWinner=winnerEntry?winnerEntry[0]:null;
+  const nextPhase=gameWinner?'winner':'result';
+  await update(ref(db,`rooms/${S.roomId}`),{phase:nextPhase,humanWon,mostVotedId:mostVoted,voteCounts:counts,scores:newScores,gameWinner});
 }
 
 /* ══════════ RESULT ══════════ */
@@ -938,21 +1064,62 @@ async function enterResult(room){
   const players=pS.val()||{},roomData=rS.val()||room;
   const aiId=roomData.aiPlayerId,aiData=players[aiId]||{name:'???',avatar:'🤖'};
   document.getElementById('res-badge').textContent=isAr?'المتسلل الذكي':'AI IMPOSTOR';
-  document.getElementById('res-name').textContent=aiData.name;
+  document.getElementById('res-name').textContent=`${aiData.avatar} ${aiData.name}`;
   const outEl=document.getElementById('res-outcome');
   if(roomData.humanWon){outEl.textContent=isAr?'🎉 البشر اكتشفوا الذكاء الاصطناعي!':'🎉 Humans caught the AI!';outEl.className='result-outcome win';}
   else{outEl.textContent=isAr?'🤖 الذكاء الاصطناعي نجح في الخداع!':'🤖 The AI fooled everyone!';outEl.className='result-outcome lose';}
   const allMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg'):[];
   const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
-  document.getElementById('analysis-title').textContent=isAr?'رسائل المتسلل':'Impostor Messages';
-  document.getElementById('analysis-content').innerHTML=aiMsgs.length?aiMsgs.map(m=>`<div class="analysis-item"><div class="analysis-icon">💬</div><div class="analysis-text">"${esc(m.text)}"</div></div>`).join(''):`<div class="analysis-text">${isAr?'لم يرسل الذكاء الاصطناعي أي رسائل':'The AI sent no messages'}</div>`;
+  // Show persona reveal in analysis
+  const personaKey=roomData.aiPersona;
+  const persona=personaKey?(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey]:null;
+  const personaHTML=persona
+    ?`<div class="analysis-item"><div class="analysis-icon">🎭</div><div class="analysis-text">${isAr?'شخصية الجولة:':'Round personality:'} <strong style="color:var(--cyan)">${persona.label}</strong></div></div>`
+    :'';
+  document.getElementById('analysis-title').textContent=isAr?'تحليل المتسلل':'Impostor Analysis';
+  document.getElementById('analysis-content').innerHTML=personaHTML+(aiMsgs.length
+    ?aiMsgs.map(m=>`<div class="analysis-item"><div class="analysis-icon">💬</div><div class="analysis-text">"${esc(m.text)}"</div></div>`).join('')
+    :`<div class="analysis-text">${isAr?'لم يرسل الذكاء الاصطناعي أي رسائل':'The AI sent no messages'}</div>`);
   const counts=roomData.voteCounts||{},totalV=Math.max(Object.values(counts).reduce((a,b)=>a+b,0),1);
   document.getElementById('vote-bars').innerHTML=Object.entries(players).map(([pid,p])=>{const c=counts[pid]||0,pct=Math.round((c/totalV)*100),color=pid===aiId?'var(--red)':'var(--violet)';return`<div class="vote-bar-item"><div class="vote-bar-name">${p.avatar} ${esc(p.name)}${pid===aiId?' 🤖':''}</div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${color}"></div></div><div class="vote-bar-count">${c}</div></div>`;}).join('');
   document.getElementById('th-p').textContent=isAr?'اللاعب':'Player';
   document.getElementById('th-s').textContent=isAr?'النقاط':'Score';
   document.getElementById('th-r').textContent=isAr?'هذه الجولة':'This Round';
-  document.getElementById('scores-body').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0)).map(([pid,p])=>{const score=roomData.scores?.[pid]||0,prev=S.prevScores?.[pid]||0,delta=score-prev;return`<tr><td>${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</td><td style="font-family:'Share Tech Mono',monospace;font-weight:700">${score}</td><td class="score-delta">${delta>0?'+'+delta:delta===0?'—':delta}</td></tr>`;}).join('');
-  const nb=document.getElementById('next-round-btn');nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';
+  const winTarget=roomData.winTarget||WIN_TARGET_DEFAULT;
+  document.getElementById('scores-body').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0)).map(([pid,p])=>{
+    const score=roomData.scores?.[pid]||0,prev=S.prevScores?.[pid]||0,delta=score-prev;
+    return`<tr><td>${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</td><td style="font-family:'Share Tech Mono',monospace;font-weight:700">${score}<span style="color:var(--text3);font-size:10px;margin-right:4px">/${winTarget}</span></td><td class="score-delta">${delta>0?'+'+delta:delta===0?'—':delta}</td></tr>`;
+  }).join('');
+  // Only show next round if no winner yet
+  const nb=document.getElementById('next-round-btn');
+  if(!roomData.gameWinner){nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';}
+  else{nb.style.display='none';}
+}
+
+/* ══════════ WINNER SCREEN ══════════ */
+async function enterWinner(room){
+  clearTimers();stopGameAmbient();S.phase='winner';
+  showScreen('winner-screen');
+  // Win sound
+  try{const a=getAC();[523,659,784,1047].forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,a.currentTime+i*0.13);g.gain.linearRampToValueAtTime(0.1,a.currentTime+i*0.13+0.01);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+i*0.13+0.4);o.start(a.currentTime+i*0.13);o.stop(a.currentTime+i*0.13+0.45);});}catch(e){}
+  const isAr=S.lang==='ar';
+  const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+  const players=pSnap.val()||{};
+  const scores=room.scores||{};
+  const winnerId=room.gameWinner;
+  const winnerData=players[winnerId]||{name:'???',avatar:'🏆'};
+  document.getElementById('winner-name').textContent=`${winnerData.avatar} ${winnerData.name}`;
+  document.getElementById('winner-sub').textContent=isAr
+    ?`وصل إلى ${room.winTarget||WIN_TARGET_DEFAULT} نقاط أولاً!`
+    :`Reached ${room.winTarget||WIN_TARGET_DEFAULT} points first!`;
+  const rankSymbols=['🥇','🥈','🥉'];
+  const sorted=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(scores[b[0]]||0)-(scores[a[0]]||0));
+  document.getElementById('winner-scores-list').innerHTML=sorted.map(([pid,p],i)=>`
+    <div class="ws-rank-row">
+      <span style="font-size:22px;width:32px;">${rankSymbols[i]||'  '}</span>
+      <span style="flex:1;font-weight:700;padding:0 8px;">${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</span>
+      <span style="font-family:'Share Tech Mono',monospace;color:var(--cyan);font-size:16px;">${scores[pid]||0}</span>
+    </div>`).join('');
 }
 
 /* ══════════ NEXT ROUND — rename phase + clear memory ══════════ */
@@ -978,7 +1145,7 @@ window.nextRound=async function(){
     await update(ref(db,`rooms/${S.roomId}`),{
       phase:'rename',topic:'',aiPlayerId:null,mostVotedId:null,
       humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null,
-      turnOrder:null,currentTurnIdx:0,turnStartTime:null,aiMemory:''
+      turnOrder:null,currentTurnIdx:0,turnStartTime:null,aiMemory:'',aiPersona:null,gameWinner:null
     });
     loading(false);
   }catch(e){loading(false);toast('خطأ: '+e.message);}
@@ -986,8 +1153,9 @@ window.nextRound=async function(){
 function resetRound(){
   clearTimers();_lastKeys.clear();S._aiTyping=false;
   if(S._aiSched)clearTimeout(S._aiSched);
+  if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
-  S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;
+  S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;S._lastTurnId=null;
 }
 /* ══════════ RENAME PHASE ══════════ */
 function enterRename(){
@@ -1046,8 +1214,9 @@ window.leaveRoom=async function(){
   clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
   if(S._aiSched)clearTimeout(S._aiSched);
+  if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
   try{if(S.roomId&&S.playerId){await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));if(S.isHost)await remove(ref(db,`rooms/${S.roomId}`));}}catch(e){}
-  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null});
+  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null});
   _lastKeys.clear();showScreen('home-screen');
 };
 /* INPUT EVENTS */
@@ -1088,7 +1257,7 @@ function _anim(){
   requestAnimationFrame(_anim);}
 _anim();
 /* AMBIENT SOUND */
-function _ambient(){try{const a=getAC(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';o.frequency.setValueAtTime(60,a.currentTime);o.frequency.linearRampToValueAtTime(55,a.currentTime+3);g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(0.012,a.currentTime+1);g.gain.linearRampToValueAtTime(0,a.currentTime+4);o.start(a.currentTime);o.stop(a.currentTime+4.5);setTimeout(_ambient,14000);}catch(e){}}
+function _ambient(){try{const a=getAC(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sawtooth';o.frequency.setValueAtTime(60,a.currentTime);o.frequency.linearRampToValueAtTime(55,a.currentTime+3);g.gain.setValueAtTime(0,a.currentTime);g.gain.linearRampToValueAtTime(0.045,a.currentTime+1.5);g.gain.linearRampToValueAtTime(0,a.currentTime+4);o.start(a.currentTime);o.stop(a.currentTime+4.5);setTimeout(_ambient,14000);}catch(e){}}
 document.addEventListener('click',()=>{_ambient();},{once:true});
 </script>
 </body>
