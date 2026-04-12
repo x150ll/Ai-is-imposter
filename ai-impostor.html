@@ -539,18 +539,30 @@ const genId=()=>Math.random().toString(36).substring(2,12);
 const nowTs=()=>Date.now();
 const rnd=arr=>arr[Math.floor(Math.random()*arr.length)];
 const TURN_SECS=15; // 15 seconds per turn
+let _screenSwitching=false;
 function showScreen(id){
-  const current=document.querySelector('.screen.active');
   const next=document.getElementById(id);
   if(!next)return;
-  if(current&&current!==next){
+  const current=document.querySelector('.screen.active');
+  if(current===next){
+    // Already on this screen — ensure it's visible
+    if(!next.classList.contains('fade-in'))
+      requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('fade-in')));
+    return;
+  }
+  // FIX-5: cancel any in-progress switch to prevent orphan states
+  _screenSwitching=true;
+  if(current){
     current.classList.remove('fade-in');
     setTimeout(()=>{
-      current.classList.remove('active');
+      _screenSwitching=false;
+      // Cleanup all just in case
+      document.querySelectorAll('.screen.active').forEach(s=>{if(s!==next){s.classList.remove('active');s.classList.remove('fade-in');}});
       next.classList.add('active');
       requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('fade-in')));
     },200);
   } else {
+    _screenSwitching=false;
     document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.classList.remove('fade-in');});
     next.classList.add('active');
     requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('fade-in')));
@@ -749,10 +761,61 @@ window.saveGroqKey=async function(){
     btn.disabled=false;btn.textContent='حفظ المفتاح والمتابعة ▶';
   }
 };
+
+/* ══════════ GROQ AUTO-VALIDATION ON STARTUP ══════════ */
+async function _validateGroqKey(key,isRetry=false){
+  // Phase 4: silent background check — does not block UI
+  try{
+    const ctrl=new AbortController();
+    const timeout=setTimeout(()=>ctrl.abort(),8000); // 8s timeout
+    const r=await fetch('https://api.groq.com/openai/v1/models',{
+      headers:{'Authorization':`Bearer ${key}`},
+      signal:ctrl.signal
+    });
+    clearTimeout(timeout);
+    if(r.ok)return true; // key valid
+    if(r.status===401){
+      // Key is definitively invalid — clear it silently
+      localStorage.removeItem('__ai_imp_gk');
+      GROQ='';
+      return false;
+    }
+    if(r.status===429){
+      // Quota exceeded but key is valid — keep it, let them proceed
+      return true;
+    }
+    // Any other error (5xx, network) — be lenient, don't delete key
+    if(!isRetry)return _validateGroqKey(key,true); // one retry
+    return true; // assume valid on repeated failure (Groq downtime)
+  }catch(e){
+    // Network failure or abort — be lenient, keep the key
+    if(!isRetry)return _validateGroqKey(key,true);
+    return true;
+  }
+}
+
 (function init(){
   const saved=localStorage.getItem('__ai_imp_gk');
-  if(saved&&saved.startsWith('gsk_')&&saved.length>20){GROQ=saved;showScreen('home-screen');}
-  else{showScreen('groq-screen');}
+  if(saved&&saved.startsWith('gsk_')&&saved.length>20){
+    GROQ=saved;
+    showScreen('home-screen');
+    // Phase 4: validate in background — non-blocking
+    _validateGroqKey(saved).then(valid=>{
+      if(!valid){
+        // Key was silently cleared — redirect to groq screen
+        GROQ='';
+        showScreen('groq-screen');
+        // Show subtle notice on the groq screen
+        const errEl=document.getElementById('groq-error');
+        if(errEl){
+          errEl.textContent='⚠️ مفتاحك السابق لم يعد صالحاً — أدخل مفتاحاً جديداً';
+          errEl.style.display='block';
+        }
+      }
+    }).catch(()=>{}); // never crash on validation failure
+  } else {
+    showScreen('groq-screen');
+  }
   setTimeout(attachSounds,100);
 })();
 window.switchTab=function(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-btn-'+tab).classList.add('active');document.getElementById('tab-create').style.display=tab==='create'?'block':'none';document.getElementById('tab-join').style.display=tab==='join'?'block':'none';};
@@ -797,6 +860,8 @@ window.joinRoom=async function(){
 
 /* ══════════ WAITING ══════════ */
 function enterWaiting(){
+  // FIX-7: prevent re-entering waiting if already there (duplicate listeners/tipInt)
+  if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
   S.phase='waiting';showScreen('waiting-screen');
   const isAr=S.lang==='ar';
   document.getElementById('display-code').textContent=S.roomId;
@@ -1131,22 +1196,22 @@ async function sendReaction(msgKey,emoji){
 function updateReactionPill(m){
   const row=document.getElementById(`react-${m.msgKey}`);
   if(!row)return;
-  // Find or create pill for this emoji
   let pill=row.querySelector(`[data-emoji="${m.emoji}"]`);
   if(!pill){
     pill=document.createElement('div');
     pill.className='reaction-pill';
     pill.dataset.emoji=m.emoji;
-    pill.dataset.senders='';
+    // FIX-4: initialize senders with first sender immediately
+    pill.dataset.senders=m.senderId;
     pill.innerHTML=`<span>${m.emoji}</span><span class="reaction-count">1</span>`;
     pill.onclick=()=>sendReaction(m.msgKey,m.emoji);
     row.appendChild(pill);
   } else {
-    const senders=pill.dataset.senders?pill.dataset.senders.split(','):[];
+    const senders=pill.dataset.senders?pill.dataset.senders.split(',').filter(Boolean):[];
     if(!senders.includes(m.senderId)){
       senders.push(m.senderId);
       pill.dataset.senders=senders.join(',');
-      pill.querySelector('.reaction-count').textContent=senders.length+1;
+      pill.querySelector('.reaction-count').textContent=senders.length;
     }
   }
   if(m.senderId===S.playerId)pill.classList.add('mine-react');
@@ -1342,16 +1407,22 @@ Write your reply now as "${aiName}". One short sentence only, in English.`;
     const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
     if(cur2!==S.aiId){removeTyping();S._aiTyping=false;return;}
 
-    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-      body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        messages:[{role:'system',content:sys},{role:'user',content:usr}],
-        max_tokens:60,temperature:0.95,top_p:0.93,
-        frequency_penalty:0.4  // reduce repetition
-      })
-    });
+    const _ctrl=new AbortController();
+    const _fetchTimeout=setTimeout(()=>_ctrl.abort(),12000);
+    let res;
+    try{
+      res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
+        body:JSON.stringify({
+          model:'llama-3.3-70b-versatile',
+          messages:[{role:'system',content:sys},{role:'user',content:usr}],
+          max_tokens:60,temperature:0.95,top_p:0.93,
+          frequency_penalty:0.4
+        }),
+        signal:_ctrl.signal
+      });
+    }finally{clearTimeout(_fetchTimeout);}
     if(!res.ok)throw new Error('Groq '+res.status);
     const data=await res.json();
     let text=data.choices?.[0]?.message?.content?.trim()||'';
@@ -1610,7 +1681,7 @@ async function enterResult(room){
   },1300);
 
   // O-FIX: Stage 4 — after 2s, reveal all details
-  setTimeout(()=>{
+  setTimeout(async()=>{
     const allMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg'):[];
     const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
     const personaKey=roomData.aiPersona;
@@ -1786,32 +1857,38 @@ function enterRename(){
   // Listen to ready count — show host start button when all ready
   const readyRef=ref(db,`rooms/${S.roomId}/ready`);
   const readyU=onValue(readyRef,async snap=>{
-    const ready=snap.val()||{};
-    const readyCount=Object.keys(ready).length;
-    // Get total human count
-    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
-    const totalH=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
-    document.getElementById('rename-wait-text').textContent=isAr
-      ?`${readyCount} من ${totalH} جاهز...`
-      :`${readyCount} of ${totalH} ready...`;
-    // Host: show start when all ready
-    if(S.isHost){
-      const existing=document.getElementById('host-start-rename-btn');
-      if(existing)existing.remove();
-      if(readyCount>=totalH){
-        const startBtn=document.createElement('button');
-        startBtn.id='host-start-rename-btn';
-        startBtn.className='btn btn-violet';
-        startBtn.style.cssText='max-width:400px;width:100%;margin-top:10px;';
-        startBtn.textContent=isAr?`ابدأ الجولة — الكل جاهز ▶`:`Start Round — All Ready ▶`;
-        startBtn.onclick=async()=>{
-          startBtn.disabled=true;
-          await remove(ref(db,`rooms/${S.roomId}/ready`));
-          await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
-        };
-        if(hostArea)hostArea.appendChild(startBtn);
+    try{
+      const ready=snap.val()||{};
+      const readyCount=Object.keys(ready).length;
+      // Get total human count — cached from S.players if available
+      let totalH=0;
+      if(S.players&&Object.keys(S.players).length>0){
+        totalH=Object.values(S.players).filter(p=>!p.isAI).length;
+      } else {
+        const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+        totalH=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
       }
-    }
+      const waitEl=document.getElementById('rename-wait-text');
+      if(waitEl)waitEl.textContent=isAr?`${readyCount} من ${totalH} جاهز...`:`${readyCount} of ${totalH} ready...`;
+      if(S.isHost){
+        const existing=document.getElementById('host-start-rename-btn');
+        if(existing)existing.remove();
+        if(readyCount>=totalH&&totalH>0){
+          const startBtn=document.createElement('button');
+          startBtn.id='host-start-rename-btn';
+          startBtn.className='btn btn-violet';
+          startBtn.style.cssText='max-width:400px;width:100%;margin-top:10px;';
+          startBtn.textContent=isAr?`ابدأ الجولة — الكل جاهز ▶`:`Start Round — All Ready ▶`;
+          startBtn.onclick=async()=>{
+            startBtn.disabled=true;
+            await remove(ref(db,`rooms/${S.roomId}/ready`));
+            await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
+          };
+          const hostArea=document.getElementById('rename-host-area');
+          if(hostArea)hostArea.appendChild(startBtn);
+        }
+      }
+    }catch(e){console.warn('rename ready listener err:',e);}
   });
   S._listeners.push(()=>off(readyRef,'value',readyU));
 }
@@ -1839,7 +1916,7 @@ window.leaveRoom=async function(){
       await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));
     }
   }catch(e){}
-  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},players:{},_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null});
+  Object.assign(S,{roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},players:{},winTarget:WIN_TARGET_DEFAULT,_listeners:[],_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null});
   _lastKeys.clear();showScreen('home-screen');
 };
 /* INPUT EVENTS */

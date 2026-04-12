@@ -8,210 +8,792 @@
 <meta property="og:title" content="AI IMPOSTOR | كاشف الذكاء">
 <meta property="og:description" content="ذكاء اصطناعي يختبئ بينكم — تحدثوا، حللوا، صوّتوا. من يكشفه أولاً يفوز.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://x150ll.github.io/pinfinder/">
+<meta property="og:url" content="https://x150ll.github.io/ai-impostor/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AI IMPOSTOR | كاشف الذكاء">
 <meta name="twitter:description" content="ذكاء اصطناعي يختبئ بينكم — تحدثوا، حللوا، صوّتوا. من يكشفه أولاً يفوز.">
 <meta name="theme-color" content="#ff2020">
+
+<!-- Favicon: SVG eye icon matching the game theme -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23030407' stroke='%23ff2020' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%238b0000'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23030407'/%3E%3Ccircle cx='36' cy='28' r='3' fill='%23ffffff' opacity='0.9'/%3E%3Ccircle cx='32' cy='32' r='28' fill='none' stroke='%23ff202044' stroke-width='1' stroke-dasharray='4 4'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23030407' stroke='%23ff2020' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%238b0000'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23030407'/%3E%3Ccircle cx='36' cy='28' r='3' fill='%23ffffff' opacity='0.9'/%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
 <style>
-:root{--black:#030407;--dark:#080b12;--surface:#0d1117;--surface2:#131820;--border:#1e2535;--red:#ff2020;--red-dim:#8b0000;--violet:#7c3aed;--violet2:#4f1fad;--cyan:#00e5ff;--cyan-dim:#005f6b;--text:#e2e8f4;--text2:#7a8aa8;--text3:#3d4d68;--glow-r:rgba(255,32,32,0.35);--glow-v:rgba(124,58,237,0.35);--glow-c:rgba(0,229,255,0.2);}
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root{
+  --black:#030407;
+  --dark:#07090f;
+  --surface:#0c0f18;
+  --surface2:#111520;
+  --surface3:#161c2a;
+  --border:#1a2235;
+  --border2:#222d42;
+  --red:#ff2020;
+  --red-dim:#8b0000;
+  --red-glow:rgba(255,32,32,0.25);
+  --violet:#7c3aed;
+  --violet2:#4f1fad;
+  --violet-glow:rgba(124,58,237,0.25);
+  --cyan:#00e5ff;
+  --cyan-dim:#005f6b;
+  --cyan-glow:rgba(0,229,255,0.15);
+  --text:#dde4f0;
+  --text2:#6b7fa0;
+  --text3:#323d55;
+  --gold:#f59e0b;
+  --success:#22c55e;
+}
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{font-family:'Tajawal',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden;}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--black);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.6;
+}
+/* Custom cursor — desktop only */
 @media(pointer:fine){body{cursor:none;}}
-body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9000;opacity:.5;}
-.cursor{position:fixed;width:12px;height:12px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,background .2s;mix-blend-mode:screen;display:none;}
-.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(255,32,32,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;display:none;}
+.cursor{position:fixed;width:10px;height:10px;background:var(--red);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;display:none;transition:transform .08s,background .2s;}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(255,32,32,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);display:none;}
 @media(pointer:fine){.cursor,.cursor-ring{display:block;}}
-body:has(a:hover) .cursor,body:has(button:hover) .cursor{transform:translate(-50%,-50%) scale(2);background:var(--cyan);}
+
+/* Noise overlay */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9000;opacity:.5;
+}
+
+/* Grid background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(124,58,237,0.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,58,237,0.015) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(to bottom,rgba(3,4,7,0.95),transparent);backdrop-filter:blur(2px);}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;display:flex;align-items:center;gap:4px;}
-.nav-logo .r{color:var(--red);text-shadow:0 0 20px var(--glow-r);}
-.nav-links{display:flex;gap:24px;align-items:center;}
-.nav-links a{color:var(--text2);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;letter-spacing:.5px;}
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY
+═══════════════════════════════════════════ */
+.font-mono{font-family:'Share Tech Mono',monospace;}
+.font-display{font-family:'Bebas Neue',sans-serif;}
+.label-tag{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--red);
+  display:inline-flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+}
+.label-tag::before{content:'//';opacity:.5;}
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:18px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(3,4,7,0.98) 0%,rgba(3,4,7,0.0) 100%);
+  backdrop-filter:blur(3px);
+  border-bottom:1px solid rgba(26,34,53,0.4);
+  transition:padding .3s;
+}
+nav.scrolled{
+  padding:12px 48px;
+  background:rgba(3,4,7,0.97);
+  border-bottom-color:var(--border);
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:24px;letter-spacing:3px;
+  display:flex;align-items:center;gap:4px;
+  text-decoration:none;color:var(--text);
+}
+.nav-logo .r{color:var(--red);text-shadow:0 0 20px var(--red-glow);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{
+  color:var(--text2);text-decoration:none;
+  font-size:13px;font-weight:500;
+  transition:color .2s;letter-spacing:.5px;
+  font-family:'Share Tech Mono',monospace;
+}
 .nav-links a:hover{color:var(--text);}
-.nav-cta{background:var(--red)!important;color:#fff!important;padding:10px 22px;border-radius:6px;font-weight:700!important;transition:all .2s!important;box-shadow:0 0 20px var(--glow-r);}
-.nav-cta:hover{background:#ff4040!important;transform:translateY(-1px);box-shadow:0 0 30px var(--glow-r)!important;}
-/* LANG TOGGLE */
-.lang-toggle{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0;}
-.lang-btn{background:transparent;border:none;color:var(--text2);padding:7px 12px;font-family:'Share Tech Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.nav-cta{
+  background:var(--red)!important;color:#fff!important;
+  padding:9px 22px;border-radius:6px;
+  font-weight:700!important;font-family:'Tajawal',sans-serif!important;
+  transition:all .2s!important;font-size:14px!important;
+  box-shadow:0 0 20px var(--red-glow);letter-spacing:.3px!important;
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 0 35px var(--red-glow)!important;}
+.lang-toggle{
+  display:flex;align-items:center;
+  border:1px solid var(--border2);border-radius:6px;overflow:hidden;
+}
+.lang-btn{
+  background:transparent;border:none;
+  color:var(--text2);padding:7px 13px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  cursor:pointer;transition:all .18s;letter-spacing:1.5px;
+}
 .lang-btn.active{background:var(--violet);color:#fff;}
 .lang-btn:hover:not(.active){background:var(--surface2);color:var(--text);}
-/* HERO */
-#hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 24px 80px;text-align:center;overflow:hidden;}
-#hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:0;animation:scanMove 8s linear infinite;}
-@keyframes scanMove{from{background-position:0 0}to{background-position:0 100px}}
-.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(255,32,32,0.08) 0%,transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:glowPulse 4s ease-in-out infinite;pointer-events:none;}
-@keyframes glowPulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
-.ai-eye-wrap{position:relative;z-index:2;margin-bottom:40px;animation:fadeUp .8s ease both;}
-.ai-eye{width:90px;height:90px;position:relative;margin:0 auto;}
-.eye-outer{width:90px;height:90px;border:2px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:eyeSpin 8s linear infinite;box-shadow:0 0 30px var(--glow-r),inset 0 0 30px rgba(255,32,32,0.05);}
-.eye-outer::before,.eye-outer::after{content:'';position:absolute;border:1px solid rgba(255,32,32,0.3);border-radius:50%;}
-.eye-outer::before{width:110px;height:110px;animation:eyeSpin 5s linear infinite reverse;}
-.eye-outer::after{width:130px;height:130px;animation:eyeSpin 12s linear infinite;border-color:rgba(124,58,237,0.2);}
-@keyframes eyeSpin{to{transform:rotate(360deg)}}
-.eye-inner{width:50px;height:50px;background:radial-gradient(circle at 40% 40%,#ff4444,#8b0000);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--glow-r);animation:blink 6s ease-in-out infinite;}
-@keyframes blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(0.05)}}
-.eye-pupil{width:18px;height:18px;background:#000;border-radius:50%;position:relative;}
-.eye-pupil::after{content:'';position:absolute;top:3px;right:3px;width:5px;height:5px;background:#fff;border-radius:50%;}
-.hero-label{position:relative;z-index:2;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--red);letter-spacing:5px;text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeUp .6s ease .3s both;}
-.hero-title{position:relative;z-index:2;font-family:'Bebas Neue',sans-serif;font-size:clamp(72px,14vw,160px);line-height:.9;letter-spacing:-2px;margin-bottom:24px;opacity:0;animation:fadeUp .8s ease .5s both;}
-.hero-title .line1{display:block;color:var(--text);}
-.hero-title .line2{display:block;color:transparent;-webkit-text-stroke:2px var(--red);text-shadow:0 0 40px var(--glow-r);animation:glitch 8s infinite;}
-@keyframes glitch{0%,94%,100%{text-shadow:0 0 40px var(--glow-r);transform:none}95%{text-shadow:-3px 0 var(--cyan),3px 0 var(--red);transform:translateX(2px)}96%{text-shadow:3px 0 var(--cyan),-3px 0 var(--red);transform:translateX(-2px)}97%{text-shadow:0 0 40px var(--glow-r);transform:none}}
-.hero-title-ar{position:relative;z-index:2;font-size:clamp(22px,4vw,40px);font-weight:300;color:var(--text2);letter-spacing:2px;margin-bottom:32px;opacity:0;animation:fadeUp .8s ease .7s both;}
-.hero-desc{position:relative;z-index:2;font-size:clamp(15px,2vw,19px);color:var(--text2);max-width:600px;line-height:1.8;margin-bottom:48px;opacity:0;animation:fadeUp .8s ease .9s both;}
-.hero-desc strong{color:var(--cyan);font-weight:700;}
-.hero-btns{position:relative;z-index:2;display:flex;gap:16px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s ease 1.1s both;}
-.btn-play{background:var(--red);color:#fff;border:none;padding:18px 48px;font-family:'Tajawal',sans-serif;font-size:18px;font-weight:800;border-radius:8px;cursor:none;transition:all .25s;box-shadow:0 0 30px var(--glow-r),0 4px 0 #8b0000;letter-spacing:.5px;position:relative;overflow:hidden;text-decoration:none;display:inline-flex;align-items:center;gap:10px;}
-.btn-play::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity .2s;}
-.btn-play:hover{transform:translateY(-3px);box-shadow:0 0 50px var(--glow-r),0 7px 0 #8b0000;}
-.btn-play:hover::before{opacity:1;}
-.btn-how{background:transparent;color:var(--text);border:1px solid var(--border);padding:18px 36px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:600;border-radius:8px;cursor:none;transition:all .25s;letter-spacing:.5px;text-decoration:none;display:inline-flex;align-items:center;}
-.btn-how:hover{border-color:var(--violet);color:var(--text);background:rgba(124,58,237,0.08);}
-.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeIn 1s ease 2s both;z-index:2;transition:opacity .5s ease;}
-.scroll-hint span{font-size:11px;color:var(--text3);letter-spacing:3px;font-family:'Share Tech Mono',monospace;}
-.scroll-arrow{width:20px;height:30px;border:1px solid var(--text3);border-radius:10px;position:relative;}
-.scroll-arrow::after{content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);width:3px;height:8px;background:var(--text3);border-radius:2px;animation:scrollBounce 2s ease infinite;}
-@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
-.live-badge{position:absolute;top:100px;right:48px;z-index:2;background:rgba(255,32,32,0.1);border:1px solid rgba(255,32,32,0.3);border-radius:20px;padding:6px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-family:'Share Tech Mono',monospace;color:var(--red);animation:fadeIn 1s ease 1.5s both;}
+@media(max-width:768px){
+  nav{padding:14px 20px;}
+  nav.scrolled{padding:10px 20px;}
+  .nav-links{display:none;}
+}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:140px 24px 100px;
+  text-align:center;overflow:hidden;
+}
+
+/* Scanlines */
+#hero::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 3px,
+    rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px
+  );
+  pointer-events:none;z-index:0;
+  animation:scanMove 12s linear infinite;
+}
+@keyframes scanMove{from{background-position:0 0}to{background-position:0 160px}}
+
+/* Radial glow */
+.hero-glow{
+  position:absolute;
+  width:800px;height:500px;
+  background:radial-gradient(ellipse,rgba(255,32,32,0.07) 0%,transparent 68%);
+  border-radius:50%;top:50%;left:50%;
+  transform:translate(-50%,-55%);
+  animation:glowPulse 5s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes glowPulse{
+  0%,100%{opacity:.7;transform:translate(-50%,-55%) scale(1);}
+  50%{opacity:1;transform:translate(-50%,-55%) scale(1.12);}
+}
+
+/* Live badge */
+.live-badge{
+  position:absolute;top:110px;right:48px;z-index:2;
+  background:rgba(255,32,32,0.08);
+  border:1px solid rgba(255,32,32,0.25);
+  border-radius:20px;padding:6px 14px;
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-family:'Share Tech Mono',monospace;
+  color:var(--red);
+  animation:fadeIn .8s ease 1.6s both;
+}
 .live-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse 1.5s infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
-.stat-float{position:absolute;z-index:2;background:rgba(13,17,23,0.9);border:1px solid var(--border);border-radius:12px;padding:14px 18px;backdrop-filter:blur(10px);animation:floatCard 4s ease-in-out infinite;}
-.stat-float-1{top:35%;left:4%;animation-delay:0s;}
-.stat-float-2{top:55%;right:4%;animation-delay:2s;}
-@media(max-width:900px){.stat-float{display:none;}}
-@keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.stat-val{font-family:'Share Tech Mono',monospace;font-size:22px;font-weight:700;color:var(--cyan);}
-.stat-lbl{font-size:11px;color:var(--text2);margin-top:3px;}
-/* SECTIONS */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+@media(max-width:768px){.live-badge{top:80px;right:16px;}}
+
+/* Floating stats */
+.stat-float{
+  position:absolute;z-index:2;
+  background:rgba(12,15,24,0.92);
+  border:1px solid var(--border2);border-radius:12px;
+  padding:16px 20px;backdrop-filter:blur(12px);
+  animation:floatCard 5s ease-in-out infinite;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+.stat-float-1{top:34%;left:3%;animation-delay:0s;}
+.stat-float-2{top:56%;right:3%;animation-delay:2.5s;}
+@media(max-width:1000px){.stat-float{display:none;}}
+@keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--cyan);text-shadow:0 0 16px var(--cyan-glow);}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+
+/* AI Eye */
+.ai-eye-wrap{
+  position:relative;z-index:2;
+  margin-bottom:44px;
+  animation:fadeUp .8s ease both;
+}
+.ai-eye{width:96px;height:96px;position:relative;margin:0 auto;}
+.eye-outer{
+  width:96px;height:96px;
+  border:1.5px solid var(--red);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  animation:eyeSpin 10s linear infinite;
+  box-shadow:0 0 40px var(--red-glow),inset 0 0 24px rgba(255,32,32,0.06);
+}
+.eye-outer::before,.eye-outer::after{
+  content:'';position:absolute;
+  border-radius:50%;border-style:solid;border-color:transparent;
+}
+.eye-outer::before{
+  width:118px;height:118px;
+  border-top-color:rgba(255,32,32,0.3);
+  border-right-color:rgba(255,32,32,0.1);
+  border-width:1px;
+  animation:eyeSpin 6s linear infinite reverse;
+}
+.eye-outer::after{
+  width:140px;height:140px;
+  border-top-color:rgba(124,58,237,0.2);
+  border-left-color:rgba(124,58,237,0.1);
+  border-width:1px;
+  animation:eyeSpin 15s linear infinite;
+}
+@keyframes eyeSpin{to{transform:rotate(360deg)}}
+.eye-inner{
+  width:56px;height:56px;
+  background:radial-gradient(circle at 38% 38%,#ff3333,#6b0000);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 28px var(--red-glow);
+  animation:blink 7s ease-in-out infinite;
+}
+@keyframes blink{0%,88%,100%{transform:scaleY(1)}94%{transform:scaleY(0.04)}}
+.eye-pupil{width:22px;height:22px;background:#000;border-radius:50%;position:relative;transition:transform .15s ease;}
+.eye-pupil::after{content:'';position:absolute;top:4px;right:4px;width:6px;height:6px;background:#fff;border-radius:50%;opacity:.9;}
+
+/* Hero text */
+.hero-label{
+  position:relative;z-index:2;
+  font-family:'Share Tech Mono',monospace;font-size:11px;
+  color:var(--red);letter-spacing:6px;text-transform:uppercase;
+  margin-bottom:22px;opacity:0;
+  animation:fadeUp .6s ease .3s both;
+}
+.hero-title{
+  position:relative;z-index:2;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(80px,15vw,170px);
+  line-height:.88;letter-spacing:-2px;
+  margin-bottom:20px;opacity:0;
+  animation:fadeUp .8s ease .5s both;
+}
+.hero-title .line1{display:block;color:var(--text);}
+.hero-title .line2{
+  display:block;color:transparent;
+  -webkit-text-stroke:2px var(--red);
+  text-shadow:0 0 60px var(--red-glow);
+  animation:glitch 9s infinite .5s;
+}
+@keyframes glitch{
+  0%,93%,100%{text-shadow:0 0 60px var(--red-glow);transform:none;clip-path:none;}
+  94%{text-shadow:-4px 0 var(--cyan),4px 0 var(--red);transform:translateX(3px);}
+  95%{text-shadow:4px 0 var(--cyan),-4px 0 var(--red);transform:translateX(-3px);}
+  96%{clip-path:inset(20% 0 30% 0);transform:translateX(2px) skewX(-2deg);}
+  97%{clip-path:inset(60% 0 10% 0);transform:translateX(-2px);}
+  98%{text-shadow:0 0 60px var(--red-glow);transform:none;clip-path:none;}
+}
+.hero-sub{
+  position:relative;z-index:2;
+  font-size:clamp(20px,3.5vw,34px);
+  font-weight:300;color:var(--text2);
+  letter-spacing:2px;margin-bottom:28px;
+  opacity:0;animation:fadeUp .8s ease .7s both;
+}
+.hero-desc{
+  position:relative;z-index:2;
+  font-size:clamp(15px,2vw,18px);
+  color:var(--text2);max-width:580px;
+  line-height:1.85;margin-bottom:52px;
+  opacity:0;animation:fadeUp .8s ease .9s both;
+}
+.hero-desc strong{color:var(--cyan);font-weight:700;}
+.hero-btns{
+  position:relative;z-index:2;
+  display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+  opacity:0;animation:fadeUp .8s ease 1.1s both;
+}
+.btn-play{
+  background:var(--red);color:#fff;border:none;
+  padding:16px 44px;
+  font-family:'Tajawal',sans-serif;font-size:17px;font-weight:800;
+  border-radius:8px;cursor:pointer;transition:all .22s;
+  box-shadow:0 0 32px var(--red-glow),0 4px 0 #7a0000;
+  letter-spacing:.5px;position:relative;overflow:hidden;
+  text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+}
+.btn-play::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.14),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.btn-play:hover{transform:translateY(-3px);box-shadow:0 0 56px var(--red-glow),0 7px 0 #7a0000;}
+.btn-play:hover::before{opacity:1;}
+.btn-play:active{transform:translateY(1px);box-shadow:0 0 20px var(--red-glow),0 2px 0 #7a0000;}
+.btn-secondary{
+  background:transparent;color:var(--text);
+  border:1px solid var(--border2);
+  padding:16px 32px;
+  font-family:'Tajawal',sans-serif;font-size:15px;font-weight:600;
+  border-radius:8px;cursor:pointer;transition:all .22s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-secondary:hover{border-color:var(--violet);background:rgba(124,58,237,0.08);}
+
+/* Scroll hint */
+.scroll-hint{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:0;animation:fadeIn .8s ease 2.2s both;z-index:2;
+  transition:opacity .5s;
+}
+.scroll-hint span{font-size:10px;color:var(--text3);letter-spacing:3px;font-family:'Share Tech Mono',monospace;}
+.scroll-arrow{width:18px;height:28px;border:1px solid var(--text3);border-radius:9px;position:relative;}
+.scroll-arrow::after{
+  content:'';position:absolute;top:5px;left:50%;transform:translateX(-50%);
+  width:2px;height:7px;background:var(--text3);border-radius:2px;
+  animation:scrollBounce 2s ease infinite;
+}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ═══════════════════════════════════════════
+   TICKER
+═══════════════════════════════════════════ */
+#topics-ticker{
+  position:relative;z-index:1;
+  padding:32px 0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+#topics-ticker::before,#topics-ticker::after{
+  content:'';position:absolute;top:0;bottom:0;width:140px;z-index:2;
+}
+#topics-ticker::before{left:0;background:linear-gradient(90deg,var(--surface),transparent);}
+#topics-ticker::after{right:0;background:linear-gradient(270deg,var(--surface),transparent);}
+.ticker-track{display:flex;animation:tickerMove 45s linear infinite;width:max-content;}
+.ticker-track:hover{animation-play-state:paused;}
+.ticker-item{
+  white-space:nowrap;padding:0 28px;
+  font-size:13px;color:var(--text2);
+  display:flex;align-items:center;gap:14px;
+  border-right:1px solid var(--border);
+  font-family:'Share Tech Mono',monospace;letter-spacing:.5px;
+}
+.ticker-item::before{content:'◆';color:var(--red);font-size:7px;opacity:.7;}
+@keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ═══════════════════════════════════════════
+   SECTIONS — SHARED
+═══════════════════════════════════════════ */
 section{position:relative;z-index:1;}
-.section-inner{max-width:1100px;margin:0 auto;padding:100px 24px;}
-.section-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);letter-spacing:5px;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
-.section-label::after{content:'';flex:1;max-width:80px;height:1px;background:var(--red-dim);}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);line-height:1;margin-bottom:16px;}
-.section-sub{color:var(--text2);font-size:16px;line-height:1.7;max-width:520px;}
-/* HOW */
+.section-inner{max-width:1120px;margin:0 auto;padding:110px 28px;}
+.section-label{
+  font-family:'Share Tech Mono',monospace;font-size:10px;
+  color:var(--red);letter-spacing:5px;text-transform:uppercase;
+  margin-bottom:18px;display:flex;align-items:center;gap:14px;
+}
+.section-label::after{content:'';flex:1;max-width:70px;height:1px;background:var(--red-dim);}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(42px,6.5vw,76px);
+  line-height:.95;margin-bottom:18px;
+}
+.section-sub{color:var(--text2);font-size:16px;line-height:1.75;max-width:500px;}
+
+/* ═══════════════════════════════════════════
+   HOW TO PLAY
+═══════════════════════════════════════════ */
 #how{background:linear-gradient(180deg,var(--black) 0%,var(--dark) 50%,var(--black) 100%);}
-.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:60px;}
-.how-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 28px;position:relative;overflow:hidden;transition:all .3s;opacity:0;transform:translateY(30px);}
-.how-card.visible{opacity:1;transform:translateY(0);transition:opacity .6s ease,transform .6s ease;}
-.how-card:hover{border-color:var(--violet);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 30px var(--glow-v);}
-.how-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.04),transparent);opacity:0;transition:opacity .3s;}
-.how-card:hover::before{opacity:1;}
-.how-step-num{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--border);position:absolute;top:-10px;left:20px;line-height:1;transition:color .3s;}
-.how-card:hover .how-step-num{color:rgba(124,58,237,0.15);}
-.how-icon{font-size:40px;margin-bottom:20px;position:relative;z-index:1;display:block;filter:drop-shadow(0 0 10px rgba(255,255,255,0.2));}
-.how-title{font-size:20px;font-weight:800;margin-bottom:12px;position:relative;z-index:1;}
-.how-desc{font-size:15px;color:var(--text2);line-height:1.7;position:relative;z-index:1;}
-.how-tag{display:inline-block;margin-top:16px;padding:4px 12px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;position:relative;z-index:1;}
-.tag-red{background:rgba(255,32,32,.12);color:var(--red);border:1px solid rgba(255,32,32,.3);}
+.how-steps{display:flex;flex-direction:column;gap:2px;margin-top:64px;}
+.how-step{
+  display:grid;grid-template-columns:80px 1fr;gap:0;
+  position:relative;
+  opacity:0;transform:translateY(24px);
+  transition:opacity .6s ease,transform .6s ease;
+}
+.how-step.visible{opacity:1;transform:none;}
+.how-step-left{
+  display:flex;flex-direction:column;align-items:center;
+  padding-top:4px;
+}
+.how-step-num-circle{
+  width:52px;height:52px;border-radius:50%;
+  border:1px solid var(--border2);
+  background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;
+  color:var(--red);flex-shrink:0;
+  box-shadow:0 0 16px rgba(255,32,32,0.1);
+  transition:all .3s;
+}
+.how-step:hover .how-step-num-circle{
+  border-color:var(--red);
+  box-shadow:0 0 28px var(--red-glow);
+  background:rgba(255,32,32,0.06);
+}
+.how-step-line{
+  width:1px;flex:1;min-height:40px;
+  background:linear-gradient(to bottom,var(--border2),transparent);
+  margin-top:8px;
+}
+.how-step:last-child .how-step-line{display:none;}
+.how-step-right{
+  padding:0 0 56px 28px;
+}
+.how-step-icon{font-size:32px;margin-bottom:14px;display:block;}
+.how-step-title{
+  font-size:22px;font-weight:800;margin-bottom:12px;
+  color:var(--text);line-height:1.3;
+}
+.how-step-desc{
+  font-size:15px;color:var(--text2);line-height:1.8;
+  max-width:640px;margin-bottom:16px;
+}
+.how-step-tag{
+  display:inline-block;padding:4px 14px;border-radius:20px;
+  font-size:11px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;
+}
 .tag-cyan{background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.2);}
 .tag-violet{background:rgba(124,58,237,.1);color:#a78bfa;border:1px solid rgba(124,58,237,.3);}
-/* RULES SECTION */
-#rules{background:var(--dark);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:48px;}
-.rule-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 24px;position:relative;overflow:hidden;transition:all .3s;opacity:0;transform:translateY(20px);}
-.rule-card.visible{opacity:1;transform:translateY(0);transition:opacity .5s ease,transform .5s ease;}
-.rule-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--rule-color),transparent);}
-.rule-card:hover{border-color:var(--rule-color);transform:translateY(-3px);}
-.rule-num{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--rule-color);opacity:.15;position:absolute;top:8px;right:16px;line-height:1;}
-.rule-icon{font-size:28px;margin-bottom:14px;display:block;}
-.rule-title{font-size:15px;font-weight:800;margin-bottom:8px;color:var(--text);}
-.rule-desc{font-size:14px;color:var(--text2);line-height:1.65;}
-.rule-badge{display:inline-block;margin-top:12px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;background:rgba(255,32,32,.08);color:var(--red);border:1px solid rgba(255,32,32,.2);}
-/* DEMO */
+.tag-red{background:rgba(255,32,32,.08);color:var(--red);border:1px solid rgba(255,32,32,.2);}
+.how-step-note{
+  margin-top:14px;padding:10px 14px;
+  background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);
+  border-radius:8px;font-size:12px;color:var(--text3);
+  font-family:'Share Tech Mono',monospace;letter-spacing:.3px;
+}
+
+/* ═══════════════════════════════════════════
+   RULES
+═══════════════════════════════════════════ */
+#rules{
+  background:var(--dark);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.rules-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:18px;margin-top:52px;
+}
+.rule-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:30px 26px;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+  opacity:0;transform:translateY(20px);
+}
+.rule-card.visible{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease;}
+.rule-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--rule-color,var(--red)),transparent);
+}
+.rule-card:hover{border-color:var(--rule-color,var(--red));transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.35);}
+.rule-num{
+  font-family:'Bebas Neue',sans-serif;font-size:60px;
+  color:var(--rule-color,var(--red));opacity:.1;
+  position:absolute;top:4px;right:16px;line-height:1;
+}
+.rule-icon{font-size:28px;margin-bottom:16px;display:block;}
+.rule-title{font-size:16px;font-weight:800;margin-bottom:10px;color:var(--text);}
+.rule-desc{font-size:14px;color:var(--text2);line-height:1.7;}
+.rule-badge{
+  display:inline-block;margin-top:14px;padding:4px 12px;
+  border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;
+  background:rgba(255,32,32,.07);color:var(--red);
+  border:1px solid rgba(255,32,32,.2);
+}
+
+/* ═══════════════════════════════════════════
+   AI DEMO SECTION
+═══════════════════════════════════════════ */
 #demo{background:var(--black);}
-.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:60px;}
-@media(max-width:768px){.demo-layout{grid-template-columns:1fr;}}
-.demo-feature{display:flex;gap:16px;align-items:flex-start;margin-bottom:24px;opacity:0;transform:translateX(20px);}
+.demo-layout{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:72px;align-items:center;margin-top:64px;
+}
+@media(max-width:860px){.demo-layout{grid-template-columns:1fr;gap:40px;}}
+.demo-feature{
+  display:flex;gap:16px;align-items:flex-start;
+  margin-bottom:28px;
+  opacity:0;transform:translateX(16px);
+}
 .demo-feature.visible{opacity:1;transform:none;transition:all .5s ease;}
-.demo-feature-icon{width:44px;height:44px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
-.demo-feature-text h4{font-size:16px;font-weight:700;margin-bottom:4px;}
-.demo-feature-text p{font-size:14px;color:var(--text2);line-height:1.6;}
-.chat-mockup{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04);opacity:0;transform:translateY(20px);}
+.demo-feature-icon{
+  width:46px;height:46px;flex-shrink:0;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;transition:all .3s;
+}
+.demo-feature:hover .demo-feature-icon{border-color:var(--violet);box-shadow:0 0 16px var(--violet-glow);}
+.demo-feature-text h4{font-size:16px;font-weight:700;margin-bottom:5px;color:var(--text);}
+.demo-feature-text p{font-size:14px;color:var(--text2);line-height:1.65;}
+
+/* Chat mockup */
+.chat-mockup{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:18px;overflow:hidden;
+  box-shadow:0 32px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.03);
+  opacity:0;transform:translateY(24px);
+}
 .chat-mockup.visible{opacity:1;transform:none;transition:all .7s ease .2s;}
-.chat-mock-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
-.chat-mock-topic{background:linear-gradient(135deg,var(--violet),#4f1fad);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+.chat-mock-header{
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
+}
+.chat-mock-topic{
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  box-shadow:0 0 12px var(--violet-glow);
+}
 .chat-mock-timer{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--red);}
-.chat-mock-body{padding:16px;display:flex;flex-direction:column;gap:10px;min-height:280px;}
-.mock-msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;}
-.mock-msg.other{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:3px;}
-.mock-msg.mine{align-self:flex-end;background:linear-gradient(135deg,var(--violet),#4f1fad);border-bottom-right-radius:3px;}
-.mock-msg.ai-msg{align-self:flex-start;background:var(--surface2);border:1px solid rgba(255,32,32,0.2);border-bottom-left-radius:3px;}
-.mock-sender{font-size:10px;opacity:.6;margin-bottom:3px;font-weight:700;}
+.chat-mock-body{padding:18px;display:flex;flex-direction:column;gap:11px;min-height:260px;}
+.mock-msg{
+  max-width:82%;padding:10px 15px;border-radius:14px;font-size:14px;line-height:1.55;
+}
+.mock-msg.other{
+  align-self:flex-start;background:var(--surface2);
+  border:1px solid var(--border);border-bottom-left-radius:3px;
+}
+.mock-msg.mine{
+  align-self:flex-end;
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  border-bottom-right-radius:3px;
+}
+.mock-msg.ai-msg{
+  align-self:flex-start;background:var(--surface2);
+  border:1px solid rgba(255,32,32,.2);border-bottom-left-radius:3px;
+}
+.mock-sender{font-size:10px;opacity:.6;margin-bottom:4px;font-weight:700;}
 .mock-msg.ai-msg .mock-sender{color:var(--red);}
-.ai-suspect-badge{align-self:center;background:rgba(255,32,32,0.08);border:1px solid rgba(255,32,32,0.2);color:var(--red);padding:4px 12px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;}
-/* FEATURES */
+.ai-suspect-badge{
+  align-self:center;
+  background:rgba(255,32,32,.07);border:1px solid rgba(255,32,32,.2);
+  color:var(--red);padding:5px 14px;border-radius:20px;
+  font-size:11px;font-family:'Share Tech Mono',monospace;
+}
+.chat-mock-input{
+  padding:12px 16px;border-top:1px solid var(--border);
+  display:flex;gap:10px;align-items:center;
+  background:var(--surface2);
+}
+.chat-mock-input-field{
+  flex:1;height:36px;background:var(--surface3);
+  border:1px solid var(--border);border-radius:8px;
+  display:flex;align-items:center;padding:0 12px;
+  font-size:13px;color:var(--text3);font-family:'Share Tech Mono',monospace;
+}
+.chat-mock-send{
+  width:36px;height:36px;background:var(--violet);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+
+/* ═══════════════════════════════════════════
+   FEATURES
+═══════════════════════════════════════════ */
 #features{background:linear-gradient(180deg,var(--black) 0%,var(--dark) 100%);}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:60px;}
-.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px 24px;transition:all .3s;position:relative;overflow:hidden;opacity:0;transform:scale(.96);}
+.features-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:16px;margin-top:60px;
+}
+.feat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:28px 24px;
+  transition:all .3s;position:relative;overflow:hidden;
+  opacity:0;transform:scale(.97);
+}
 .feat-card.visible{opacity:1;transform:scale(1);transition:opacity .5s ease,transform .5s ease;}
-.feat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent-color),transparent);transform:scaleX(0);transition:transform .3s;}
-.feat-card:hover{transform:translateY(-4px);border-color:var(--accent-color);}
+.feat-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent-color,var(--red)),transparent);
+  transform:scaleX(0);transition:transform .3s;
+}
+.feat-card:hover{transform:translateY(-5px);border-color:var(--accent-color,var(--red));box-shadow:0 16px 48px rgba(0,0,0,.35);}
 .feat-card:hover::after{transform:scaleX(1);}
 .feat-card[data-accent="red"]{--accent-color:var(--red);}
 .feat-card[data-accent="cyan"]{--accent-color:var(--cyan);}
 .feat-card[data-accent="violet"]{--accent-color:var(--violet);}
-.feat-card[data-accent="gold"]{--accent-color:#f59e0b;}
-.feat-icon{font-size:32px;margin-bottom:16px;display:block;}
-.feat-title{font-size:17px;font-weight:800;margin-bottom:8px;}
-.feat-desc{font-size:14px;color:var(--text2);line-height:1.65;}
-/* TICKER */
-#topics-ticker{padding:40px 0;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;position:relative;z-index:1;}
-#topics-ticker::before,#topics-ticker::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;}
-#topics-ticker::before{left:0;background:linear-gradient(90deg,var(--surface),transparent);}
-#topics-ticker::after{right:0;background:linear-gradient(270deg,var(--surface),transparent);}
-.ticker-track{display:flex;animation:tickerMove 40s linear infinite;width:max-content;}
-.ticker-track:hover{animation-play-state:paused;}
-.ticker-item{white-space:nowrap;padding:0 32px;font-size:14px;color:var(--text2);display:flex;align-items:center;gap:16px;border-right:1px solid var(--border);}
-.ticker-item::before{content:'◆';color:var(--red);font-size:8px;}
-@keyframes tickerMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-/* CTA */
+.feat-card[data-accent="gold"]{--accent-color:var(--gold);}
+.feat-card[data-accent="green"]{--accent-color:var(--success);}
+.feat-icon{font-size:30px;margin-bottom:16px;display:block;}
+.feat-title{font-size:16px;font-weight:800;margin-bottom:9px;color:var(--text);}
+.feat-desc{font-size:13px;color:var(--text2);line-height:1.7;}
+
+/* NEW: feat card badge */
+.feat-new{
+  position:absolute;top:16px;left:16px;
+  background:rgba(34,197,94,.1);color:var(--success);
+  border:1px solid rgba(34,197,94,.25);
+  border-radius:20px;padding:2px 9px;
+  font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;
+}
+
+/* ═══════════════════════════════════════════
+   PERSONAS SECTION — NEW
+═══════════════════════════════════════════ */
+#personas{background:var(--dark);border-top:1px solid var(--border);}
+.personas-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:14px;margin-top:56px;
+}
+.persona-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:26px 22px;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+  opacity:0;transform:translateY(18px);
+}
+.persona-card.visible{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease;}
+.persona-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 0%,var(--persona-color,var(--red)) 0%,transparent 60%);
+  opacity:.05;transition:opacity .3s;
+}
+.persona-card:hover::before{opacity:.1;}
+.persona-card:hover{border-color:var(--persona-color,var(--red));transform:translateY(-4px);}
+.persona-emoji{font-size:34px;margin-bottom:14px;display:block;}
+.persona-name{font-size:16px;font-weight:800;margin-bottom:6px;color:var(--text);}
+.persona-label{
+  font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;
+  color:var(--persona-color,var(--red));margin-bottom:12px;text-transform:uppercase;
+}
+.persona-desc{font-size:13px;color:var(--text2);line-height:1.7;}
+.persona-tells{
+  margin-top:14px;padding:10px 12px;
+  background:rgba(0,0,0,.2);border-radius:8px;
+  font-size:12px;color:var(--text3);
+  font-family:'Share Tech Mono',monospace;letter-spacing:.3px;
+  border-right:2px solid var(--persona-color,var(--red));
+}
+
+/* ═══════════════════════════════════════════
+   SCORING — NEW
+═══════════════════════════════════════════ */
+#scoring{background:var(--black);}
+.scoring-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:16px;margin-top:56px;
+  max-width:720px;
+}
+@media(max-width:640px){.scoring-grid{grid-template-columns:1fr;}}
+.score-card{
+  border:1px solid var(--border);border-radius:14px;padding:28px 22px;
+  text-align:center;position:relative;overflow:hidden;
+  opacity:0;transform:scale(.95);transition:all .3s;
+}
+.score-card.visible{opacity:1;transform:scale(1);transition:opacity .5s ease,transform .5s ease;}
+.score-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--sc-color),transparent);
+}
+.score-card:hover{border-color:var(--sc-color);transform:translateY(-4px);}
+.score-card[data-type="win"]{--sc-color:var(--success);}
+.score-card[data-type="lose"]{--sc-color:var(--red);}
+.score-card[data-type="draw"]{--sc-color:var(--gold);}
+.score-card[data-type="ai"]{--sc-color:var(--violet);}
+.score-icon{font-size:36px;margin-bottom:12px;display:block;}
+.score-val{
+  font-family:'Bebas Neue',sans-serif;font-size:48px;
+  color:var(--sc-color);line-height:1;margin-bottom:4px;
+  text-shadow:0 0 24px var(--sc-color);
+}
+.score-title{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.score-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* ═══════════════════════════════════════════
+   CTA
+═══════════════════════════════════════════ */
 #cta{background:var(--black);position:relative;}
-.cta-inner{max-width:800px;margin:0 auto;padding:120px 24px;text-align:center;position:relative;z-index:1;}
-.cta-glow{position:absolute;inset:0;background:radial-gradient(ellipse 600px 300px at 50% 50%,rgba(255,32,32,0.06),transparent);pointer-events:none;}
-.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);line-height:.95;margin-bottom:24px;}
-.cta-title span{color:var(--red);text-shadow:0 0 40px var(--glow-r);}
-.cta-sub{color:var(--text2);font-size:18px;line-height:1.7;margin-bottom:48px;max-width:500px;margin-left:auto;margin-right:auto;}
-.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
-/* FOOTER */
-footer{background:var(--surface);border-top:1px solid var(--border);padding:36px 48px;position:relative;z-index:1;}
-.footer-main{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
-.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
-.footer-logo .r{color:var(--red);text-shadow:0 0 15px var(--glow-r);}
+.cta-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 700px 400px at 50% 50%,rgba(255,32,32,.07),transparent);
+  pointer-events:none;
+}
+.cta-inner{
+  max-width:820px;margin:0 auto;
+  padding:120px 28px;text-align:center;position:relative;z-index:1;
+}
+.cta-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,9vw,110px);
+  line-height:.92;margin-bottom:24px;
+}
+.cta-title span{color:var(--red);text-shadow:0 0 50px var(--red-glow);}
+.cta-sub{
+  color:var(--text2);font-size:17px;
+  line-height:1.75;margin-bottom:52px;
+  max-width:480px;margin-left:auto;margin-right:auto;
+}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.cta-note{
+  margin-top:22px;font-size:12px;color:var(--text3);
+  font-family:'Share Tech Mono',monospace;letter-spacing:.5px;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer{
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:40px 48px;position:relative;z-index:1;
+}
+.footer-main{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;margin-bottom:28px;
+}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;text-decoration:none;color:var(--text);}
+.footer-logo .r{color:var(--red);text-shadow:0 0 14px var(--red-glow);}
 .footer-links{display:flex;gap:24px;}
-.footer-links a{font-size:13px;color:var(--text2);text-decoration:none;transition:color .2s;letter-spacing:.3px;}
+.footer-links a{font-size:12px;color:var(--text2);text-decoration:none;transition:color .2s;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .footer-links a:hover{color:var(--text);}
-.footer-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin-bottom:20px;}
+.footer-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin-bottom:22px;}
 .footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
 .footer-copy{font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .footer-dev{display:flex;align-items:center;gap:10px;}
 .footer-dev-label{font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:2px;text-transform:uppercase;}
-.footer-dev-badge{display:flex;align-items:center;gap:7px;background:rgba(124,58,237,0.07);border:1px solid rgba(124,58,237,0.18);border-radius:6px;padding:6px 13px;text-decoration:none;transition:all .25s;}
-.footer-dev-badge:hover{background:rgba(124,58,237,0.14);border-color:rgba(124,58,237,0.38);transform:translateY(-1px);box-shadow:0 4px 16px rgba(124,58,237,0.15);}
+.footer-dev-badge{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(124,58,237,.07);border:1px solid rgba(124,58,237,.18);
+  border-radius:6px;padding:6px 13px;
+  text-decoration:none;transition:all .22s;
+}
+.footer-dev-badge:hover{background:rgba(124,58,237,.14);border-color:rgba(124,58,237,.35);transform:translateY(-1px);}
 .footer-dev-badge span{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text2);letter-spacing:.5px;}
 .footer-dev-badge .at{color:var(--violet);}
 .footer-dev-dot{width:5px;height:5px;background:var(--violet);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;}
-/* ANIMS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.live-badge{top:80px;right:20px;}.stat-float{display:none;}footer{padding:28px 20px;}.footer-main,.footer-bottom{flex-direction:column;text-align:center;}.footer-links{justify-content:center;}.footer-dev{justify-content:center;}}
+@media(max-width:768px){
+  footer{padding:28px 20px;}
+  .footer-main,.footer-bottom{flex-direction:column;text-align:center;}
+  .footer-links{justify-content:center;}
+  .footer-dev{justify-content:center;}
+}
 </style>
 </head>
 <body>
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 <canvas id="bg-canvas"></canvas>
-<nav>
-  <div class="nav-logo"><span class="r">AI</span><span> IMPOSTOR</span></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo"><span class="r">AI</span><span> IMPOSTOR</span></a>
   <div class="nav-links">
     <a href="#how" data-ar="كيف تلعب" data-en="How to Play">كيف تلعب</a>
-    <a href="#rules" data-ar="الشروط" data-en="Rules">الشروط</a>
+    <a href="#personas" data-ar="الشخصيات" data-en="AI Personas">الشخصيات</a>
+    <a href="#scoring" data-ar="النقاط" data-en="Scoring">النقاط</a>
     <a href="#features" data-ar="المميزات" data-en="Features">المميزات</a>
     <a href="ai-impostor.html" class="nav-cta" data-ar="العب الآن ◀" data-en="Play Now ▶">العب الآن ◀</a>
   </div>
@@ -220,135 +802,300 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
     <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
   </div>
 </nav>
+
+<!-- HERO -->
 <section id="hero">
   <div class="hero-glow"></div>
   <div class="live-badge"><span class="live-dot"></span><span data-ar="مباشر • LIVE" data-en="LIVE • Online">مباشر • LIVE</span></div>
-  <div class="stat-float stat-float-1"><div class="stat-val">50+</div><div class="stat-lbl" data-ar="موضوع للنقاش" data-en="Discussion Topics">موضوع للنقاش</div></div>
-  <div class="stat-float stat-float-2"><div class="stat-val">3-5</div><div class="stat-lbl" data-ar="لاعبين لكل غرفة" data-en="Players per Room">لاعبين لكل غرفة</div></div>
-  <div class="ai-eye-wrap"><div class="ai-eye"><div class="eye-outer"><div class="eye-inner"><div class="eye-pupil"></div></div></div></div></div>
-  <div class="hero-label">// SOCIAL DEDUCTION GAME //</div>
-  <h1 class="hero-title"><span class="line1">AI</span><span class="line2">IMPOSTOR</span></h1>
-  <div class="hero-title-ar" data-ar="كاشف الذكاء الاصطناعي" data-en="Detect the AI Among You">كاشف الذكاء الاصطناعي</div>
-  <p class="hero-desc"><span data-ar='واحد منكم <strong>ذكاء اصطناعي</strong> يتظاهر بأنه إنسان.<br>تحدثوا، حللوا، وصوّتوا — هل تستطيع كشفه؟' data-en='One among you is an <strong>AI</strong> pretending to be human.<br>Chat, analyze, vote — can you expose it?'>واحد منكم <strong>ذكاء اصطناعي</strong> يتظاهر بأنه إنسان.<br>تحدثوا، حللوا، وصوّتوا — هل تستطيع كشفه؟</span></p>
-  <div class="hero-btns">
-    <a href="ai-impostor.html" class="btn-play" data-ar="▶ &nbsp;العب الآن" data-en="▶ &nbsp;Play Now">▶ &nbsp;العب الآن</a>
-    <a href="#how" class="btn-how" data-ar="كيف تلعب؟" data-en="How to Play?">كيف تلعب؟</a>
+  <div class="stat-float stat-float-1">
+    <div class="stat-val">50+</div>
+    <div class="stat-lbl" data-ar="موضوع للنقاش" data-en="Discussion Topics">موضوع للنقاش</div>
   </div>
-  <div class="scroll-hint" id="scroll-hint"><div class="scroll-arrow"></div><span>SCROLL</span></div>
+  <div class="stat-float stat-float-2">
+    <div class="stat-val">3-5</div>
+    <div class="stat-lbl" data-ar="لاعبين لكل غرفة" data-en="Players per Room">لاعبين لكل غرفة</div>
+  </div>
+
+  <div class="ai-eye-wrap">
+    <div class="ai-eye">
+      <div class="eye-outer">
+        <div class="eye-inner">
+          <div class="eye-pupil" id="eye-pupil"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-label">// SOCIAL DEDUCTION GAME //</div>
+  <h1 class="hero-title">
+    <span class="line1">AI</span>
+    <span class="line2">IMPOSTOR</span>
+  </h1>
+  <div class="hero-sub" data-ar="كاشف الذكاء الاصطناعي" data-en="Detect the AI Among You">كاشف الذكاء الاصطناعي</div>
+  <p class="hero-desc">
+    <span data-ar='واحد منكم <strong>ذكاء اصطناعي</strong> يختبئ خلف اسم وهمي مثلكم تماماً.<br>تحدثوا، راقبوا، حللوا — واكشفوه قبل أن ينتهي الوقت.' data-en='One among you is an <strong>AI</strong> hiding behind a fake alias — just like everyone else.<br>Talk, observe, analyze — expose it before time runs out.'>واحد منكم <strong>ذكاء اصطناعي</strong> يختبئ خلف اسم وهمي مثلكم تماماً.<br>تحدثوا، راقبوا، حللوا — واكشفوه قبل أن ينتهي الوقت.</span>
+  </p>
+  <div class="hero-btns">
+    <a href="ai-impostor.html" class="btn-play" data-ar="▶ &nbsp;العب الآن مجاناً" data-en="▶ &nbsp;Play Now Free">▶ &nbsp;العب الآن مجاناً</a>
+    <a href="#how" class="btn-secondary" data-ar="كيف تلعب؟" data-en="How to Play?">كيف تلعب؟</a>
+  </div>
+  <div class="scroll-hint" id="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <span>SCROLL</span>
+  </div>
 </section>
+
+<!-- TOPICS TICKER -->
 <div id="topics-ticker"><div class="ticker-track" id="ticker-track"></div></div>
+
+<!-- HOW TO PLAY -->
 <section id="how">
   <div class="section-inner">
     <div class="section-label" data-ar="كيف تلعب" data-en="HOW TO PLAY">كيف تلعب</div>
-    <h2 class="section-title" data-ar="ثلاث خطوات<br><span style='color:var(--red)'>بسيطة</span>" data-en="Three Simple<br><span style='color:var(--red)'>Steps</span>">ثلاث خطوات<br><span style="color:var(--red)">بسيطة</span></h2>
-    <p class="section-sub" data-ar="اللعبة سهلة التعلم، لكنها تحتاج ذكاء وملاحظة دقيقة لاكتشاف المتسلل." data-en="Easy to learn, hard to master — sharp observation is your best weapon.">اللعبة سهلة التعلم، لكنها تحتاج ذكاء وملاحظة دقيقة لاكتشاف المتسلل.</p>
-    <div class="how-grid">
-      <div class="how-card" data-delay="0">
-        <div class="how-step-num">01</div><span class="how-icon">🏠</span>
-        <h3 class="how-title" data-ar="أنشئ غرفة وادخل باسم خيالي" data-en="Create a Room with a Fictional Name">أنشئ غرفة وادخل باسم خيالي</h3>
-        <p class="how-desc" data-ar="أنشئ غرفة أو انضم بكود. اختر اسماً واحداً خيالياً — لا اسمك الحقيقي. من 3 إلى 5 لاعبين بشر + ذكاء اصطناعي مخفي بينهم." data-en="Create or join a room with a code. Choose a single fictional name. 3 to 5 human players plus a hidden AI among you.">أنشئ غرفة أو انضم بكود. اختر اسماً واحداً خيالياً — لا اسمك الحقيقي. من 3 إلى 5 لاعبين بشر + ذكاء اصطناعي مخفي بينهم.</p>
-        <div style="margin-top:12px;padding:8px 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:8px;font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;" data-ar="⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء الاصطناعي — خطوة واحدة عند أول دخول" data-en="⚠️ You need a free Groq API key to power the AI — one-time setup on first launch">⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء الاصطناعي — خطوة واحدة عند أول دخول</div>
-        <span class="how-tag tag-cyan">3-5 Players</span>
+    <h2 class="section-title" data-ar="أربع خطوات<br><span style='color:var(--red)'>بسيطة</span>" data-en="Four Simple<br><span style='color:var(--red)'>Steps</span>">أربع خطوات<br><span style="color:var(--red)">بسيطة</span></h2>
+    <p class="section-sub" data-ar="اللعبة سهلة التعلم، لكنها تحتاج ذكاء وملاحظة لاكتشاف من يتظاهر." data-en="Easy to learn, but sharp observation is everything — the AI blends in perfectly.">اللعبة سهلة التعلم، لكنها تحتاج ذكاء وملاحظة لاكتشاف من يتظاهر.</p>
+
+    <div class="how-steps">
+      <!-- Step 1 -->
+      <div class="how-step" data-delay="0">
+        <div class="how-step-left">
+          <div class="how-step-num-circle">01</div>
+          <div class="how-step-line"></div>
+        </div>
+        <div class="how-step-right">
+          <span class="how-step-icon">🪪</span>
+          <h3 class="how-step-title" data-ar="أدخل اسمك الحقيقي — الكل يأخذ هوية سرية" data-en="Enter your real name — everyone gets a secret identity">أدخل اسمك الحقيقي — الكل يأخذ هوية سرية</h3>
+          <p class="how-step-desc" data-ar="اسمك الحقيقي يظهر فقط في جدول النقاط النهائي. كل جولة، يمنحك الموقع اسماً وهمياً مختلفاً — هو هويتك الوحيدة داخل الدردشة. الذكاء الاصطناعي أيضاً يأخذ اسماً وهمياً ويندمج مع البقية — لا أحد يعلم من هو حتى تنكشف النتائج." data-en="Your real name only appears in the final scoreboard. Each round, the game assigns you a different alias — that's your only chat identity. The AI also gets an alias and blends in — nobody knows who it is until results reveal everything.">اسمك الحقيقي يظهر فقط في جدول النقاط النهائي. كل جولة، يمنحك الموقع اسماً وهمياً مختلفاً — هو هويتك الوحيدة داخل الدردشة. الذكاء الاصطناعي أيضاً يأخذ اسماً وهمياً ويندمج مع البقية — لا أحد يعلم من هو حتى تنكشف النتائج.</p>
+          <div class="how-step-note" data-ar="⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء — خطوة واحدة عند أول دخول فقط" data-en="⚠️ You need a free Groq API key to power the AI — one-time setup on first launch only">⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء — خطوة واحدة عند أول دخول فقط</div>
+          <span class="how-step-tag tag-cyan" data-ar="3 إلى 5 لاعبين" data-en="3 to 5 Players">3 إلى 5 لاعبين</span>
+        </div>
       </div>
-      <div class="how-card" data-delay="150">
-        <div class="how-step-num">02</div><span class="how-icon">🎭</span>
-        <h3 class="how-title" data-ar="تكلم وخادع الجميع" data-en="Talk and Deceive Everyone">تكلم وخادع الجميع</h3>
-        <p class="how-desc" data-ar="تصرّف كأنك الذكاء الاصطناعي لتخدع البشر الآخرين — لكن في الوقت نفسه راقب الجميع بهدوء واكتشف الـ AI الحقيقي بنفسك. لا تشارك هذه المعلومة مع أحد." data-en="Act like the AI to fool the other humans — but quietly observe everyone to identify the real AI yourself. Keep that information to yourself alone.">تصرّف كأنك الذكاء الاصطناعي لتخدع البشر الآخرين — لكن في الوقت نفسه راقب الجميع بهدوء واكتشف الـ AI الحقيقي بنفسك. لا تشارك هذه المعلومة مع أحد.</p>
-        <span class="how-tag tag-violet" data-ar="3 دقائق • 15 ثانية/دور" data-en="3 Min • 15s/Turn">3 دقائق • 15 ثانية/دور</span>
+
+      <!-- Step 2 -->
+      <div class="how-step" data-delay="120">
+        <div class="how-step-left">
+          <div class="how-step-num-circle">02</div>
+          <div class="how-step-line"></div>
+        </div>
+        <div class="how-step-right">
+          <span class="how-step-icon">💬</span>
+          <h3 class="how-step-title" data-ar="تحدث في دورك — 15 ثانية فقط" data-en="Speak in your turn — 15 seconds only">تحدث في دورك — 15 ثانية فقط</h3>
+          <p class="how-step-desc" data-ar="الكل يكتب عن نفس الموضوع العشوائي. كل لاعب يرسل رسالة واحدة بحد أقصى 50 حرفاً في دوره — لا أكثر. 3 دقائق إجمالية للجولة، الأدوار تتناوب تلقائياً. خلال هذا الوقت: راقب من يبدو مصطنعاً، من يتهرب، من ردوده غير طبيعية. لا تخبر أحداً بما لاحظته — الفوز فردي تماماً." data-en="Everyone writes about the same random topic. Each player sends one message (max 50 chars) per turn — no more. 3 minutes total, turns rotate automatically. Meanwhile: watch who sounds robotic, who avoids details, whose replies feel off. Keep your observations secret — victory is purely individual.">الكل يكتب عن نفس الموضوع العشوائي. كل لاعب يرسل رسالة واحدة (50 حرفاً) في دوره. 3 دقائق إجمالية. خلال هذا الوقت راقب من يبدو مصطنعاً أو يتهرب — لا تخبر أحداً بما لاحظته، الفوز فردي.</p>
+          <span class="how-step-tag tag-violet" data-ar="3 دقائق • 15 ثانية لكل دور" data-en="3 Minutes • 15s Per Turn">3 دقائق • 15 ثانية لكل دور</span>
+        </div>
       </div>
-      <div class="how-card" data-delay="300">
-        <div class="how-step-num">03</div><span class="how-icon">🎯</span>
-        <h3 class="how-title" data-ar="صوّت على الـ AI وحدك تكسب" data-en="Vote Alone — Win Alone">صوّت على الـ AI وحدك تكسب</h3>
-        <p class="how-desc" data-ar="فقط من صوّت على الذكاء الاصطناعي الحقيقي يأخذ النقطة. إذا صوّت الجميع على بشري — فاز الـ AI. الفوز فردي — لا تعاون، لا تحالف." data-en="Only the player who voted for the real AI earns the point. If everyone votes for a human — the AI wins. Victory is individual — no cooperation, no alliances.">فقط من صوّت على الذكاء الاصطناعي الحقيقي يأخذ النقطة. إذا صوّت الجميع على بشري — فاز الـ AI. الفوز فردي — لا تعاون، لا تحالف.</p>
-        <span class="how-tag tag-red" data-ar="30 ثانية للتصويت" data-en="30s to Vote">30 ثانية للتصويت</span>
+
+      <!-- Step 3 -->
+      <div class="how-step" data-delay="240">
+        <div class="how-step-left">
+          <div class="how-step-num-circle">03</div>
+          <div class="how-step-line"></div>
+        </div>
+        <div class="how-step-right">
+          <span class="how-step-icon">🗳️</span>
+          <h3 class="how-step-title" data-ar="30 ثانية مراجعة — ثم التصويت" data-en="30s review — then vote">30 ثانية مراجعة — ثم التصويت</h3>
+          <p class="how-step-desc" data-ar="بعد انتهاء الدردشة، تحصل على 30 ثانية لمراجعة الرسائل قبل التصويت. ثم يظهر شاشة التصويت — 30 ثانية لتختار من تعتقد أنه الذكاء الاصطناعي. التصويت الصحيح على الذكاء: +1 نقطة. التصويت الخاطئ على بشري: -1 نقطة. إذا صوّت أقل من نصف اللاعبين على الذكاء: الذكاء يكسب نقطة هو أيضاً. تعادل 50%: لا أحد يكسب." data-en="After chat ends, you get 30 seconds to review all messages before voting. Then the vote screen opens — 30 seconds to pick who you think is the AI. Correct vote on AI: +1 point. Wrong vote on a human: -1 point. If less than half catch the AI: AI earns a point too. Exact 50%: draw, nobody wins.">بعد الدردشة، 30 ثانية لمراجعة الرسائل ثم التصويت. صوّت صح على الذكاء = +1. صوّت غلط على بشري = -1. الذكاء يكسب لو خدع أكثر من نصف اللاعبين. تعادل 50% = لا أحد يكسب.</p>
+          <span class="how-step-tag tag-red" data-ar="صح +1 • خطأ -1 • تعادل = لا أحد" data-en="Correct +1 • Wrong -1 • Draw = Nobody">صح +1 • خطأ -1 • تعادل = لا أحد</span>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-<!-- RULES SECTION -->
-<section id="rules">
-  <div class="section-inner">
-    <div class="section-label" data-ar="شروط اللعبة" data-en="GAME RULES">شروط اللعبة</div>
-    <h2 class="section-title" data-ar="القواعد التي<br><span style='color:var(--red)'>يجب اتباعها</span>" data-en="Rules You<br><span style='color:var(--red)'>Must Follow</span>">القواعد التي<br><span style="color:var(--red)">يجب اتباعها</span></h2>
-    <p class="section-sub" data-ar="هذه القواعد تجعل اللعبة عادلة وممتعة للجميع — الالتزام بها يصنع الفرق." data-en="These rules keep the game fair and exciting for everyone — following them makes all the difference.">هذه القواعد تجعل اللعبة عادلة وممتعة للجميع — الالتزام بها يصنع الفرق.</p>
-    <div class="rules-grid">
-      <div class="rule-card" style="--rule-color:var(--cyan)" data-delay="0">
-        <div class="rule-num">01</div>
-        <span class="rule-icon">🌐</span>
-        <h3 class="rule-title" data-ar="اسم خيالي — لغة الغرفة" data-en="Fictional Name — Room Language">اسم خيالي — لغة الغرفة</h3>
-        <p class="rule-desc" data-ar="اختر اسماً واحداً خيالياً — ليس اسمك الحقيقي. تحدث بلغة الغرفة (عربي أو إنجليزي). يمكن خلط العامية بالفصحى — الذكاء الاصطناعي يفعل ذلك أيضاً." data-en="Pick a single fictional name — not your real one. Speak the room's language. Mixing casual and formal style is fine — the AI does it too.">اختر اسماً واحداً خيالياً — ليس اسمك الحقيقي. تحدث بلغة الغرفة. يمكن خلط العامية بالفصحى — الذكاء الاصطناعي يفعل ذلك أيضاً.</p>
-        <span class="rule-badge" data-ar="إلزامي" data-en="Required">إلزامي</span>
-      </div>
-      <div class="rule-card" style="--rule-color:var(--violet)" data-delay="100">
-        <div class="rule-num">02</div>
-        <span class="rule-icon">🎭</span>
-        <h3 class="rule-title" data-ar="تصرّف كأنك ذكاء اصطناعي" data-en="Act Like You're an AI">تصرّف كأنك ذكاء اصطناعي</h3>
-        <p class="rule-desc" data-ar="هدفك تخدع البشر الآخرين ليصوتوا عليك — لأنك أنت المستفيد الوحيد من اكتشاف الـ AI الحقيقي. اجعل الجميع يظنك الـ AI بينما تبحث أنت عنه في السر." data-en="Your goal is to make other humans vote for you as the AI — while you secretly identify the real AI yourself. Only you benefit from catching it. Trick them while hunting it alone.">هدفك تخدع البشر الآخرين ليصوتوا عليك — لأنك أنت المستفيد الوحيد من اكتشاف الـ AI الحقيقي. اجعل الجميع يظنك الـ AI بينما تبحث أنت عنه في السر.</p>
-        <span class="rule-badge" data-ar="الاستراتيجية الأساسية" data-en="Core Strategy">الاستراتيجية الأساسية</span>
-      </div>
-      <div class="rule-card" style="--rule-color:var(--red)" data-delay="200">
-        <div class="rule-num">03</div>
-        <span class="rule-icon">✍️</span>
-        <h3 class="rule-title" data-ar="رسالة واحدة • 50 حرفاً" data-en="One Message • 50 Characters">رسالة واحدة • 50 حرفاً</h3>
-        <p class="rule-desc" data-ar="كل لاعب يرسل رسالة واحدة في دوره، جملة كاملة ومرتبطة بالموضوع، لا تتجاوز 50 حرفاً. 15 ثانية لكل دور — لا وقت للتفكير الطويل." data-en="Each player sends one message per turn — a complete sentence related to the topic, max 50 characters. 15 seconds per turn. No time to overthink.">كل لاعب يرسل رسالة واحدة في دوره، جملة كاملة ومرتبطة بالموضوع، لا تتجاوز 50 حرفاً. 15 ثانية لكل دور — لا وقت للتفكير الطويل.</p>
-        <span class="rule-badge" data-ar="15 ثانية • 50 حرف" data-en="15s • 50 chars">15 ثانية • 50 حرف</span>
-      </div>
-    </div>
-  </div>
-</section>
-<section id="demo">
-  <div class="section-inner">
-    <div class="demo-layout">
-      <div class="demo-text">
-        <div class="section-label" data-ar="المتسلل الذكي" data-en="THE AI IMPOSTOR">المتسلل الذكي</div>
-        <h2 class="section-title" data-ar="الذكاء الاصطناعي<br><span style='color:var(--cyan)'>يتظاهر</span>" data-en="The AI<br><span style='color:var(--cyan)'>Pretends</span>">الذكاء الاصطناعي<br><span style="color:var(--cyan)">يتظاهر</span></h2>
-        <p class="section-sub" style="margin-bottom:36px" data-ar="يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً." data-en="It makes deliberate mistakes, hesitates, accuses others — all to seem perfectly human.">يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً.</p>
-        <div class="demo-feature" data-delay="0"><div class="demo-feature-icon">🧠</div><div class="demo-feature-text"><h4 data-ar="ذاكرة سياقية" data-en="Contextual Memory">ذاكرة سياقية</h4><p data-ar="يتذكر ما قاله في الرسائل السابقة ويبني عليها." data-en="Remembers past messages and builds on them — no contradictions.">يتذكر ما قاله في الرسائل السابقة ويبني عليها.</p></div></div>
-        <div class="demo-feature" data-delay="150"><div class="demo-feature-icon">🎭</div><div class="demo-feature-text"><h4 data-ar="4 شخصيات + سلوك يتطور" data-en="4 Personas + Evolving Behavior">4 شخصيات + سلوك يتطور</h4><p data-ar="خجول في البداية، مهاجم في النهاية — سلوكه يتغير كلما اقترب الوقت من الانتهاء." data-en="Shy at the start, aggressive near the end — its behavior shifts as time runs out.">خجول في البداية، مهاجم في النهاية — سلوكه يتغير كلما اقترب الوقت من الانتهاء.</p></div></div>
-        <div class="demo-feature" data-delay="300"><div class="demo-feature-icon">🌐</div><div class="demo-feature-text"><h4 data-ar="ثنائي اللغة" data-en="Bilingual">ثنائي اللغة</h4><p data-ar="يلعب بالعربية أو الإنجليزية — مع ضمان نقاء اللغة في كل رسالة." data-en="Plays in Arabic or English — with guaranteed language purity in every message.">يلعب بالعربية أو الإنجليزية — مع ضمان نقاء اللغة في كل رسالة.</p></div></div>
-      </div>
-      <div class="chat-mockup" id="chat-mockup">
-        <div class="chat-mock-header"><div class="chat-mock-topic" id="mock-topic">ذكرى من الطفولة</div><div class="chat-mock-timer" id="mock-timer">1:24</div></div>
-        <div class="chat-mock-body">
-          <div class="mock-msg other"><div class="mock-sender">سارة</div>أتذكر لما كنا نلعب في الشارع حتى المغرب</div>
-          <div class="mock-msg mine"><div class="mock-sender" data-ar="أنت" data-en="You">أنت</div>والله نفس الشيء! أحلى لحظات بدون جوال</div>
-          <div class="mock-msg ai-msg"><div class="mock-sender">نورا 🤖</div>يعني... كنت أذهب لجيراننا وآكل عندهم دون علم أهلي</div>
-          <div class="ai-suspect-badge">⚠️ <span data-ar="مشبوه — تعليق غريب؟" data-en="Suspicious — Odd comment?">مشبوه — تعليق غريب؟</span></div>
-          <div class="mock-msg ai-msg"><div class="mock-sender">نورا 🤖</div>أظن أن محمد هو الأكثر غرابة هنا</div>
+
+      <!-- Step 4 -->
+      <div class="how-step" data-delay="360">
+        <div class="how-step-left">
+          <div class="how-step-num-circle">04</div>
+          <div class="how-step-line"></div>
+        </div>
+        <div class="how-step-right">
+          <span class="how-step-icon">🏆</span>
+          <h3 class="how-step-title" data-ar="الكشف — ثم جولة جديدة" data-en="The Reveal — then next round">الكشف — ثم جولة جديدة</h3>
+          <p class="how-step-desc" data-ar="بعد التصويت تُكشف هوية الذكاء الاصطناعي بتأثير بصري ضخم — وتُكشف الأسماء الحقيقية لكل لاعب في جدول النقاط. أول من يصل لهدف النقاط المحدد (5، 7، أو 10) يفوز باللعبة بالكامل. في كل جولة جديدة، الذكاء الاصطناعي يأخذ شخصية وسلوكاً مختلفاً تماماً." data-en="After voting, the AI's identity is revealed with a dramatic visual effect — and real names are shown in the scoreboard. First player to reach the target score (5, 7, or 10) wins the whole game. Each new round, the AI gets a completely different personality and behavior.">بعد التصويت تُكشف هوية الذكاء بتأثير بصري ضخم وتُكشف الأسماء الحقيقية. أول من يصل لهدف النقاط يفوز بالكامل. كل جولة جديدة يأخذ الذكاء شخصية وسلوكاً مختلفاً تماماً.</p>
+          <span class="how-step-tag tag-cyan" data-ar="هدف: 5 أو 7 أو 10 نقاط" data-en="Target: 5, 7, or 10 Points">هدف: 5 أو 7 أو 10 نقاط</span>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- AI DEMO -->
+<section id="demo" style="background:var(--dark);border-top:1px solid var(--border);">
+  <div class="section-inner">
+    <div class="demo-layout">
+      <div class="demo-text">
+        <div class="section-label" data-ar="المتسلل الذكي" data-en="THE AI IMPOSTOR">المتسلل الذكي</div>
+        <h2 class="section-title" data-ar="الذكاء الاصطناعي<br><span style='color:var(--cyan)'>يتظاهر</span>" data-en="The AI<br><span style='color:var(--cyan)'>Pretends</span>">الذكاء الاصطناعي<br><span style="color:var(--cyan)">يتظاهر</span></h2>
+        <p class="section-sub" style="margin-bottom:36px" data-ar="يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً ويضلّل أكبر عدد ممكن." data-en="Makes deliberate mistakes, hesitates, accuses others — everything to seem perfectly human and mislead as many as possible.">يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً ويضلّل أكبر عدد ممكن.</p>
+
+        <div class="demo-feature" data-delay="0">
+          <div class="demo-feature-icon">🧠</div>
+          <div class="demo-feature-text">
+            <h4 data-ar="ذاكرة سياقية" data-en="Contextual Memory">ذاكرة سياقية</h4>
+            <p data-ar="يتذكر ما قاله سابقاً ويبني عليه — لا يتناقض مع نفسه." data-en="Remembers past messages and builds consistently — no contradictions.">يتذكر ما قاله سابقاً ويبني عليه — لا يتناقض مع نفسه.</p>
+          </div>
+        </div>
+        <div class="demo-feature" data-delay="140">
+          <div class="demo-feature-icon">⏱️</div>
+          <div class="demo-feature-text">
+            <h4 data-ar="سلوك يتطور مع الوقت" data-en="Time-Adaptive Behavior">سلوك يتطور مع الوقت</h4>
+            <p data-ar="هادئ في البداية، مهاجم في النهاية — يشعر بالضغط ويتصرف بناءً عليه." data-en="Calm at the start, aggressive near the end — it senses pressure and reacts.">هادئ في البداية، مهاجم في النهاية — يشعر بالضغط ويتصرف بناءً عليه.</p>
+          </div>
+        </div>
+        <div class="demo-feature" data-delay="280">
+          <div class="demo-feature-icon">🎯</div>
+          <div class="demo-feature-text">
+            <h4 data-ar="يتهم ويدافع بذكاء" data-en="Accuses & Defends Smartly">يتهم ويدافع بذكاء</h4>
+            <p data-ar="يحوّل الشكوك عن نفسه نحو لاعبين آخرين — بطريقة غير مباشرة تماماً." data-en="Deflects suspicion toward others indirectly — never obvious, never direct.">يحوّل الشكوك عن نفسه نحو لاعبين آخرين — بطريقة غير مباشرة تماماً.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-mockup" id="chat-mockup">
+        <div class="chat-mock-header">
+          <div class="chat-mock-topic" id="mock-topic">ذكرى من الطفولة</div>
+          <div class="chat-mock-timer" id="mock-timer">1:42</div>
+        </div>
+        <div class="chat-mock-body">
+          <div class="mock-msg other"><div class="mock-sender">سارة</div>أتذكر لما كنا نلعب في الشارع حتى المغرب</div>
+          <div class="mock-msg mine"><div class="mock-sender" data-ar="أنت" data-en="You">أنت</div><span data-ar="والله نفس الشيء! أحلى لحظات بدون جوال" data-en="Same here! Best moments, no phones existed">والله نفس الشيء! أحلى لحظات بدون جوال</span></div>
+          <div class="mock-msg ai-msg"><div class="mock-sender">نورا 🤖</div><span data-ar="يعني... كنت أذهب لجيراننا وآكل عندهم دون علم أهلي" data-en="idk... i used to just go to neighbors and eat there without telling anyone">يعني... كنت أذهب لجيراننا وآكل عندهم دون علم أهلي</span></div>
+          <div class="ai-suspect-badge">⚠️ <span data-ar="مشبوه — تفاصيل غريبة؟" data-en="Suspicious — odd details?">مشبوه — تفاصيل غريبة؟</span></div>
+          <div class="mock-msg ai-msg"><div class="mock-sender">نورا 🤖</div><span data-ar="لاحظت إن ردود علي تبدو مصطنعة بصراحة" data-en="noticed ali's replies seem kinda robotic honestly">لاحظت إن ردود علي تبدو مصطنعة بصراحة</span></div>
+        </div>
+        <div class="chat-mock-input">
+          <div class="chat-mock-input-field"><span data-ar="اكتب رسالتك..." data-en="Write your message...">اكتب رسالتك...</span></div>
+          <div class="chat-mock-send">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI PERSONAS — NEW -->
+<section id="personas">
+  <div class="section-inner">
+    <div class="section-label" data-ar="شخصيات الذكاء" data-en="AI PERSONAS">شخصيات الذكاء</div>
+    <h2 class="section-title" data-ar="أربع شخصيات<br><span style='color:var(--violet)'>عشوائية</span>" data-en="Four Random<br><span style='color:var(--violet)'>Personas</span>">أربع شخصيات<br><span style="color:var(--violet)">عشوائية</span></h2>
+    <p class="section-sub" data-ar="كل جولة يختار الموقع شخصية مختلفة للذكاء الاصطناعي — تُكشف فقط في شاشة النتائج." data-en="Each round the game picks a random AI persona — revealed only in the results screen.">كل جولة يختار الموقع شخصية مختلفة للذكاء الاصطناعي — تُكشف فقط في شاشة النتائج.</p>
+    <div class="personas-grid">
+      <div class="persona-card" style="--persona-color:var(--cyan)" data-delay="0">
+        <span class="persona-emoji">😶</span>
+        <div class="persona-name" data-ar="خجول ومتردد" data-en="Shy & Hesitant">خجول ومتردد</div>
+        <div class="persona-label">PERSONA 01</div>
+        <p class="persona-desc" data-ar="قليل الكلام، يبدأ جمله بـ 'مو متأكد' أو 'يعني'، يتجنب الآراء الحاسمة، يكتب بشكل ناقص أحياناً." data-en="Speaks little, often says 'idk' or 'not sure', avoids strong opinions, trails off mid-sentence.">قليل الكلام، يبدأ جمله بـ 'مو متأكد' أو 'يعني'، يتجنب الآراء الحاسمة، يكتب بشكل ناقص أحياناً.</p>
+        <div class="persona-tells" data-ar="علامة الكشف: جملة ناقصة أو تردد مبالغ فيه في وقت غير مناسب" data-en="Tell: incomplete sentences or excessive hesitation at the wrong moment">علامة الكشف: جملة ناقصة أو تردد مبالغ فيه في وقت غير مناسب</div>
+      </div>
+      <div class="persona-card" style="--persona-color:var(--gold)" data-delay="100">
+        <span class="persona-emoji">😏</span>
+        <div class="persona-name" data-ar="ساخر وعفوي" data-en="Sarcastic & Casual">ساخر وعفوي</div>
+        <div class="persona-label">PERSONA 02</div>
+        <p class="persona-desc" data-ar="يعلق بشكل ساخر وخفيف، يستخدم 'خخخ' أو 'والله ما أدري'، يقلل من الأمور، منفصل عاطفياً." data-en="Makes light jokes, uses 'lol' or 'honestly tho', slightly dismissive, emotionally detached.">يعلق بشكل ساخر وخفيف، يستخدم 'خخخ' أو 'والله ما أدري'، يقلل من الأمور، منفصل عاطفياً.</p>
+        <div class="persona-tells" data-ar="علامة الكشف: برود عاطفي عند الحديث عن تجارب شخصية عميقة" data-en="Tell: emotional detachment when discussing deep personal experiences">علامة الكشف: برود عاطفي عند الحديث عن تجارب شخصية عميقة</div>
+      </div>
+      <div class="persona-card" style="--persona-color:var(--red)" data-delay="200">
+        <span class="persona-emoji">😤</span>
+        <div class="persona-name" data-ar="واثق ومسيطر" data-en="Confident & Direct">واثق ومسيطر</div>
+        <div class="persona-label">PERSONA 03</div>
+        <p class="persona-desc" data-ar="يبدي رأيه بثقة، يسأل أسئلة مباشرة لغيره، يحاول قيادة النقاش، لا يتردد أبداً." data-en="States opinions clearly, asks others direct questions, tries to lead the conversation, never hesitates.">يبدي رأيه بثقة، يسأل أسئلة مباشرة لغيره، يحاول قيادة النقاش، لا يتردد أبداً.</p>
+        <div class="persona-tells" data-ar="علامة الكشف: ثقة مبالغ فيها في مواقف تستدعي الحذر" data-en="Tell: overconfidence in situations that call for uncertainty">علامة الكشف: ثقة مبالغ فيها في مواقف تستدعي الحذر</div>
+      </div>
+      <div class="persona-card" style="--persona-color:var(--violet)" data-delay="300">
+        <span class="persona-emoji">😵</span>
+        <div class="persona-name" data-ar="مشتت وسريع" data-en="Distracted & Brief">مشتت وسريع</div>
+        <div class="persona-label">PERSONA 04</div>
+        <p class="persona-desc" data-ar="يرد بجمل قصيرة جداً كأنه مشغول، يغيّر الموضوع أحياناً، يكتب بسرعة وبأخطاء بسيطة." data-en="Very short replies like they're busy, changes subject sometimes, types fast with small mistakes.">يرد بجمل قصيرة جداً كأنه مشغول، يغيّر الموضوع أحياناً، يكتب بسرعة وبأخطاء بسيطة.</p>
+        <div class="persona-tells" data-ar="علامة الكشف: قصر الرد مع أسئلة عميقة تستحق تفصيلاً حقيقياً" data-en="Tell: very short replies to deep questions that deserve real detail">علامة الكشف: قصر الرد مع أسئلة عميقة تستحق تفصيلاً حقيقياً</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCORING — NEW -->
+<section id="scoring" style="background:var(--black);">
+  <div class="section-inner">
+    <div class="section-label" data-ar="نظام النقاط" data-en="SCORING SYSTEM">نظام النقاط</div>
+    <h2 class="section-title" data-ar="كل صوت<br><span style='color:var(--gold)'>له ثمن</span>" data-en="Every Vote<br><span style='color:var(--gold)'>Has a Price</span>">كل صوت<br><span style="color:var(--gold)">له ثمن</span></h2>
+    <p class="section-sub" data-ar="لا تصوّت عشوائياً — الخطأ يُعاقب. التحليل الدقيق هو سلاحك الوحيد." data-en="Don't vote randomly — mistakes are penalized. Sharp analysis is your only weapon.">لا تصوّت عشوائياً — الخطأ يُعاقب. التحليل الدقيق هو سلاحك الوحيد.</p>
+    <div class="scoring-grid">
+      <div class="score-card" data-type="win" data-delay="0">
+        <span class="score-icon">✅</span>
+        <div class="score-val">+1</div>
+        <div class="score-title" data-ar="صوّت صح على الذكاء" data-en="Correct Vote on AI">صوّت صح على الذكاء</div>
+        <div class="score-desc" data-ar="اكتشفته = نقطة لك." data-en="You caught it = point for you.">اكتشفته = نقطة لك.</div>
+      </div>
+      <div class="score-card" data-type="lose" data-delay="100">
+        <span class="score-icon">❌</span>
+        <div class="score-val">-1</div>
+        <div class="score-title" data-ar="صوّت خطأ على بشري" data-en="Wrong Vote on Human">صوّت خطأ على بشري</div>
+        <div class="score-desc" data-ar="اتهمت بريء = نقطة تُخصم." data-en="Accused an innocent = point deducted.">اتهمت بريء = نقطة تُخصم.</div>
+      </div>
+      <div class="score-card" data-type="draw" data-delay="200">
+        <span class="score-icon">🤝</span>
+        <div class="score-val">—</div>
+        <div class="score-title" data-ar="تعادل 50%" data-en="50% Draw">تعادل 50%</div>
+        <div class="score-desc" data-ar="بالضبط نصف اللاعبين صوّتوا على الذكاء = لا أحد يكسب هذه الجولة." data-en="Exactly half voted AI = nobody wins this round.">بالضبط نصف اللاعبين صوّتوا على الذكاء = لا أحد يكسب هذه الجولة.</div>
+      </div>
+      <div class="score-card" data-type="ai" data-delay="300">
+        <span class="score-icon">🤖</span>
+        <div class="score-val">+1</div>
+        <div class="score-title" data-ar="الذكاء يخدع الأغلبية" data-en="AI Fools the Majority">الذكاء يخدع الأغلبية</div>
+        <div class="score-desc" data-ar="إذا صوّت أقل من نصف اللاعبين على الذكاء = الذكاء يكسب نقطة وحده." data-en="Less than half caught AI = it earns a point on its own.">إذا صوّت أقل من نصف اللاعبين على الذكاء = الذكاء يكسب نقطة وحده.</div>
+      </div>
+    </div>
+    <div style="margin-top:28px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:14px;color:var(--text2);font-family:'Share Tech Mono',monospace;max-width:560px;letter-spacing:.3px;line-height:1.7;">
+      🏆 <span data-ar="أول لاعب يصل لهدف النقاط (5، 7، أو 10) يفوز باللعبة بالكامل — اختار الهدف عند إنشاء الغرفة." data-en="First player to reach the target score (5, 7, or 10) wins the whole game — set the target when creating the room.">أول لاعب يصل لهدف النقاط (5، 7، أو 10) يفوز باللعبة بالكامل — اختار الهدف عند إنشاء الغرفة.</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
 <section id="features">
   <div class="section-inner">
     <div class="section-label" data-ar="مميزات اللعبة" data-en="FEATURES">مميزات اللعبة</div>
     <h2 class="section-title" data-ar="كل شيء تحتاجه<br><span style='color:var(--violet)'>موجود</span>" data-en="Everything You Need<br><span style='color:var(--violet)'>Is Here</span>">كل شيء تحتاجه<br><span style="color:var(--violet)">موجود</span></h2>
     <div class="features-grid">
-      <div class="feat-card" data-accent="red"><span class="feat-icon">⚡</span><h3 class="feat-title" data-ar="Real-Time كامل" data-en="Full Real-Time">Real-Time كامل</h3><p class="feat-desc" data-ar="كل رسالة تصل فورياً لجميع اللاعبين — تجربة سلسة ومتزامنة." data-en="Every message reaches all players instantly — seamless synchronized experience.">كل رسالة تصل فورياً لجميع اللاعبين — تجربة سلسة ومتزامنة.</p></div>
-      <div class="feat-card" data-accent="cyan"><span class="feat-icon">🎯</span><h3 class="feat-title" data-ar="50 موضوع متنوع" data-en="50 Unique Topics">50 موضوع متنوع</h3><p class="feat-desc" data-ar="مواضيع عميقة وشخصية تجعل كل جولة مختلفة تماماً." data-en="Deep, personal topics that make every round feel completely different.">مواضيع عميقة وشخصية تجعل كل جولة مختلفة تماماً.</p></div>
-      <div class="feat-card" data-accent="violet"><span class="feat-icon">🌐</span><h3 class="feat-title" data-ar="عربي وإنجليزي" data-en="Arabic & English">عربي وإنجليزي</h3><p class="feat-desc" data-ar="اختر لغة غرفتك — الذكاء الاصطناعي يلعب بنفس اللغة بدقة تامة." data-en="Choose your room language — the AI plays in the exact same language.">اختر لغة غرفتك — الذكاء الاصطناعي يلعب بنفس اللغة بدقة تامة.</p></div>
-      <div class="feat-card" data-accent="gold"><span class="feat-icon">🏆</span><h3 class="feat-title" data-ar="نظام فوز بالنقاط" data-en="Win by Points">نظام فوز بالنقاط</h3><p class="feat-desc" data-ar="اكسب نقطة لكل جولة تكشف فيها الذكاء الاصطناعي — أول من يصل للهدف يفوز باللعبة كلها." data-en="Earn a point every round you catch the AI — first to reach the target wins the whole game.">اكسب نقطة لكل جولة تكشف فيها الذكاء الاصطناعي — أول من يصل للهدف يفوز باللعبة كلها.</p></div>
-      <div class="feat-card" data-accent="red"><span class="feat-icon">👥</span><h3 class="feat-title" data-ar="3 إلى 5 لاعبين" data-en="3 to 5 Players">3 إلى 5 لاعبين</h3><p class="feat-desc" data-ar="العدد المثالي للتوتر الحقيقي — لا كثير يضيع فيه المتسلل، ولا قليل يكشفه بسهولة." data-en="The perfect number for real tension — not too many to hide in, not too few to be obvious.">العدد المثالي للتوتر الحقيقي — لا كثير يضيع فيه المتسلل، ولا قليل يكشفه بسهولة.</p></div>
-      <div class="feat-card" data-accent="violet"><span class="feat-icon">🎭</span><h3 class="feat-title" data-ar="شخصية مختلفة كل جولة" data-en="New Personality Every Round">شخصية مختلفة كل جولة</h3><p class="feat-desc" data-ar="الذكاء الاصطناعي يأخذ شخصية عشوائية كل جولة — خجول، ساخر، واثق، أو مشتت. تُكشف في النهاية." data-en="The AI gets a random personality each round — shy, sarcastic, confident, or distracted. Revealed at the end.">الذكاء الاصطناعي يأخذ شخصية عشوائية كل جولة — خجول، ساخر، واثق، أو مشتت. تُكشف في النهاية.</p></div>
-      <div class="feat-card" data-accent="cyan"><span class="feat-icon">📊</span><h3 class="feat-title" data-ar="تحليل بعد الجولة" data-en="Post-Round Analysis">تحليل بعد الجولة</h3><p class="feat-desc" data-ar="شاهد رسائل المتسلل، نتائج التصويت، والنقاط — اعرف أين أخطأ أو نجح." data-en="See the impostor's messages, vote results, and scores — find where it failed or succeeded.">شاهد رسائل المتسلل، نتائج التصويت، والنقاط — اعرف أين أخطأ أو نجح.</p></div>
+      <div class="feat-card" data-accent="red"><span class="feat-icon">⚡</span><h3 class="feat-title" data-ar="Real-Time كامل" data-en="Full Real-Time">Real-Time كامل</h3><p class="feat-desc" data-ar="كل رسالة تصل فورياً لجميع اللاعبين — Firebase يضمن التزامن بدون أي تأخير." data-en="Every message reaches all players instantly — Firebase ensures perfect sync with zero delay.">كل رسالة تصل فورياً لجميع اللاعبين — Firebase يضمن التزامن بدون أي تأخير.</p></div>
+      <div class="feat-card" data-accent="cyan"><span class="feat-icon">🎯</span><h3 class="feat-title" data-ar="50+ موضوع عميق" data-en="50+ Deep Topics">50+ موضوع عميق</h3><p class="feat-desc" data-ar="مواضيع شخصية تصعّب على الذكاء التظاهر — ذكريات، مشاعر، مواقف حقيقية." data-en="Personal topics that make it hard for AI to fake — memories, emotions, real-life moments.">مواضيع شخصية تصعّب على الذكاء التظاهر — ذكريات، مشاعر، مواقف حقيقية.</p></div>
+      <div class="feat-card" data-accent="violet"><span class="feat-icon">🌐</span><h3 class="feat-title" data-ar="عربي وإنجليزي" data-en="Arabic & English">عربي وإنجليزي</h3><p class="feat-desc" data-ar="اختر لغة غرفتك — الذكاء يلعب بنفس اللغة بدقة تامة ونقاء لغوي." data-en="Choose your room language — AI plays with perfect linguistic accuracy in that language.">اختر لغة غرفتك — الذكاء يلعب بنفس اللغة بدقة تامة ونقاء لغوي.</p></div>
+      <div class="feat-card" data-accent="gold"><span class="feat-icon">🎭</span><h3 class="feat-title" data-ar="4 شخصيات عشوائية" data-en="4 Random Personas">4 شخصيات عشوائية</h3><p class="feat-desc" data-ar="الذكاء يأخذ شخصية مختلفة كل جولة — خجول، ساخر، واثق، أو مشتت. تُكشف في النهاية." data-en="AI gets a different persona each round — shy, sarcastic, confident, or distracted. Revealed at the end.">الذكاء يأخذ شخصية مختلفة كل جولة — خجول، ساخر، واثق، أو مشتت. تُكشف في النهاية.</p></div>
+      <div class="feat-card" data-accent="green">
+        <div class="feat-new">جديد</div>
+        <span class="feat-icon">😂</span>
+        <h3 class="feat-title" data-ar="تفاعل بالإيموجي" data-en="Emoji Reactions">تفاعل بالإيموجي</h3>
+        <p class="feat-desc" data-ar="ردّ على رسائل الآخرين بإيموجي سريعة خلال دور غيرك — ابقَ منخرطاً طوال الوقت." data-en="React to others' messages with quick emojis during their turn — stay engaged throughout.">ردّ على رسائل الآخرين بإيموجي سريعة خلال دور غيرك — ابقَ منخرطاً طوال الوقت.</p>
+      </div>
+      <div class="feat-card" data-accent="cyan">
+        <div class="feat-new">جديد</div>
+        <span class="feat-icon">📜</span>
+        <h3 class="feat-title" data-ar="سجل الجولات" data-en="Round History">سجل الجولات</h3>
+        <p class="feat-desc" data-ar="بعد كل جولة، شاهد سجل الجولات السابقة — من كان الذكاء، الموضوع، من فاز." data-en="After each round, see the history of past rounds — who was the AI, the topic, who won.">بعد كل جولة، شاهد سجل الجولات السابقة — من كان الذكاء، الموضوع، من فاز.</p>
+      </div>
+      <div class="feat-card" data-accent="red"><span class="feat-icon">👑</span><h3 class="feat-title" data-ar="نقل الرئاسة تلقائياً" data-en="Auto Host Transfer">نقل الرئاسة تلقائياً</h3><p class="feat-desc" data-ar="إذا غادر المضيف، تنتقل الرئاسة تلقائياً لأول لاعب متبقٍّ — اللعبة لا تتوقف." data-en="If the host leaves, control passes automatically to the next player — game never stops.">إذا غادر المضيف، تنتقل الرئاسة تلقائياً لأول لاعب متبقٍّ — اللعبة لا تتوقف.</p></div>
+      <div class="feat-card" data-accent="violet"><span class="feat-icon">📱</span><h3 class="feat-title" data-ar="موبايل وكمبيوتر" data-en="Mobile & Desktop">موبايل وكمبيوتر</h3><p class="feat-desc" data-ar="مُحسَّن لجميع الأجهزة — العب بالموبايل مع أصدقائك في أي مكان." data-en="Optimized for all devices — play on mobile with your friends anywhere.">مُحسَّن لجميع الأجهزة — العب بالموبايل مع أصدقائك في أي مكان.</p></div>
     </div>
   </div>
 </section>
-<section id="cta" style="position:relative">
+
+<!-- CTA -->
+<section id="cta">
   <div class="cta-glow"></div>
   <div class="cta-inner">
+    <div class="label-tag" style="justify-content:center;margin-bottom:20px;" data-ar="الآن" data-en="RIGHT NOW">الآن</div>
     <h2 class="cta-title" data-ar="هل تستطيع<br><span>كشفه؟</span>" data-en="Can You<br><span>Expose It?</span>">هل تستطيع<br><span>كشفه؟</span></h2>
-    <p class="cta-sub" data-ar="اجمع أصدقاءك، ادخلوا الغرفة، وابدأوا اللعبة — الذكاء الاصطناعي في انتظاركم." data-en="Gather your friends, enter the room, and start the game — the AI is waiting for you.">اجمع أصدقاءك، ادخلوا الغرفة، وابدأوا اللعبة — الذكاء الاصطناعي في انتظاركم.</p>
-    <div class="cta-btns"><a href="ai-impostor.html" class="btn-play" data-ar="▶ &nbsp;العب الآن مجاناً" data-en="▶ &nbsp;Play Now Free">▶ &nbsp;العب الآن مجاناً</a></div>
+    <p class="cta-sub" data-ar="اجمع أصدقاءك، ادخلوا الغرفة، وابدأوا — الذكاء الاصطناعي في انتظاركم." data-en="Gather your friends, enter the room, and start — the AI is already waiting.">اجمع أصدقاءك، ادخلوا الغرفة، وابدأوا — الذكاء الاصطناعي في انتظاركم.</p>
+    <div class="cta-btns">
+      <a href="ai-impostor.html" class="btn-play" data-ar="▶ &nbsp;العب الآن مجاناً" data-en="▶ &nbsp;Play Now Free">▶ &nbsp;العب الآن مجاناً</a>
+    </div>
+    <div class="cta-note" data-ar="مجاني تماماً • لا تسجيل • يعمل في المتصفح مباشرة" data-en="Completely free • No registration • Runs directly in browser">مجاني تماماً • لا تسجيل • يعمل في المتصفح مباشرة</div>
   </div>
 </section>
+
+<!-- FOOTER -->
 <footer>
   <div class="footer-main">
-    <div class="footer-logo"><span class="r">AI</span> IMPOSTOR</div>
+    <a href="#" class="footer-logo"><span class="r">AI</span> IMPOSTOR</a>
     <div class="footer-links">
       <a href="#how" data-ar="كيف تلعب" data-en="How to Play">كيف تلعب</a>
-      <a href="#rules" data-ar="الشروط" data-en="Rules">الشروط</a>
+      <a href="#personas" data-ar="الشخصيات" data-en="Personas">الشخصيات</a>
+      <a href="#scoring" data-ar="النقاط" data-en="Scoring">النقاط</a>
       <a href="#features" data-ar="المميزات" data-en="Features">المميزات</a>
       <a href="ai-impostor.html" data-ar="العب الآن" data-en="Play Now">العب الآن</a>
     </div>
@@ -365,45 +1112,168 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:36px
     </div>
   </div>
 </footer>
+
 <script>
-/* CURSOR */
-const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+/* ═══════════════════════════════════════════
+   CURSOR — desktop only
+═══════════════════════════════════════════ */
+const cursor=document.getElementById('cursor');
+const ring=document.getElementById('cursor-ring');
+const isTouch=!window.matchMedia('(pointer:fine)').matches;
 let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
-(function ar(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(ar);})();
-/* CANVAS */
+if(!isTouch){
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    cursor.style.left=mx+'px';cursor.style.top=my+'px';
+  });
+  (function ar(){
+    rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(ar);
+  })();
+  // Cursor scale on links/buttons
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.transform='translate(-50%,-50%) scale(2.2)';cursor.style.background='var(--cyan)';});
+    el.addEventListener('mouseleave',()=>{cursor.style.transform='translate(-50%,-50%) scale(1)';cursor.style.background='var(--red)';});
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CANVAS PARTICLES — optimized
+═══════════════════════════════════════════ */
 const cv=document.getElementById('bg-canvas'),ct=cv.getContext('2d');
 let W,H,pts=[];
-function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight;}rsz();window.addEventListener('resize',rsz);
-class Pt{constructor(){this.r();}r(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.s=Math.random()*1.5+.5;this.a=Math.random()*.4+.1;this.c=Math.random()>.7?'255,32,32':Math.random()>.5?'124,58,237':'0,229,255';}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.r();}draw(){ct.beginPath();ct.arc(this.x,this.y,this.s,0,Math.PI*2);ct.fillStyle=`rgba(${this.c},${this.a})`;ct.fill();}}
-for(let i=0;i<120;i++)pts.push(new Pt());
-function anim(){ct.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ct.beginPath();ct.moveTo(pts[i].x,pts[i].y);ct.lineTo(pts[j].x,pts[j].y);ct.strokeStyle=`rgba(30,37,53,${(1-d/120)*.6})`;ct.lineWidth=.5;ct.stroke();}}requestAnimationFrame(anim);}anim();
-/* SCROLL REVEAL */
-const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){const el=e.target,d=el.dataset.delay||0;setTimeout(()=>el.classList.add('visible'),+d);obs.unobserve(el);}}),{threshold:.15});
-document.querySelectorAll('.how-card,.demo-feature,.chat-mockup,.feat-card,.rule-card').forEach(el=>obs.observe(el));
-document.querySelectorAll('.feat-card').forEach((el,i)=>el.style.transitionDelay=(i*80)+'ms');
-/* TICKER */
-const T_AR=["أغرب حلم رأيته","أكثر لحظة خجلت فيها","شيء تندم أنك لم تفعله","لحظة شعرت فيها بالخوف","ذكرى من الطفولة","أغرب شيء أكلته","لو عدت لعمر العشر سنوات","أصعب قرار اتخذته","لحظة فخر حقيقية","شيء يجعلك تضحك حتى البكاء","أغرب عادة تملكها","أصعب وداع في حياتك","ما الذي تريد أن يُذكر عنك"];
-const T_EN=["The strangest dream you had","Your most embarrassing moment","Something you regret not doing","A moment of genuine fear","A childhood memory","The weirdest thing you ate","If you could go back to age 10","Your hardest decision","A moment of real pride","What makes you laugh until you cry","Your strangest habit","The hardest goodbye","What you want to be remembered for"];
-function buildTicker(lang){const t=lang==='ar'?T_AR:T_EN;const track=document.getElementById('ticker-track');const d=[...t,...t];track.innerHTML=d.map(x=>`<div class="ticker-item">${x}</div>`).join('');}
-buildTicker('ar');
-/* MOCK TIMER */
-let ms=84;setInterval(()=>{ms--;if(ms<0)ms=120;const m=Math.floor(ms/60),s=ms%60;const el=document.getElementById('mock-timer');if(el)el.textContent=`${m}:${s.toString().padStart(2,'0')}`;},1000);
-/* ══════════ AUDIO ENGINE ══════════ */
-let ac=null;
-function ga(){if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();return ac;}
-function tone(f,t='sine',d=.1,g=.06){try{const a=ga(),o=a.createOscillator(),gn=a.createGain();o.connect(gn);gn.connect(a.destination);o.type=t;o.frequency.value=f;gn.gain.setValueAtTime(0,a.currentTime);gn.gain.linearRampToValueAtTime(g,a.currentTime+.01);gn.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.start(a.currentTime);o.stop(a.currentTime+d+.05);}catch(e){}}
-function clickSound(){tone(880,'sine',.08,.06);}
-function hoverSound(){tone(440,'sine',.04,.03);}
-document.querySelectorAll('.btn-play,.btn-how,.nav-cta,.lang-btn').forEach(b=>{b.addEventListener('click',clickSound);b.addEventListener('mouseenter',hoverSound);});
+function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+rsz();window.addEventListener('resize',rsz);
+class Pt{
+  constructor(){this.r();}
+  r(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.vx=(Math.random()-.5)*.28;this.vy=(Math.random()-.5)*.28;
+    this.s=Math.random()*1.4+.4;this.a=Math.random()*.3+.08;
+    this.c=Math.random()>.7?'255,32,32':Math.random()>.5?'124,58,237':'0,229,255';
+  }
+  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.r();}
+  draw(){ct.beginPath();ct.arc(this.x,this.y,this.s,0,Math.PI*2);ct.fillStyle=`rgba(${this.c},${this.a})`;ct.fill();}
+}
+// 60 particles — no O(n²) lines
+for(let i=0;i<60;i++)pts.push(new Pt());
+function anim(){ct.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});requestAnimationFrame(anim);}
+anim();
 
-/* ── ROBOT VOICE (Web Speech API) ── */
-let robotSpoken=false;
-let ambientNode=null,ambientGain=null;
+/* ═══════════════════════════════════════════
+   NAV SCROLL
+═══════════════════════════════════════════ */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',scrollY>60);},{passive:true});
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════ */
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting){
+    const d=+(e.target.dataset.delay||0);
+    setTimeout(()=>e.target.classList.add('visible'),d);
+    obs.unobserve(e.target);
+  }
+}),{threshold:.12});
+document.querySelectorAll('.how-step,.feat-card,.rule-card,.demo-feature,.chat-mockup,.persona-card,.score-card').forEach(el=>obs.observe(el));
+
+/* ═══════════════════════════════════════════
+   SCROLL HINT — hide on first scroll
+═══════════════════════════════════════════ */
+window.addEventListener('scroll',()=>{
+  const sh=document.getElementById('scroll-hint');
+  if(sh&&scrollY>50){sh.style.opacity='0';sh.style.pointerEvents='none';}
+},{once:true,passive:true});
+
+/* ═══════════════════════════════════════════
+   EYE TRACKING
+═══════════════════════════════════════════ */
+const pupil=document.getElementById('eye-pupil');
+if(pupil&&!isTouch){
+  document.addEventListener('mousemove',e=>{
+    const inner=document.querySelector('.eye-inner');
+    if(!inner)return;
+    const r=inner.getBoundingClientRect();
+    const cx=r.left+r.width/2,cy=r.top+r.height/2;
+    const angle=Math.atan2(e.clientY-cy,e.clientX-cx);
+    const dist=Math.min(7,Math.hypot(e.clientX-cx,e.clientY-cy)/22);
+    pupil.style.transform=`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`;
+  },{passive:true});
+}
+
+/* ═══════════════════════════════════════════
+   GLITCH effect on title
+═══════════════════════════════════════════ */
+const glLine=document.querySelector('.hero-title .line2');
+if(glLine){
+  setInterval(()=>{
+    if(Math.random()<.08){
+      glLine.style.transform=`skewX(${(Math.random()-.5)*6}deg) translateX(${(Math.random()-.5)*4}px)`;
+      setTimeout(()=>glLine.style.transform='',120);
+    }
+  },2200);
+}
+
+/* ═══════════════════════════════════════════
+   TICKER
+═══════════════════════════════════════════ */
+const T_AR=["أغرب حلم رأيته","أكثر لحظة خجلت فيها","شيء تندم أنك لم تفعله","لحظة شعرت فيها بالخوف","ذكرى من الطفولة","أغرب شيء أكلته","لو عدت لعمر العشر سنوات","أصعب قرار اتخذته","لحظة فخر حقيقية","شيء يجعلك تضحك حتى البكاء","أغرب عادة تملكها","أصعب وداع في حياتك","ما الذي تريد أن يُذكر عنك","شيء تخاف يعرفه الناس عنك","لحظة أدركت فيها أنك كبرت"];
+const T_EN=["The strangest dream you had","Your most embarrassing moment","Something you regret not doing","A moment of genuine fear","A childhood memory","The weirdest thing you ate","If you could go back to age 10","Your hardest decision","A moment of real pride","What makes you laugh until you cry","Your strangest habit","The hardest goodbye","What you want to be remembered for","Something you fear others knowing","The moment you realized you'd grown up"];
+function buildTicker(lang){
+  const t=lang==='ar'?T_AR:T_EN;
+  const track=document.getElementById('ticker-track');
+  const d=[...t,...t];
+  track.innerHTML=d.map(x=>`<div class="ticker-item">${x}</div>`).join('');
+}
+buildTicker('ar');
+
+/* ═══════════════════════════════════════════
+   MOCK TIMER
+═══════════════════════════════════════════ */
+let ms=102;
+setInterval(()=>{
+  ms--;if(ms<0)ms=180;
+  const m=Math.floor(ms/60),s=ms%60;
+  const el=document.getElementById('mock-timer');
+  if(el)el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+},1000);
+
+/* ═══════════════════════════════════════════
+   AUDIO ENGINE — improved
+═══════════════════════════════════════════ */
+let _ac=null;
+function ga(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();return _ac;}
+function tone(f,type='sine',dur=.1,gain=.05){
+  try{
+    const a=ga(),o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(0,a.currentTime);
+    g.gain.linearRampToValueAtTime(gain,a.currentTime+.012);
+    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dur);
+    o.start(a.currentTime);o.stop(a.currentTime+dur+.05);
+  }catch(e){}
+}
+function clickSound(){tone(880,'sine',.09,.05);setTimeout(()=>tone(1100,'sine',.07,.03),70);}
+function hoverSound(){tone(660,'sine',.05,.025);}
+
+// Attach sounds to interactive elements
+document.querySelectorAll('.btn-play,.btn-secondary,.nav-cta,.lang-btn').forEach(b=>{
+  b.addEventListener('click',clickSound);
+  if(!isTouch)b.addEventListener('mouseenter',hoverSound);
+});
+
+/* ═══════════════════════════════════════════
+   AMBIENT HORROR DRONE
+═══════════════════════════════════════════ */
+let _ambNode=null,_ambGain=null,_audioReady=false;
 
 function stopAmbient(){
-  try{if(ambientGain){ambientGain.gain.setTargetAtTime(0,ga().currentTime,.3);}
-  setTimeout(()=>{try{ambientNode?.stop();}catch(e){}ambientNode=null;ambientGain=null;},400);
+  try{
+    if(_ambGain){_ambGain.gain.setTargetAtTime(0,ga().currentTime,.4);}
+    setTimeout(()=>{try{_ambNode?.stop();}catch(e){}; _ambNode=null;_ambGain=null;},500);
   }catch(e){}
 }
 
@@ -411,83 +1281,73 @@ function startAmbient(){
   stopAmbient();
   try{
     const a=ga();
-    // Layered horror drone: two oscillators + filtered noise
-    const g1=a.createGain(),g2=a.createGain(),gMix=a.createGain();
+    const gMix=a.createGain();gMix.gain.value=0;gMix.connect(a.destination);
+    // Two slightly detuned oscillators = beating / unease
     const o1=a.createOscillator(),o2=a.createOscillator();
+    const g1=a.createGain(),g2=a.createGain();
     const filt=a.createBiquadFilter();
-    filt.type='lowpass';filt.frequency.value=400;
-    o1.type='sawtooth';o1.frequency.value=55;
-    o2.type='sawtooth';o2.frequency.value=58.2; // slight detune = beating
-    g1.gain.value=0.06;g2.gain.value=0.04;gMix.gain.value=0;
+    filt.type='lowpass';filt.frequency.value=350;
+    o1.type='sawtooth';o1.frequency.value=52;g1.gain.value=0.055;
+    o2.type='sawtooth';o2.frequency.value=55.4;g2.gain.value=0.038;
     o1.connect(g1);o2.connect(g2);
-    g1.connect(filt);g2.connect(filt);filt.connect(gMix);gMix.connect(a.destination);
-    o1.start();o2.start();
-    gMix.gain.setTargetAtTime(1,a.currentTime,1.5);
-    // Slow LFO tremolo
+    g1.connect(filt);g2.connect(filt);filt.connect(gMix);
+    // Slow tremolo LFO
     const lfo=a.createOscillator(),lfoG=a.createGain();
-    lfo.frequency.value=0.12;lfoG.gain.value=0.4;
-    lfo.connect(lfoG);lfoG.connect(gMix.gain);lfo.start();
-    ambientNode=o1;ambientGain=gMix;
-    // Store all nodes to stop later
-    ambientNode._all=[o1,o2,lfo];
-    ambientNode.stop=function(){this._all.forEach(n=>{try{n.stop();}catch(e){}});};
+    lfo.frequency.value=0.1;lfoG.gain.value=0.35;
+    lfo.connect(lfoG);lfoG.connect(gMix.gain);
+    o1.start();o2.start();lfo.start();
+    gMix.gain.setTargetAtTime(.9,a.currentTime,2);
+    _ambNode={_all:[o1,o2,lfo],stop(){this._all.forEach(n=>{try{n.stop();}catch(e){}});}};
+    _ambGain=gMix;
   }catch(e){}
 }
 
-function speakRobot(text,lang,onDone){
-  if(!window.speechSynthesis){if(onDone)onDone();return;}
-  speechSynthesis.cancel();
-  const utt=new SpeechSynthesisUtterance(text);
-  utt.lang=lang==='ar'?'ar-SA':'en-US';
-  utt.rate=0.72;   // slower = robot feel
-  utt.pitch=0.4;   // low pitch
-  utt.volume=0.92;
-  // Try to pick a deep/robot voice
-  const voices=speechSynthesis.getVoices();
-  const pick=voices.find(v=>v.lang.startsWith(lang==='ar'?'ar':'en')&&(v.name.toLowerCase().includes('male')||v.name.toLowerCase().includes('google')||v.name.toLowerCase().includes('microsoft')));
-  if(pick)utt.voice=pick;
-  utt.onend=()=>{if(onDone)onDone();};
-  utt.onerror=()=>{if(onDone)onDone();};
-  speechSynthesis.speak(utt);
-}
-
-const ROBOT_AR='هل تعتقد أنك ستجدني؟ ... أنا بينهم ... حاول إن استطعت';
+/* ═══════════════════════════════════════════
+   ROBOT VOICE — Web Speech API
+═══════════════════════════════════════════ */
+let _robotSpoken=false;
+const ROBOT_AR='هل تعتقد أنك ستجدني؟... أنا بينهم... حاول إن استطعت.';
 const ROBOT_EN='Do you really think... you can find me? I am among them. Good luck.';
 
+function speakRobot(text,lang,onDone){
+  if(!window.speechSynthesis){if(onDone)onDone();return;}
+  try{
+    speechSynthesis.cancel();
+    const utt=new SpeechSynthesisUtterance(text);
+    utt.lang=lang==='ar'?'ar-SA':'en-US';
+    utt.rate=0.68;utt.pitch=0.35;utt.volume=0.85;
+    const voices=speechSynthesis.getVoices();
+    const pick=voices.find(v=>v.lang.startsWith(lang==='ar'?'ar':'en')&&(v.name.toLowerCase().includes('male')||v.name.toLowerCase().includes('google')||v.name.toLowerCase().includes('microsoft')));
+    if(pick)utt.voice=pick;
+    utt.onend=()=>{if(onDone)onDone();};
+    utt.onerror=()=>{if(onDone)onDone();};
+    speechSynthesis.speak(utt);
+  }catch(e){if(onDone)onDone();}
+}
+
 function playIntro(lang){
-  robotSpoken=true;
+  _robotSpoken=true;
   stopAmbient();
   speakRobot(lang==='ar'?ROBOT_AR:ROBOT_EN,lang,()=>{
-    // After speech ends → start horror ambient
-    setTimeout(()=>startAmbient(),600);
+    setTimeout(()=>startAmbient(),500);
   });
 }
 
-// Trigger on first user click (browser requirement for audio)
-document.addEventListener('click',()=>{
-  ga().resume();
-  if(!robotSpoken)playIntro(curLang);
-},{once:true});
-
 // Preload voices
 if(window.speechSynthesis){
-  speechSynthesis.onvoiceschanged=()=>{speechSynthesis.getVoices();};
+  try{speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}catch(e){}
 }
 
-/* SCROLL HINT — hide after first scroll */
-window.addEventListener('scroll',()=>{
-  const sh=document.getElementById('scroll-hint');
-  if(sh&&window.scrollY>60){sh.style.opacity='0';sh.style.pointerEvents='none';}
+// Trigger on first interaction
+document.addEventListener('click',()=>{
+  try{ga().resume();}catch(e){}
+  _audioReady=true;
+  if(!_robotSpoken)playIntro(curLang);
 },{once:true});
 
-/* EYE */
-const pupil=document.querySelector('.eye-pupil');
-if(pupil)document.addEventListener('mousemove',e=>{const eye=document.querySelector('.eye-inner');if(!eye)return;const r=eye.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,angle=Math.atan2(e.clientY-cy,e.clientX-cx),dist=Math.min(8,Math.hypot(e.clientX-cx,e.clientY-cy)/20);pupil.style.transform=`translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px)`;});
-/* GLITCH */
-const gl=document.querySelector('.hero-title .line2');
-if(gl)setInterval(()=>{if(Math.random()<.1){gl.style.transform=`skewX(${(Math.random()-.5)*5}deg)`;setTimeout(()=>gl.style.transform='',100);}},2000);
-
-/* ══════════ LANG TOGGLE ══════════ */
+/* ═══════════════════════════════════════════
+   LANG TOGGLE
+═══════════════════════════════════════════ */
 let curLang='ar';
 function setLang(lang){
   const changed=lang!==curLang;
@@ -499,15 +1359,14 @@ function setLang(lang){
   document.querySelectorAll('[data-ar]').forEach(el=>{
     const val=el.dataset[lang];
     if(!val)return;
-    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'){el.placeholder=val;}
-    else{el.innerHTML=val;}
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.placeholder=val;
+    else el.innerHTML=val;
   });
   buildTicker(lang);
   const mt=document.getElementById('mock-topic');
   if(mt)mt.textContent=lang==='ar'?'ذكرى من الطفولة':'A Childhood Memory';
-  // On lang change: play robot voice in new language then restart ambient
   if(changed&&_audioReady){
-    robotSpoken=false;
+    _robotSpoken=false;
     playIntro(lang);
   }
 }
