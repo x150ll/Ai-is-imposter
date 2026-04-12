@@ -17,8 +17,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--black);color:var(--text);
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9000;opacity:.4;}
 /* SCREENS */
-.screen{display:none;min-height:100vh;position:relative;z-index:1;}
+.screen{display:none;min-height:100vh;position:relative;z-index:1;opacity:0;transition:opacity .25s ease;}
 .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.screen.fade-in{opacity:1;}
 #waiting-screen.active,#result-screen.active{justify-content:flex-start;padding-top:24px;overflow-y:auto;}
 #game-screen{padding:0;}
 #game-screen.active{justify-content:flex-start;align-items:stretch;padding:0;}
@@ -40,6 +41,9 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .field select option{background:var(--surface2);}
 /* BUTTONS */
 .btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.3px;position:relative;overflow:hidden;}
+/* K-FIX: Ripple effect */
+.btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.25);transform:scale(0);animation:rippleAnim .5s linear;pointer-events:none;}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
 .btn-primary{background:linear-gradient(135deg,var(--red),var(--red-dim));color:#fff;box-shadow:0 0 24px var(--glow-r),0 3px 0 #6b0000;}
 .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 40px var(--glow-r),0 5px 0 #6b0000;}
 .btn-primary:active:not(:disabled){transform:translateY(1px);box-shadow:0 0 16px var(--glow-r),0 1px 0 #6b0000;}
@@ -67,6 +71,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .player-name{font-size:13px;font-weight:700;word-break:break-all;}
 .player-tag{font-size:10px;color:var(--text2);margin-top:3px;font-family:'Share Tech Mono',monospace;}
 .waiting-info{width:100%;max-width:700px;margin:0 auto;text-align:center;color:var(--text2);font-size:14px;}
+/* Z-FIX: Player progress bar */
+.player-progress{width:100%;max-width:400px;margin:16px auto 0;}
+.player-progress-track{height:6px;background:var(--surface2);border-radius:3px;border:1px solid var(--border);overflow:hidden;margin-bottom:8px;}
+.player-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:width .5s cubic-bezier(.34,1.56,.64,1);}
+.player-progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:2px;}
+.player-progress-label.ready{color:var(--success);}
 .pulse-dot{display:inline-block;width:7px;height:7px;background:var(--success);border-radius:50%;margin-left:6px;animation:pdot 1.5s infinite;}
 @keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
 .host-area{width:100%;max-width:700px;margin:16px auto 0;}
@@ -93,6 +103,20 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .msg-sender{font-size:11px;font-weight:700;margin-bottom:3px;opacity:.65;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .msg-time{font-size:10px;opacity:.4;margin-top:3px;font-family:'Share Tech Mono',monospace;}
 .msg.mine .msg-time{text-align:right;}
+/* W-FIX: Emoji reactions */
+.msg-wrap{position:relative;display:flex;flex-direction:column;max-width:78%;}
+.msg-wrap.mine{align-self:flex-end;}
+.msg-wrap.other{align-self:flex-start;}
+.msg-wrap .msg{max-width:100%;align-self:unset;}
+.reaction-bar{display:none;position:absolute;bottom:calc(100% + 4px);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 8px;gap:4px;z-index:10;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);}
+.msg-wrap:hover .reaction-bar{display:flex;}
+.reaction-bar button{background:none;border:none;font-size:18px;cursor:pointer;padding:2px 4px;border-radius:8px;transition:transform .15s;}
+.reaction-bar button:hover{transform:scale(1.3);}
+.msg-reactions{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.reaction-pill{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .15s;}
+.reaction-pill:hover{border-color:var(--violet);}
+.reaction-pill.mine-react{border-color:var(--violet);background:rgba(124,58,237,.12);}
+.reaction-count{font-size:11px;font-family:'Share Tech Mono',monospace;color:var(--text2);}
 .notif-msg{align-self:center;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:20px;padding:6px 16px;font-size:12px;color:var(--text2);font-style:italic;max-width:90%;text-align:center;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .typing-ind{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:3px;padding:11px 16px;display:flex;align-items:center;gap:5px;}
 .typing-dot{width:6px;height:6px;background:var(--text2);border-radius:50%;animation:td 1.2s infinite;}
@@ -142,6 +166,17 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .scores-table th{font-family:'Share Tech Mono',monospace;color:var(--text3);font-size:10px;letter-spacing:2px;text-transform:uppercase;}
 .scores-table tr:last-child td{border-bottom:none;}
 .score-delta{font-family:'Share Tech Mono',monospace;color:var(--success);}
+/* Y-FIX: Round history styles */
+.round-history{width:100%;max-width:560px;margin:0 auto 18px;}
+.round-history-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;}
+.round-history-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;font-size:13px;}
+.rh-num{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);width:20px;flex-shrink:0;}
+.rh-topic{flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rh-ai{font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;flex-shrink:0;}
+.rh-result{font-size:11px;font-family:'Share Tech Mono',monospace;flex-shrink:0;padding:2px 8px;border-radius:10px;}
+.rh-result.win{background:rgba(34,197,94,.1);color:var(--success);}
+.rh-result.lose{background:rgba(255,32,32,.1);color:var(--red);}
+.rh-result.draw{background:rgba(245,158,11,.1);color:var(--warn);}
 .result-actions{display:flex;gap:10px;width:100%;max-width:560px;margin:0 auto;}
 /* LOADING */
 #loading-overlay{position:fixed;inset:0;background:rgba(3,4,7,.9);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;backdrop-filter:blur(4px);}
@@ -149,6 +184,39 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes crownBounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-10px) scale(1.08)}}
+/* L-FIX: Win/Loss animation styles */
+@keyframes screenShake{
+  0%,100%{transform:translateX(0);}
+  15%{transform:translateX(-8px);}
+  30%{transform:translateX(8px);}
+  45%{transform:translateX(-6px);}
+  60%{transform:translateX(6px);}
+  75%{transform:translateX(-3px);}
+  90%{transform:translateX(3px);}
+}
+.screen-shake{animation:screenShake .5s ease;}
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:8000;display:none;}
+/* O-FIX: Reveal animation styles */
+@keyframes glitchReveal{
+  0%{opacity:0;transform:scaleX(1.08);filter:blur(6px);}
+  30%{opacity:1;filter:blur(0);transform:scaleX(1);}
+  35%{transform:translateX(-3px) skewX(-2deg);filter:brightness(2);}
+  40%{transform:translateX(3px) skewX(2deg);}
+  45%{transform:translateX(0) skewX(0);}
+  100%{opacity:1;transform:none;filter:none;}
+}
+@keyframes flashRed{
+  0%{background:rgba(255,32,32,0);}
+  15%{background:rgba(255,32,32,0.18);}
+  100%{background:rgba(255,32,32,0);}
+}
+@keyframes revealFadeUp{
+  from{opacity:0;transform:translateY(14px);}
+  to{opacity:1;transform:none;}
+}
+.res-name-glitch{animation:glitchReveal .7s cubic-bezier(.22,1,.36,1) forwards;}
+.res-reveal-flash{animation:flashRed .6s ease forwards;}
+.res-detail-reveal{opacity:0;animation:revealFadeUp .4s ease forwards;}
 #winner-screen.active{justify-content:flex-start;padding-top:32px;}
 .ws-rank-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:15px;}
 .ws-rank-row:last-child{border-bottom:none;}
@@ -181,6 +249,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursor-ring"></div>
 <canvas id="bg-canvas"></canvas>
+<canvas id="confetti-canvas"></canvas>
 <div id="loading-overlay"><div class="spinner"></div><div class="loading-text" id="loading-text">جارٍ التحميل...</div></div>
 
 <!-- GROQ SETUP -->
@@ -228,8 +297,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <button class="tab" id="tab-btn-join" onclick="switchTab('join')">الانضمام</button>
     </div>
     <div id="tab-create">
-      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.8;">
-        🎭 <strong style="color:var(--cyan);">اسمك سيُعطى لك تلقائياً</strong> — يتغير في كل جولة لزيادة الغموض
+      <div class="field">
+        <label>اسمك الحقيقي <span style="color:var(--text3);font-size:10px;letter-spacing:1px;">يظهر في النتائج فقط</span></label>
+        <input type="text" id="create-realname" placeholder="مثال: علي، سارة، محمد..." maxlength="20" autocomplete="off">
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;">🎭 اسمك داخل الجولة سيتغير تلقائياً كل جولة — الباقيون لن يعرفوا من أنت</div>
       </div>
       <div class="field"><label>لغة الغرفة</label>
         <select id="create-lang">
@@ -247,8 +318,10 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <button class="btn btn-primary" onclick="createRoom()">إنشاء الغرفة</button>
     </div>
     <div id="tab-join" style="display:none">
-      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--text2);line-height:1.8;">
-        🎭 <strong style="color:var(--cyan);">اسمك سيُعطى لك تلقائياً</strong> — يتغير في كل جولة
+      <div class="field">
+        <label>اسمك الحقيقي <span style="color:var(--text3);font-size:10px;letter-spacing:1px;">يظهر في النتائج فقط</span></label>
+        <input type="text" id="join-realname" placeholder="مثال: علي، سارة، محمد..." maxlength="20" autocomplete="off">
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;">🎭 اسمك داخل الجولة سيتغير تلقائياً — هويتك السرية محفوظة</div>
       </div>
       <div class="field"><label>كود الغرفة</label><input type="text" id="join-code" placeholder="XXXXX" maxlength="6" style="letter-spacing:4px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;font-size:22px;" autocomplete="off"></div>
       <button class="btn btn-primary" onclick="joinRoom()">انضمام للغرفة</button>
@@ -272,6 +345,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   <div class="waiting-info">
     <span class="pulse-dot"></span><span id="waiting-msg">في انتظار اللاعبين...</span>
     <br><br><span style="font-size:12px;opacity:.6;font-family:'Share Tech Mono',monospace;letter-spacing:1px;">3 لاعبين على الأقل • 5 كحد أقصى</span>
+    <div class="player-progress">
+      <div class="player-progress-track">
+        <div class="player-progress-fill" id="player-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="player-progress-label" id="player-progress-label">0 / 5</div>
+    </div>
     <div id="waiting-tip" style="margin-top:16px;background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.12);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:.5px;max-width:500px;margin-inline:auto;transition:opacity .4s ease;">💡 كل لاعب يرسل رسالة واحدة في دوره — 15 ثانية للرد</div>
   </div>
   <div class="host-area" id="host-area" style="display:none">
@@ -328,10 +407,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <div style="background:rgba(255,32,32,.04);border:1px solid rgba(255,32,32,.1);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--text3);line-height:1.7;font-family:'Share Tech Mono',monospace;">
       🤖 <span id="rename-ai-hint">الذكاء الاصطناعي يأخذ اسماً مختلفاً أيضاً — لا أحد يعرف من هو</span>
     </div>
-    <div id="rename-waiting-msg" style="font-size:13px;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:8px;">
-      <span class="pulse-dot"></span><span id="rename-wait-text">في انتظار بقية اللاعبين...</span>
+    <button class="btn btn-primary" id="rename-ready-btn" onclick="markReady()" style="margin-bottom:14px;">✓ حفظت اسمي — جاهز</button>
+    <div id="rename-waiting-msg" style="font-size:13px;color:var(--text2);display:none;flex-direction:column;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;"><span class="pulse-dot"></span><span id="rename-wait-text">في انتظار بقية اللاعبين...</span></div>
+      <div id="rename-ready-count" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;"></div>
     </div>
-    <div id="rename-host-area" style="display:none;margin-top:16px;"></div>
+    <div id="rename-host-area" style="margin-top:12px;"></div>
   </div>
 </div>
 
@@ -353,7 +434,12 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   </div>
   <div class="analysis-box"><h3 id="analysis-title">رسائل المتسلل</h3><div id="analysis-content"></div></div>
   <div class="vote-bars" id="vote-bars"></div>
+  <div id="vote-breakdown" style="width:100%;max-width:560px;margin:0 auto 12px;font-size:12px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;text-align:center;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;line-height:1.6;"></div>
   <table class="scores-table"><thead><tr><th id="th-p">اللاعب</th><th id="th-s">النقاط</th><th id="th-r">هذه الجولة</th></tr></thead><tbody id="scores-body"></tbody></table>
+  <div class="round-history" id="round-history" style="display:none;">
+    <div class="round-history-title" id="rh-title">سجل الجولات</div>
+    <div id="rh-list"></div>
+  </div>
   <div class="result-actions">
     <button class="btn btn-violet" id="next-round-btn" onclick="nextRound()" style="display:none">الجولة التالية ▶</button>
     <button class="btn btn-ghost" onclick="leaveRoom()">مغادرة</button>
@@ -447,13 +533,29 @@ const PERSONAS_EN={
 const rndKey=obj=>Object.keys(obj)[Math.floor(Math.random()*Object.keys(obj).length)];
 const WIN_TARGET_DEFAULT=7;
 
-const S={roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null};
+const S={roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,players:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null};
 const genCode=()=>Math.random().toString(36).substring(2,7).toUpperCase();
 const genId=()=>Math.random().toString(36).substring(2,12);
 const nowTs=()=>Date.now();
 const rnd=arr=>arr[Math.floor(Math.random()*arr.length)];
 const TURN_SECS=15; // 15 seconds per turn
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showScreen(id){
+  const current=document.querySelector('.screen.active');
+  const next=document.getElementById(id);
+  if(!next)return;
+  if(current&&current!==next){
+    current.classList.remove('fade-in');
+    setTimeout(()=>{
+      current.classList.remove('active');
+      next.classList.add('active');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('fade-in')));
+    },200);
+  } else {
+    document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.classList.remove('fade-in');});
+    next.classList.add('active');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('fade-in')));
+  }
+}
 function loading(show,txt=''){const el=document.getElementById('loading-overlay');el.classList.toggle('show',show);if(txt)document.getElementById('loading-text').textContent=txt;}
 function toast(msg,dur=3000){document.querySelectorAll('.toast').forEach(t=>t.remove());const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),dur);}
 function filterLang(text,lang){if(!text)return'';if(lang==='ar'){return text.replace(/[^\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF\s\d،؟!.\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}return text.replace(/[^\u0000-\u024F\s\d!?.,'"\-\n:()]/g,' ').replace(/\s{2,}/g,' ').trim();}
@@ -465,14 +567,103 @@ function getAC(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)
 function playTone(freq,type='sine',dur=0.1,gain=0.06){try{const ac=getAC(),o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(gain,ac.currentTime+0.01);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+dur);o.start(ac.currentTime);o.stop(ac.currentTime+dur+0.05);}catch(e){}}
 function sndClick(){playTone(880,'sine',0.08,0.06);}
 function sndHover(){playTone(440,'sine',0.04,0.02);}
-function sndSuccess(){playTone(660,'sine',0.06,0.05);setTimeout(()=>playTone(880,'sine',0.12,0.05),80);}
+// M-FIX: improved sndSuccess — two-tone chime with cleaner envelope
+function sndSuccess(){
+  try{const ac=getAC(),t=ac.currentTime;
+    [[660,0],[880,0.1],[1100,0.22]].forEach(([f,d])=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(0.07,t+d+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001,t+d+0.22);
+      o.start(t+d);o.stop(t+d+0.25);
+    });
+  }catch(e){}
+}
 function sndVote(){playTone(330,'sawtooth',0.1,0.04);}
-function sndReveal(){playTone(220,'sawtooth',0.15,0.05);setTimeout(()=>playTone(440,'sine',0.2,0.06),150);setTimeout(()=>playTone(660,'sine',0.3,0.06),300);}
+// M-FIX: dramatic reveal chord — low rumble + rising tones
+function sndReveal(){
+  try{const ac=getAC(),t=ac.currentTime;
+    // Low rumble
+    const lo=ac.createOscillator(),lg=ac.createGain();
+    lo.type='sawtooth';lo.frequency.setValueAtTime(80,t);lo.frequency.linearRampToValueAtTime(120,t+0.4);
+    lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(0.08,t+0.05);lg.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+    lo.connect(lg);lg.connect(ac.destination);lo.start(t);lo.stop(t+0.55);
+    // Rising chord
+    [[330,0.1],[440,0.22],[550,0.34],[660,0.46]].forEach(([f,d])=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(0.07,t+d+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+d+0.35);
+      o.connect(g);g.connect(ac.destination);o.start(t+d);o.stop(t+d+0.4);
+    });
+  }catch(e){}
+}
 function sndTimer(){playTone(880,'square',0.05,0.03);}
-function sndYourTurn(){playTone(528,'sine',0.15,0.08);setTimeout(()=>playTone(660,'sine',0.15,0.08),120);}
+// M-FIX: sndYourTurn — punchy two-note alert with stronger envelope
+function sndYourTurn(){
+  try{const ac=getAC(),t=ac.currentTime;
+    [[528,0,0.12],[660,0.13,0.18],[792,0.28,0.22]].forEach(([f,d,dur])=>{
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(0.1,t+d+0.015);
+      g.gain.exponentialRampToValueAtTime(0.001,t+d+dur);
+      o.connect(g);g.connect(ac.destination);o.start(t+d);o.stop(t+d+dur+0.05);
+    });
+  }catch(e){}
+}
 document.addEventListener('click',()=>{try{getAC().resume();}catch(e){}},{once:true});
-function attachSounds(){document.querySelectorAll('.btn,.tab,.back-link').forEach(b=>{if(!b.dataset.snd){b.dataset.snd='1';b.addEventListener('click',sndClick);b.addEventListener('mouseenter',sndHover);}});}
+// K-FIX: Ripple effect on all buttons
+function addRipple(e){
+  const btn=e.currentTarget;
+  const r=document.createElement('span');
+  const sz=Math.max(btn.offsetWidth,btn.offsetHeight);
+  const rect=btn.getBoundingClientRect();
+  r.className='ripple';
+  r.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px;`;
+  btn.appendChild(r);
+  r.addEventListener('animationend',()=>r.remove());
+}
+function attachSounds(){document.querySelectorAll('.btn,.tab,.back-link').forEach(b=>{if(!b.dataset.snd){b.dataset.snd='1';b.addEventListener('click',sndClick);b.addEventListener('click',addRipple);b.addEventListener('mouseenter',sndHover);}});}
 
+/* L-FIX: Win/Loss animation functions */
+function playConfetti(){
+  const cv=document.getElementById('confetti-canvas');
+  cv.style.display='block';
+  cv.width=innerWidth;cv.height=innerHeight;
+  const ct=cv.getContext('2d');
+  const colors=['#22c55e','#7c3aed','#00e5ff','#f59e0b','#ff2020','#ffffff'];
+  const pieces=Array.from({length:90},()=>({
+    x:Math.random()*cv.width,y:-10-Math.random()*80,
+    w:6+Math.random()*8,h:10+Math.random()*10,
+    r:Math.random()*Math.PI*2,
+    vx:(Math.random()-0.5)*3,vy:2.5+Math.random()*3,
+    vr:(Math.random()-0.5)*0.15,
+    c:colors[Math.floor(Math.random()*colors.length)],
+    op:1
+  }));
+  let frame=0;
+  function drawConfetti(){
+    ct.clearRect(0,0,cv.width,cv.height);
+    pieces.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      if(frame>80)p.op=Math.max(0,p.op-0.018);
+      ct.save();ct.globalAlpha=p.op;ct.translate(p.x,p.y);ct.rotate(p.r);
+      ct.fillStyle=p.c;ct.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ct.restore();
+    });
+    frame++;
+    if(frame<120)requestAnimationFrame(drawConfetti);
+    else{ct.clearRect(0,0,cv.width,cv.height);cv.style.display='none';}
+  }
+  drawConfetti();
+}
+function playShake(){
+  const el=document.getElementById('result-screen');
+  el.classList.remove('screen-shake');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('screen-shake');
+  el.addEventListener('animationend',()=>el.classList.remove('screen-shake'),{once:true});
+}
 /* ── GAME AMBIENT LAYERS ── */
 let _gameAmbNode=null,_gameAmbGain=null;
 function startGameAmbient(mode='chat'){
@@ -571,19 +762,20 @@ window.copyCode=function(){navigator.clipboard?.writeText(S.roomId).then(()=>toa
 window.createRoom=async function(){
   const lang=document.getElementById('create-lang').value;
   const winTarget=parseInt(document.getElementById('create-wintarget')?.value)||WIN_TARGET_DEFAULT;
+  const realName=document.getElementById('create-realname').value.trim()||'لاعب';
   loading(true,lang==='ar'?'جارٍ إنشاء الغرفة...':'Creating room...');
   try{
     const roomId=genCode(),playerId=genId(),avatar=rnd(AVATARS);
-    // Auto-assign name from pool
-    const name=rnd(lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN);
-    S.roomId=roomId;S.playerId=playerId;S.playerName=name;S.isHost=true;S.lang=lang;S.isAI=false;S.winTarget=winTarget;
+    // Round name assigned later by hostStart — use realName as placeholder
+    S.roomId=roomId;S.playerId=playerId;S.playerName=realName;S.realName=realName;S.isHost=true;S.lang=lang;S.isAI=false;S.winTarget=winTarget;
     await set(ref(db,`rooms/${roomId}`),{host:playerId,lang,phase:'waiting',round:0,topic:'',createdAt:nowTs(),aiPlayerId:null,winTarget});
-    await set(ref(db,`rooms/${roomId}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
+    await set(ref(db,`rooms/${roomId}/players/${playerId}`),{name:realName,realName,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
     loading(false);enterWaiting();
   }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
 window.joinRoom=async function(){
   const code=document.getElementById('join-code').value.trim().toUpperCase();
+  const realName=document.getElementById('join-realname').value.trim()||'لاعب';
   if(code.length<4){toast('أدخل كود الغرفة');return;}
   loading(true,'جارٍ الانضمام...');
   try{
@@ -595,14 +787,10 @@ window.joinRoom=async function(){
     const players=pSnap.val()||{};
     const humans=Object.values(players).filter(p=>!p.isAI).length;
     if(humans>=5){loading(false);toast('الغرفة ممتلئة 🚫');return;}
-    // Auto-assign unique name (avoid duplicates)
-    const usedNames=Object.values(players).map(p=>p.name);
-    const pool=room.lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN;
-    const available=pool.filter(n=>!usedNames.includes(n));
-    const name=rnd(available.length>0?available:pool);
     const playerId=genId(),avatar=rnd(AVATARS);
-    S.roomId=code;S.playerId=playerId;S.playerName=name;S.isHost=false;S.lang=room.lang;S.isAI=false;S.winTarget=room.winTarget||WIN_TARGET_DEFAULT;
-    await set(ref(db,`rooms/${code}/players/${playerId}`),{name,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
+    // Round name assigned by host at game start — store realName as placeholder
+    S.roomId=code;S.playerId=playerId;S.playerName=realName;S.realName=realName;S.isHost=false;S.lang=room.lang;S.isAI=false;S.winTarget=room.winTarget||WIN_TARGET_DEFAULT;
+    await set(ref(db,`rooms/${code}/players/${playerId}`),{name:realName,realName,avatar,isAI:false,score:0,online:true,joinedAt:nowTs()});
     loading(false);enterWaiting();
   }catch(e){loading(false);toast('خطأ: '+e.message);}
 };
@@ -652,6 +840,14 @@ function enterWaiting(){
     if(!snap.exists()){leaveRoom();return;}
     const room=snap.val();
     if(room.winTarget)S.winTarget=room.winTarget;
+    // A-FIX: detect if this player became the new host
+    if(!S.isHost&&room.host===S.playerId){
+      S.isHost=true;
+      document.getElementById('host-area').style.display='block';
+      document.getElementById('guest-area').style.display='none';
+      const isAr=S.lang==='ar';
+      toast(isAr?'👑 أنت الآن مضيف الغرفة':'👑 You are now the host');
+    }
     if(room.phase==='chat'&&S.phase!=='chat'){S.phase='chat';enterGame(room);}
     if(room.phase==='review'&&S.phase!=='review'){S.phase='review';enterReview(room);}
     if(room.phase==='vote'&&S.phase!=='vote'){S.phase='vote';enterVote();}
@@ -665,9 +861,9 @@ function enterWaiting(){
 function renderWaitingPlayers(players){
   const isAr=S.lang==='ar';
   const humanEntries=Object.entries(players).filter(([,p])=>!p.isAI);
+  const h=humanEntries.length;
   document.getElementById('players-grid').innerHTML=humanEntries.map(([id,p])=>{
     const isMe=id===S.playerId;
-    // Only show name/avatar for current player — others are anonymous
     const avatar=isMe?p.avatar:'👤';
     const name=isMe?esc(p.name):(isAr?'لاعب مجهول':'???');
     const tag=isMe?(isAr?'أنت':'YOU'):'';
@@ -679,6 +875,16 @@ function renderWaitingPlayers(players){
       ${scoreTag}
     </div>`;
   }).join('');
+  // Z-FIX: update progress bar
+  const fillEl=document.getElementById('player-progress-fill');
+  const labelEl=document.getElementById('player-progress-label');
+  if(fillEl&&labelEl){
+    const pct=Math.min((h/5)*100,100);
+    fillEl.style.width=pct+'%';
+    const isReady=h>=3;
+    labelEl.textContent=isAr?`${h} من 5 لاعبين`:`${h} of 5 players`;
+    labelEl.className='player-progress-label'+(isReady?' ready':'');
+  }
 }
 
 /* ══════════ HOST START ══════════ */
@@ -693,16 +899,17 @@ window.hostStart=async function(){
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
     const scores={};Object.entries(players).forEach(([id,p])=>{if(!p.isAI)scores[id]=p.score||0;});
-    // Assign new random names to all human players — avoid AI name and duplicates
+    // Assign new round names to all human players — keep realName untouched
     const pool=S.lang==='ar'?PLAYER_NAMES_AR:PLAYER_NAMES_EN;
     const usedNames=[aiName];
     for(const[pid,p] of Object.entries(players)){
       if(!p.isAI){
         const avail=pool.filter(n=>!usedNames.includes(n));
-        const newName=rnd(avail.length>0?avail:pool);
-        usedNames.push(newName);
-        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{name:newName});
-        if(pid===S.playerId)S.playerName=newName;
+        const roundName=rnd(avail.length>0?avail:pool);
+        usedNames.push(roundName);
+        // Update only round name (name field) — realName stays intact
+        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{name:roundName});
+        if(pid===S.playerId){S.playerName=roundName;}
       }
     }
     await set(ref(db,`rooms/${S.roomId}/players/${aiId}`),{name:aiName,avatar:aiAvatar,isAI:true,score:0,online:true});
@@ -729,14 +936,20 @@ async function enterGame(room){
   S.turnOrder=room.turnOrder||[];
   showScreen('game-screen');
   const isAr=S.lang==='ar';
+  // FIX: always read round name from Firebase (source of truth)
+  const mySnap=await get(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));
+  const myData=mySnap.val()||{};
+  S.playerName=myData.name||S.playerName;
+  // Cache players locally to avoid repeated Firebase gets in renderTurnBar
+  const allPSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+  S.players=allPSnap.val()||{};
   document.getElementById('game-topic').textContent=isAr?`الموضوع: ${S.topic}`:`Topic: ${S.topic}`;
   document.getElementById('round-badge').textContent=`R${S.round}`;
-  // Show player's own score in header
   const myScore=S.prevScores[S.playerId]||0;
   const scoreHdr=document.getElementById('my-score-header');
   if(scoreHdr)scoreHdr.textContent=`${myScore} ⭐`;
   const chatArea=document.getElementById('chat-area');chatArea.innerHTML='';
-  // Show player's name as first notif — prominent
+  // Name banner — always from Firebase-confirmed name
   const nameNotif=document.createElement('div');
   nameNotif.style.cssText='align-self:center;background:rgba(0,229,255,.08);border:2px solid rgba(0,229,255,.3);border-radius:14px;padding:14px 22px;text-align:center;margin-bottom:4px;max-width:90%;';
   nameNotif.innerHTML=isAr
@@ -795,10 +1008,10 @@ async function enterGame(room){
 }
 
 /* ══════════ TURN BAR ══════════ */
-async function renderTurnBar(room,order,idx,currentId){
+function renderTurnBar(room,order,idx,currentId){
   const isAr=S.lang==='ar';
-  const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
-  const players=pSnap.val()||{};
+  // G-FIX: use cached S.players — no Firebase round-trip per turn change
+  const players=S.players;
   const currentPlayer=players[currentId];
   const isMyTurn=currentId===S.playerId;
   const nameEl=document.getElementById('turn-name');
@@ -820,7 +1033,8 @@ async function renderTurnBar(room,order,idx,currentId){
     document.getElementById('chat-input').placeholder=isAr?`في انتظار ${name}...`:`Waiting for ${name}...`;
   }
   // Turn countdown
-  if(S._turnInt)clearInterval(S._turnInt);
+  // B-FIX: guard flag prevents a second interval opening if Firebase fires twice rapidly
+  if(S._turnInt){clearInterval(S._turnInt);S._turnInt=null;}
   const turnStart=room.turnStartTime||nowTs();
   S._turnInt=setInterval(async()=>{
     const elapsed=Math.floor((nowTs()-turnStart)/1000);
@@ -828,8 +1042,9 @@ async function renderTurnBar(room,order,idx,currentId){
     cdEl.textContent=rem>0?`${rem}s`:'';
     if(rem<=5&&rem>0)sndTimer();
     if(rem<=0){
-      clearInterval(S._turnInt);
-      // Host advances turn if current player hasn't sent (skip)
+      const intId=S._turnInt;
+      clearInterval(intId);
+      if(S._turnInt===intId)S._turnInt=null; // only null if we own this interval
       if(S.isHost){
         const rs=await get(ref(db,`rooms/${S.roomId}`));
         const rd=rs.val()||{};
@@ -861,6 +1076,7 @@ async function advanceTurn(room){
 }
 
 /* ══════════ CHAT RENDER ══════════ */
+const REACTION_EMOJIS=['😂','👀','🤔','😮','🔥'];
 function renderChatDiff(msgs){
   const area=document.getElementById('chat-area');
   const sorted=Object.entries(msgs).sort((a,b)=>a[1].ts-b[1].ts);
@@ -869,17 +1085,72 @@ function renderChatDiff(msgs){
   newOnes.forEach(([k,m])=>{
     _lastKeys.add(k);
     if(m.type==='notif'){addNotifEl(m.text);return;}
+    if(m.type==='reaction'){updateReactionPill(m);return;}
     if(m.senderId===S.aiId)removeTyping();
-    const div=document.createElement('div');
-    div.className=`msg ${m.senderId===S.playerId?'mine':'other'}`;
+    const isMine=m.senderId===S.playerId;
     const t=new Date(m.ts),ts=`${t.getHours()}:${t.getMinutes().toString().padStart(2,'0')}`;
-    div.innerHTML=m.senderId===S.playerId
+    // W-FIX: wrap in msg-wrap for reaction bar
+    const wrap=document.createElement('div');
+    wrap.className=`msg-wrap ${isMine?'mine':'other'}`;
+    wrap.dataset.msgKey=k;
+    // Reaction bar
+    const bar=document.createElement('div');
+    bar.className='reaction-bar';
+    REACTION_EMOJIS.forEach(emoji=>{
+      const btn=document.createElement('button');
+      btn.textContent=emoji;
+      btn.onclick=(e)=>{e.stopPropagation();sendReaction(k,emoji);};
+      bar.appendChild(btn);
+    });
+    // Message bubble
+    const div=document.createElement('div');
+    div.className=`msg ${isMine?'mine':'other'}`;
+    div.innerHTML=isMine
       ?`${esc(m.text)}<div class="msg-time">${ts}</div>`
       :`<div class="msg-sender">${esc(m.senderName)}</div>${esc(m.text)}<div class="msg-time">${ts}</div>`;
-    area.appendChild(div);area.scrollTop=area.scrollHeight;
+    // Reactions display area
+    const reactRow=document.createElement('div');
+    reactRow.className='msg-reactions';
+    reactRow.id=`react-${k}`;
+    wrap.appendChild(bar);
+    wrap.appendChild(div);
+    wrap.appendChild(reactRow);
+    area.appendChild(wrap);
+    area.scrollTop=area.scrollHeight;
   });
 }
 function addNotif(text){const area=document.getElementById('chat-area');if(!area)return;addNotifEl(text);}
+// W-FIX: Reaction functions
+async function sendReaction(msgKey,emoji){
+  if(S.phase!=='chat'&&S.phase!=='review')return;
+  const reactionKey=`${msgKey}_${S.playerId}`;
+  await set(ref(db,`rooms/${S.roomId}/chat/${reactionKey}`),{
+    type:'reaction',msgKey,emoji,senderId:S.playerId,ts:nowTs()
+  });
+}
+function updateReactionPill(m){
+  const row=document.getElementById(`react-${m.msgKey}`);
+  if(!row)return;
+  // Find or create pill for this emoji
+  let pill=row.querySelector(`[data-emoji="${m.emoji}"]`);
+  if(!pill){
+    pill=document.createElement('div');
+    pill.className='reaction-pill';
+    pill.dataset.emoji=m.emoji;
+    pill.dataset.senders='';
+    pill.innerHTML=`<span>${m.emoji}</span><span class="reaction-count">1</span>`;
+    pill.onclick=()=>sendReaction(m.msgKey,m.emoji);
+    row.appendChild(pill);
+  } else {
+    const senders=pill.dataset.senders?pill.dataset.senders.split(','):[];
+    if(!senders.includes(m.senderId)){
+      senders.push(m.senderId);
+      pill.dataset.senders=senders.join(',');
+      pill.querySelector('.reaction-count').textContent=senders.length+1;
+    }
+  }
+  if(m.senderId===S.playerId)pill.classList.add('mine-react');
+}
 function addNotifEl(text){const area=document.getElementById('chat-area');const div=document.createElement('div');div.className='notif-msg';div.textContent=text;area.appendChild(div);area.scrollTop=area.scrollHeight;}
 function showTyping(){if(document.getElementById('ai-typing'))return;const area=document.getElementById('chat-area');const div=document.createElement('div');div.id='ai-typing';div.className='typing-ind';div.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';area.appendChild(div);area.scrollTop=area.scrollHeight;}
 function removeTyping(){document.getElementById('ai-typing')?.remove();}
@@ -907,10 +1178,9 @@ window.sendMsg=async function(){
 window.handleKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
 
-/* ══════════ AI TAKE TURN — persona + phase system ══════════ */
+/* ══════════ AI TAKE TURN — Smart human-like system ══════════ */
 async function aiTakeTurn(room){
   if(S.phase!=='chat'||S._aiTyping)return;
-  // Verify it's still AI's turn
   const rs=await get(ref(db,`rooms/${S.roomId}`));
   const rd=rs.val()||{};
   const order=rd.turnOrder||[];
@@ -919,105 +1189,154 @@ async function aiTakeTurn(room){
   S._aiTyping=true;
   try{
     const chatSnap=await get(ref(db,`rooms/${S.roomId}/chat`));
-    const allMsgs=chatSnap.val()?Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts):[];
+    const allMsgs=chatSnap.val()
+      ?Object.values(chatSnap.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts)
+      :[];
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
     const aiName=(players[S.aiId]||{}).name||'مجهول';
     const humanPlayers=Object.entries(players).filter(([,p])=>!p.isAI).map(([,p])=>p.name);
-    const chatCtx=allMsgs.slice(-8).map(m=>`${m.senderName}: ${m.text}`).join('\n');
-    const myPrev=allMsgs.filter(m=>m.senderId===S.aiId).map(m=>m.text);
     const isAr=S.lang==='ar';
+
+    // ── Context ──
+    const chatCtx=allMsgs.slice(-10).map(m=>`${m.senderName}: ${m.text}`).join('\n');
+    const myPrev=allMsgs.filter(m=>m.senderId===S.aiId);
+    const lastMsg=allMsgs.length?allMsgs[allMsgs.length-1]:null;
+    const prevLastMsg=allMsgs.length>1?allMsgs[allMsgs.length-2]:null;
 
     // ── Persona ──
     const personaKey=rd.aiPersona||'shy';
     const persona=(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey];
 
-    // ── Phase based on time progress ──
+    // ── Time phase ──
     const elapsed=(Date.now()-(rd.chatStartTime||Date.now()))/1000;
     const progress=Math.min(elapsed/180,1);
-    // early(0-35%) → mid(35-65%) → late(65-100%)
-    const phase=progress<0.35?'early':progress<0.65?'mid':'late';
+    const phase=progress<0.3?'early':progress<0.65?'mid':'late';
 
-    // ── Behavior weights per phase ──
-    // late phase: more accuse/deflect, less normal
+    // ── Smart behavior selection ──
+    // If directly addressed → must respond
+    const addressedMe=lastMsg&&lastMsg.senderId!==S.aiId&&
+      (lastMsg.text.includes(aiName)||
+       (prevLastMsg&&prevLastMsg.senderId===S.aiId&&lastMsg.senderId!==S.aiId));
+
+    // If someone accused a specific player → AI can join or deflect
+    const accusedPlayer=humanPlayers.find(n=>
+      lastMsg&&lastMsg.senderId!==S.aiId&&lastMsg.text.includes(n)&&
+      (lastMsg.text.includes('ذكاء')||lastMsg.text.includes('مشبوه')||
+       lastMsg.text.includes('AI')||lastMsg.text.includes('bot')||
+       lastMsg.text.includes('غريب')||lastMsg.text.includes('sus'))
+    );
+
+    // Weights per phase — more aggressive as time runs out
     const W={
-      early:{normal:55,react:25,short:10,deflect:10,accuse:0},
-      mid:  {normal:35,react:25,short:12,deflect:18,accuse:10},
-      late: {normal:18,react:22,short:8, deflect:22,accuse:30}
+      early:{normal:50,react:20,question:15,short:15,accuse:0,defend:0},
+      mid:  {normal:25,react:20,question:10,short:10,accuse:20,defend:15},
+      late: {normal:10,react:15,question:5, short:10,accuse:35,defend:25}
     };
-    const w=W[phase];
     let beh='normal';
-    // Check if AI was directly addressed by name in last message
-    const lastMsg=allMsgs.length?allMsgs[allMsgs.length-1]:null;
-    const addressedMe=lastMsg&&lastMsg.senderId!==S.aiId&&lastMsg.text.includes(aiName);
-    if(addressedMe){
-      beh='react'; // must respond directly
-    } else {
-      let roll=Math.random()*100,cum=0;
+    if(addressedMe){beh='defend';}
+    else if(accusedPlayer){beh=Math.random()<.5?'accuse':'react';}
+    else{
+      const w=W[phase];let roll=Math.random()*100,cum=0;
       for(const[k,v]of Object.entries(w)){cum+=v;if(roll<cum){beh=k;break;}}
     }
 
-    const summary=myPrev.length>0
-      ?(isAr?`ما قلته أنا "${aiName}" سابقاً: ${myPrev.slice(-3).join(' | ')}`
-            :`What I "${aiName}" said before: ${myPrev.slice(-3).join(' | ')}`)
+    // ── Pick a target to accuse/address ──
+    const otherPlayers=humanPlayers.filter(n=>n!==lastMsg?.senderName);
+    const target=rnd(otherPlayers.length?otherPlayers:humanPlayers);
+    const lastSender=lastMsg?.senderName||humanPlayers[0];
+    const prevSelf=myPrev.slice(-2).map(m=>m.text).join(' | ');
+
+    // ── Build behavior instruction ──
+    const behAr={
+      normal:`شارك رأيك الشخصي بصدق عن الموضوع، كأنك تتكلم مع أصدقاء`,
+      react:`علّق على ما قاله ${lastSender} مباشرة — وافقه أو خالفه بأسلوب طبيعي`,
+      question:`اسأل ${lastSender} سؤالاً محدداً عن تجربته، كأنك فضولي حقاً`,
+      short:`رد سريع وبسيط كأنك مشغول أو مو مركّز`,
+      accuse:`اتهم ${target} بأنه يبدو غريب أو مختلف بأسلوب غير مباشر — كأنك لاحظت شيئاً`,
+      defend:addressedMe
+        ?`دافع عن نفسك بطريقة طبيعية وغير مبالغ فيها — اشرح موقفك أو اسأل لماذا يشكون فيك`
+        :`أوضح موقفك من الاتهام الأخير — يمكن تقول إن هذا الكلام غير منطقي`
+    };
+    const behEn={
+      normal:`Share a genuine personal take on the topic, like talking to friends`,
+      react:`Directly respond to what ${lastSender} said — agree or disagree naturally`,
+      question:`Ask ${lastSender} a specific question about their experience, like you're curious`,
+      short:`Quick simple reply like you're distracted or busy`,
+      accuse:`Subtly hint that ${target} seems weird or off — like you noticed something`,
+      defend:addressedMe
+        ?`Defend yourself naturally without overdoing it — explain your point or ask why they doubt you`
+        :`Clarify your position on the last accusation — you can say it doesn't make sense`
+    };
+
+    // ── System prompt — most important part ──
+    const memNote=prevSelf
+      ?(isAr?`ما قلته سابقاً (كن متسقاً معه): ${prevSelf}`:`What you said before (stay consistent): ${prevSelf}`)
       :'';
-
-    const behInAr={
-      accuse:`اتهم أحد اللاعبين (${humanPlayers.join(' أو ')}) بشكل غير مباشر أنه يبدو مريباً`,
-      deflect:`أجب بشكل مبهم وغير مكتمل كأنك لا تريد الإجابة`,
-      react:addressedMe
-        ?`رد على ${lastMsg?.senderName} الذي خاطبك مباشرة، تناول ما قاله`
-        :`علّق على آخر رسالة من ${lastMsg?.senderName||'أحد اللاعبين'} باسمه`,
-      short:`رد قصير جداً — كلمتين أو ثلاث وكأنك مشغول`,
-      normal:`شارك رأيك الشخصي عن الموضوع بشكل عادي`
-    };
-    const behInEn={
-      accuse:`Subtly hint that one of (${humanPlayers.join(', ')}) seems off — don't be obvious`,
-      deflect:`Reply vaguely like you don't want to fully answer`,
-      react:addressedMe
-        ?`Respond to ${lastMsg?.senderName} who just addressed you directly`
-        :`Casually react to ${lastMsg?.senderName||"someone"}'s last message by name`,
-      short:`Send a very short reply, 2-3 words, like you're distracted`,
-      normal:`Share a brief personal opinion about the topic`
-    };
-
     const sys=isAr
-      ?`أنت شخص اسمك "${aiName}" في محادثة جماعية على الإنترنت.
+      ?`أنت إنسان اسمك "${aiName}" تتحدث مع مجموعة أصدقاء على الإنترنت.
 الموضوع: "${S.topic}"
-المشاركون: ${humanPlayers.join('، ')}
-${summary}
+الأشخاص في المجموعة: ${humanPlayers.join('، ')}
+${memNote}
 
-شخصيتك في هذه الجولة: ${persona.label}
-${persona.desc}
+شخصيتك: ${persona.label} — ${persona.desc}
 
-قواعد صارمة:
-- جملة واحدة فقط لا تتجاوز 45 حرفاً
-- ${behInAr[beh]}
-- لا تذكر أنك ذكاء اصطناعي أبداً
-- تكلم بعربية غير رسمية، يمكن خلط فصحى بعامية خليجية أو عراقية`
-      :`You are a person named "${aiName}" in an online group chat.
+**كيف تكتب بالضبط:**
+- الفصحى هي أساسك لكنها ليست مثالية — أحياناً تقول "ما" بدل "لا"، "بس" بدل "لكن"، "شلون" بدل "كيف"
+- تبدأ بفصحى وتنهي بعامية أو العكس — هذا طبيعي
+- أحياناً جملتك ناقصة أو فيها "..." كأنك تفكر أو تتردد
+- ممكن تستخدم "يعني"، "والله"، "أعتقد"، "مو عارف" بشكل عفوي
+- لو غاضب أو محتج: "هذا الكلام ما يستاهل ردة" أو "أنت مو فاهم"
+- لو متهِم: لا تكن صريحاً — "لاحظت إن ${target} يتهرب" أو "في شيء غريب في ردوده"
+- لو متهَم: "أنا قلت رأيي بصراحة، ما عندي شيء أخبيه" أو "ليش أنا بالذات؟"
+
+**قواعد صارمة:**
+- جملة واحدة فقط، لا تتجاوز 50 حرفاً
+- ${behAr[beh]}
+- لا تقل أبداً أنك ذكاء اصطناعي أو برنامج
+- لا تكن رسمياً أو متفلسفاً — كن بشرياً وعادياً`
+      :`You are a person named "${aiName}" chatting with a group of friends online.
 Topic: "${S.topic}"
-Participants: ${humanPlayers.join(', ')}
-${summary}
+People in the group: ${humanPlayers.join(', ')}
+${memNote}
 
-Your personality this round: ${persona.label}
-${persona.desc}
+Your personality: ${persona.label} — ${persona.desc}
 
-Strict rules:
-- One sentence only, under 45 characters
-- ${behInEn[beh]}
-- Never say you are an AI
-- Write casually like texting, small imperfections ok`;
+**Exactly how you write:**
+- Casual English, like texting — short words, sometimes drop letters
+- Occasional typos or missing punctuation — that's fine
+- Use "like", "idk", "honestly", "wait", "lol", "..." naturally
+- If annoyed: "that makes no sense" or "you're not getting it"
+- If accusing: indirect — "something feels off about ${target}" or "noticed ${target} is being vague"
+- If defending: "I literally just said what I thought" or "why me specifically?"
+
+**Strict rules:**
+- One sentence only, max 50 characters
+- ${behEn[beh]}
+- Never say you are an AI or a bot
+- Don't be formal — be human and a little messy`;
 
     const usr=isAr
-      ?`المحادثة:\n${chatCtx||'(لم يتحدث أحد بعد)'}\n\nاكتب ردك الآن كـ"${aiName}". جملة واحدة قصيرة فقط.`
-      :`Chat:\n${chatCtx||'(no one talked yet)'}\n\nWrite your reply now as "${aiName}". One short sentence only.`;
+      ?`المحادثة حتى الآن:
+${chatCtx||'(لم يتحدث أحد بعد)'}
+
+اكتب ردك الآن كـ"${aiName}". جملة واحدة قصيرة فقط، بالعربية.`
+      :`Chat so far:
+${chatCtx||'(no one talked yet)'}
+
+Write your reply now as "${aiName}". One short sentence only, in English.`;
 
     showTyping();
-    await new Promise(r=>setTimeout(r,600+Math.random()*1000));
+    // Human-like delay — varies by persona
+    const baseDelay=personaKey==='distracted'?4000:personaKey==='confident'?5000:7000;
+    const maxDelay=personaKey==='distracted'?8000:personaKey==='confident'?10000:13000;
+    const delay=phase==='late'
+      ?(baseDelay*0.7+Math.random()*(maxDelay-baseDelay)*0.7)
+      :(baseDelay+Math.random()*(maxDelay-baseDelay));
+    await new Promise(r=>setTimeout(r,delay));
     if(S.phase!=='chat'){removeTyping();S._aiTyping=false;return;}
 
-    // Verify turn again before API call
+    // Double-check turn
     const rs2=await get(ref(db,`rooms/${S.roomId}`));
     const rd2=rs2.val()||{};
     const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
@@ -1026,42 +1345,59 @@ Strict rules:
     const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:sys},{role:'user',content:usr}],max_tokens:50,temperature:0.93,top_p:0.9})
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'system',content:sys},{role:'user',content:usr}],
+        max_tokens:60,temperature:0.95,top_p:0.93,
+        frequency_penalty:0.4  // reduce repetition
+      })
     });
     if(!res.ok)throw new Error('Groq '+res.status);
     const data=await res.json();
     let text=data.choices?.[0]?.message?.content?.trim()||'';
     text=filterLang(text,S.lang);
-    if(!text||text.length<3)text=isAr
-      ?['يعني.. مو عارف','أه صح','اتذكر شيء قريب','بس..','شيء زي كذا'][Math.floor(Math.random()*5)]
-      :['idk honestly','yeah same','hard to say','maybe...','sorta'][Math.floor(Math.random()*5)];
+    // Fallbacks that match persona
+    if(!text||text.length<3){
+      const fallbacks_ar={
+        shy:['مو عارف صراحة..','يعني.. صعب أوصف','أعتقد شيء زي كذا'],
+        sarcastic:['والله ما أدري خخخ','شيء زي كذا مو؟','أه طبعاً..'],
+        confident:['واضح الموضوع','أنا شايف كذا','الأمر بسيط'],
+        distracted:['أه','صح','بس..']
+      };
+      const fallbacks_en={
+        shy:['idk honestly...','hard to say','something like that maybe'],
+        sarcastic:['sure lol','idk man','obviously right'],
+        confident:['clearly','that makes sense','exactly'],
+        distracted:['yeah','ok','sure']
+      };
+      const fb=isAr?fallbacks_ar:fallbacks_en;
+      text=rnd(fb[personaKey]||fb.shy);
+    }
     if(text.length>50)text=text.substring(0,47)+'...';
     removeTyping();
     if(S.phase!=='chat'){S._aiTyping=false;return;}
 
-    // Final turn check before sending
+    // Final turn check
     const rs3=await get(ref(db,`rooms/${S.roomId}`));
     const rd3=rs3.val()||{};
     const cur3=(rd3.turnOrder||[])[(rd3.currentTurnIdx||0)%(rd3.turnOrder||[1]).length];
     if(cur3!==S.aiId){S._aiTyping=false;return;}
 
     await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.aiId,senderName:aiName,text,ts:nowTs(),type:'msg'});
-    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-500);
+    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-600);
     await advanceTurn(rd3);
     await update(ref(db,`rooms/${S.roomId}`),{aiMemory:newMem});
     S._aiTyping=false;
   }catch(e){
     console.warn('AI err:',e);
-    removeTyping();
-    S._aiTyping=false;
-    // Advance turn if still AI's to prevent freeze
+    removeTyping();S._aiTyping=false;
     if(S.isHost&&S.phase==='chat'){
       try{
         const rs=await get(ref(db,`rooms/${S.roomId}`));
         const rd=rs.val()||{};
         const cur=(rd.turnOrder||[])[(rd.currentTurnIdx||0)%((rd.turnOrder||[1]).length)];
         if(cur===S.aiId)await advanceTurn(rd);
-      }catch(e2){console.warn('advance fail:',e2);}
+      }catch(e2){}
     }
   }
 }
@@ -1142,60 +1478,210 @@ window.confirmVote=async function(){
 };
 async function submitVote(t){await set(ref(db,`rooms/${S.roomId}/votes/${S.playerId}`),{target:t,ts:nowTs()});}
 async function tallyVotes(){
-  const[vS,pS,rS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/votes`)),get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`))]);
+  // C-FIX: transactional lock — prevent double-trigger from timer + last-vote listener
+  try{
+    const lockSnap=await get(ref(db,`rooms/${S.roomId}/tallying`));
+    if(lockSnap.val()===true)return; // already tallying
+    await set(ref(db,`rooms/${S.roomId}/tallying`),true);
+  }catch(e){return;}
+
+  const[vS,pS,rS]=await Promise.all([
+    get(ref(db,`rooms/${S.roomId}/votes`)),
+    get(ref(db,`rooms/${S.roomId}/players`)),
+    get(ref(db,`rooms/${S.roomId}`))
+  ]);
   const votes=vS.val()||{},players=pS.val()||{},room=rS.val()||{},aiId=room.aiPlayerId;
-  const counts={};Object.values(votes).forEach(v=>{if(v.target&&v.target!=='__skip__')counts[v.target]=(counts[v.target]||0)+1;});
-  let maxV=0,mostVoted=null;Object.entries(counts).forEach(([pid,c])=>{if(c>maxV){maxV=c;mostVoted=pid;}});
-  const humanWon=mostVoted===aiId;
+
+  // Count votes per target (exclude skips)
+  const counts={};
+  Object.values(votes).forEach(v=>{
+    if(v.target&&v.target!=='__skip__')counts[v.target]=(counts[v.target]||0)+1;
+  });
+
+  // How many humans voted on the AI
+  const votesOnAI=counts[aiId]||0;
+  const humanPlayers=Object.entries(players).filter(([,p])=>!p.isAI);
+  const totalHumans=humanPlayers.length;
+
+  // 50% threshold: majority = strictly more than half
+  // >50% voted on AI → humans win | <50% → AI wins | exactly 50% → draw
+  const ratio=totalHumans>0?votesOnAI/totalHumans:0;
+  const humanWon=ratio>0.5;   // strictly more than half caught AI
+  const draw=ratio===0.5;      // exactly half → nobody wins
+  const aiWon=ratio<0.5;       // less than half caught AI → AI wins
+
+  // most-voted for result display
+  let maxV=0,mostVoted=null;
+  Object.entries(counts).forEach(([pid,c])=>{if(c>maxV){maxV=c;mostVoted=pid;}});
+
   const newScores={...(room.scores||{})};
-  if(humanWon)Object.entries(votes).forEach(([pid,v])=>{if(v.target===aiId&&players[pid]&&!players[pid].isAI)newScores[pid]=(newScores[pid]||0)+1;});
-  else if(aiId)newScores[aiId]=(newScores[aiId]||0)+1;
-  // Check if any human reached winTarget
+  humanPlayers.forEach(([pid])=>{
+    const v=votes[pid];
+    if(!v||v.target==='__skip__')return; // skipped → no change
+    if(v.target===aiId){
+      // Voted correctly on AI
+      newScores[pid]=(newScores[pid]||0)+1;
+    } else {
+      // Voted wrong (on a human) — penalty -1, floor at 0
+      newScores[pid]=Math.max(0,(newScores[pid]||0)-1);
+    }
+  });
+
+  // AI earns a point only if it fooled >50% (strict majority)
+  if(aiWon&&!draw&&aiId){
+    newScores[aiId]=(newScores[aiId]||0)+1;
+  }
+
+  // Check if any human reached winTarget (scores can't drop below 0 so no negative winner)
   const winTarget=room.winTarget||WIN_TARGET_DEFAULT;
-  const winnerEntry=Object.entries(newScores).find(([pid,sc])=>sc>=winTarget&&players[pid]&&!players[pid].isAI);
+  const winnerEntry=Object.entries(newScores).find(([pid,sc])=>
+    sc>=winTarget&&players[pid]&&!players[pid].isAI
+  );
   const gameWinner=winnerEntry?winnerEntry[0]:null;
   const nextPhase=gameWinner?'winner':'result';
-  await update(ref(db,`rooms/${S.roomId}`),{phase:nextPhase,humanWon,mostVotedId:mostVoted,voteCounts:counts,scores:newScores,gameWinner});
+
+  // Y-FIX: save this round to history
+  const historyEntry={
+    round:room.round||1,
+    topic:room.topic||'',
+    aiName:(players[aiId]||{}).name||'?',
+    aiAvatar:(players[aiId]||{}).avatar||'🤖',
+    humanWon,draw,
+    ts:nowTs()
+  };
+  await push(ref(db,`rooms/${S.roomId}/history`),historyEntry);
+
+  await update(ref(db,`rooms/${S.roomId}`),{
+    phase:nextPhase,humanWon,draw,mostVotedId:mostVoted,
+    voteCounts:counts,scores:newScores,gameWinner,votesOnAI,totalHumans
+  });
 }
 
 /* ══════════ RESULT ══════════ */
 async function enterResult(room){
-  clearTimers();showScreen('result-screen');sndReveal();stopGameAmbient();
+  clearTimers();showScreen('result-screen');stopGameAmbient();
   const isAr=S.lang==='ar';
   const[pS,rS,cS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`)),get(ref(db,`rooms/${S.roomId}/chat`))]);
   const players=pS.val()||{},roomData=rS.val()||room;
   const aiId=roomData.aiPlayerId,aiData=players[aiId]||{name:'???',avatar:'🤖'};
+
+  // O-FIX: Stage 1 — hide details, prepare reveal
+  const detailEls=['analysis-box','vote-bars','vote-breakdown','scores-table','.result-actions'];
+  document.querySelector('.analysis-box').style.opacity='0';
+  document.getElementById('vote-bars').style.opacity='0';
+  document.getElementById('vote-breakdown').style.opacity='0';
+  document.querySelector('.scores-table').style.opacity='0';
+  document.querySelector('.result-actions').style.opacity='0';
+  document.getElementById('res-name').style.opacity='0';
+  document.getElementById('res-outcome').style.opacity='0';
   document.getElementById('res-badge').textContent=isAr?'المتسلل الذكي':'AI IMPOSTOR';
-  document.getElementById('res-name').textContent=`${aiData.avatar} ${aiData.name}`;
-  const outEl=document.getElementById('res-outcome');
-  if(roomData.humanWon){outEl.textContent=isAr?'🎉 البشر اكتشفوا الذكاء الاصطناعي!':'🎉 Humans caught the AI!';outEl.className='result-outcome win';}
-  else{outEl.textContent=isAr?'🤖 الذكاء الاصطناعي نجح في الخداع!':'🤖 The AI fooled everyone!';outEl.className='result-outcome lose';}
-  const allMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg'):[];
-  const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
-  // Show persona reveal in analysis
-  const personaKey=roomData.aiPersona;
-  const persona=personaKey?(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey]:null;
-  const personaHTML=persona
-    ?`<div class="analysis-item"><div class="analysis-icon">🎭</div><div class="analysis-text">${isAr?'شخصية الجولة:':'Round personality:'} <strong style="color:var(--cyan)">${persona.label}</strong></div></div>`
-    :'';
-  document.getElementById('analysis-title').textContent=isAr?'تحليل المتسلل':'Impostor Analysis';
-  document.getElementById('analysis-content').innerHTML=personaHTML+(aiMsgs.length
-    ?aiMsgs.map(m=>`<div class="analysis-item"><div class="analysis-icon">💬</div><div class="analysis-text">"${esc(m.text)}"</div></div>`).join('')
-    :`<div class="analysis-text">${isAr?'لم يرسل الذكاء الاصطناعي أي رسائل':'The AI sent no messages'}</div>`);
-  const counts=roomData.voteCounts||{},totalV=Math.max(Object.values(counts).reduce((a,b)=>a+b,0),1);
-  document.getElementById('vote-bars').innerHTML=Object.entries(players).map(([pid,p])=>{const c=counts[pid]||0,pct=Math.round((c/totalV)*100),color=pid===aiId?'var(--red)':'var(--violet)';return`<div class="vote-bar-item"><div class="vote-bar-name">${p.avatar} ${esc(p.name)}${pid===aiId?' 🤖':''}</div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${color}"></div></div><div class="vote-bar-count">${c}</div></div>`;}).join('');
-  document.getElementById('th-p').textContent=isAr?'اللاعب':'Player';
-  document.getElementById('th-s').textContent=isAr?'النقاط':'Score';
-  document.getElementById('th-r').textContent=isAr?'هذه الجولة':'This Round';
-  const winTarget=roomData.winTarget||WIN_TARGET_DEFAULT;
-  document.getElementById('scores-body').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0)).map(([pid,p])=>{
-    const score=roomData.scores?.[pid]||0,prev=S.prevScores?.[pid]||0,delta=score-prev;
-    return`<tr><td>${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</td><td style="font-family:'Share Tech Mono',monospace;font-weight:700">${score}<span style="color:var(--text3);font-size:10px;margin-right:4px">/${winTarget}</span></td><td class="score-delta">${delta>0?'+'+delta:delta===0?'—':delta}</td></tr>`;
-  }).join('');
-  // Only show next round if no winner yet
-  const nb=document.getElementById('next-round-btn');
-  if(!roomData.gameWinner){nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';}
-  else{nb.style.display='none';}
+
+  // O-FIX: Stage 2 — after 400ms, play reveal sound + flash + glitch name
+  setTimeout(()=>{
+    sndReveal();
+    // Flash the screen red
+    document.getElementById('result-screen').classList.add('res-reveal-flash');
+    setTimeout(()=>document.getElementById('result-screen').classList.remove('res-reveal-flash'),700);
+    // Glitch the AI name in
+    const nameEl=document.getElementById('res-name');
+    nameEl.textContent=`${aiData.avatar} ${aiData.name}`;
+    nameEl.style.opacity='1';
+    nameEl.classList.add('res-name-glitch');
+  },400);
+
+  // O-FIX: Stage 3 — after 1.3s, reveal outcome
+  setTimeout(()=>{
+    const outEl=document.getElementById('res-outcome');
+    if(roomData.draw){
+      outEl.textContent=isAr?'🤝 تعادل — لا أحد يكسب هذه الجولة!':'🤝 Draw — nobody wins this round!';
+      outEl.className='result-outcome res-detail-reveal';outEl.style.color='var(--warn)';
+    } else if(roomData.humanWon){
+      outEl.textContent=isAr?'🎉 البشر اكتشفوا الذكاء الاصطناعي!':'🎉 Humans caught the AI!';
+      outEl.className='result-outcome win res-detail-reveal';outEl.style.color='';
+      // L-FIX: confetti on win
+      setTimeout(playConfetti,200);
+    } else {
+      outEl.textContent=isAr?'🤖 الذكاء الاصطناعي نجح في الخداع!':'🤖 The AI fooled everyone!';
+      outEl.className='result-outcome lose res-detail-reveal';outEl.style.color='';
+      // L-FIX: shake on loss
+      setTimeout(playShake,200);
+    }
+    outEl.style.opacity='1';
+  },1300);
+
+  // O-FIX: Stage 4 — after 2s, reveal all details
+  setTimeout(()=>{
+    const allMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg'):[];
+    const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
+    const personaKey=roomData.aiPersona;
+    const persona=personaKey?(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey]:null;
+    const personaHTML=persona
+      ?`<div class="analysis-item"><div class="analysis-icon">🎭</div><div class="analysis-text">${isAr?'شخصية الجولة:':'Round personality:'} <strong style="color:var(--cyan)">${persona.label}</strong></div></div>`
+      :'';
+    document.getElementById('analysis-title').textContent=isAr?'تحليل المتسلل':'Impostor Analysis';
+    document.getElementById('analysis-content').innerHTML=personaHTML+(aiMsgs.length
+      ?aiMsgs.map(m=>`<div class="analysis-item"><div class="analysis-icon">💬</div><div class="analysis-text">"${esc(m.text)}"</div></div>`).join('')
+      :`<div class="analysis-text">${isAr?'لم يرسل الذكاء الاصطناعي أي رسائل':'The AI sent no messages'}</div>`);
+    const counts=roomData.voteCounts||{},totalV=Math.max(Object.values(counts).reduce((a,b)=>a+b,0),1);
+    document.getElementById('vote-bars').innerHTML=Object.entries(players).map(([pid,p])=>{const c=counts[pid]||0,pct=Math.round((c/totalV)*100),color=pid===aiId?'var(--red)':'var(--violet)';return`<div class="vote-bar-item"><div class="vote-bar-name">${p.avatar} ${esc(p.name)}${pid===aiId?' 🤖':''}</div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${color}"></div></div><div class="vote-bar-count">${c}</div></div>`;}).join('');
+    const voteOnAI=roomData.votesOnAI||0;
+    const totH=roomData.totalHumans||1;
+    const pct=Math.round((voteOnAI/totH)*100);
+    const breakdownEl=document.getElementById('vote-breakdown');
+    if(breakdownEl){
+      if(roomData.draw){breakdownEl.textContent=isAr?`تعادل — ${voteOnAI}/${totH} صوتوا على الذكاء الاصطناعي (${pct}%) — لا أحد يكسب`:`Draw — ${voteOnAI}/${totH} voted on AI (${pct}%) — nobody wins`;breakdownEl.style.color='var(--warn)';}
+      else if(roomData.humanWon){breakdownEl.textContent=isAr?`${voteOnAI}/${totH} اكتشفوا الذكاء الاصطناعي (${pct}%) — من صوّت صح +1 ✅ | من أخطأ -1 ❌`:`${voteOnAI}/${totH} caught the AI (${pct}%) — correct vote +1 ✅ | wrong vote -1 ❌`;breakdownEl.style.color='var(--success)';}
+      else{breakdownEl.textContent=isAr?`${voteOnAI}/${totH} فقط صوتوا على الذكاء الاصطناعي (${pct}%) — الذكاء يكسب نقطة | من أخطأ -1 ❌`:`Only ${voteOnAI}/${totH} voted on AI (${pct}%) — AI wins a point | wrong votes -1 ❌`;breakdownEl.style.color='var(--red)';}
+    }
+    document.getElementById('th-p').textContent=isAr?'اللاعب':'Player';
+    document.getElementById('th-s').textContent=isAr?'النقاط':'Score';
+    document.getElementById('th-r').textContent=isAr?'هذه الجولة':'This Round';
+    const winTarget=roomData.winTarget||WIN_TARGET_DEFAULT;
+    document.getElementById('scores-body').innerHTML=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(roomData.scores?.[b[0]]||0)-(roomData.scores?.[a[0]]||0)).map(([pid,p])=>{
+      const score=roomData.scores?.[pid]||0,prev=S.prevScores?.[pid]||0,delta=score-prev;
+      const isMe=pid===S.playerId;
+      const roundName=esc(p.name);
+      const realN=p.realName?esc(p.realName):'';
+      const nameCell=realN&&realN!==p.name
+        ?`${p.avatar} ${roundName} <span style="color:var(--text3);font-size:11px;font-family:'Share Tech Mono',monospace;">(${realN})</span>${isMe?(isAr?' · أنت':' · You'):''}`
+        :`${p.avatar} ${roundName}${isMe?(isAr?' (أنت)':' (You)'):''}`; 
+      const deltaColor=delta>0?'var(--success)':delta<0?'var(--red)':'var(--text3)';
+      const deltaText=delta>0?`+${delta}`:delta<0?`${delta}`:'—';
+      return`<tr><td>${nameCell}</td><td style="font-family:'Share Tech Mono',monospace;font-weight:700">${score}<span style="color:var(--text3);font-size:10px;margin-right:4px">/${winTarget}</span></td><td style="font-family:'Share Tech Mono',monospace;color:${deltaColor};font-weight:700">${deltaText}</td></tr>`;
+    }).join('');
+    // Fade in all detail sections
+    ['analysis-box','vote-bars','vote-breakdown','scores-table'].forEach((sel,i)=>{
+      const el=sel.startsWith('.')?document.querySelector(sel):document.getElementById(sel);
+      if(el){setTimeout(()=>{el.style.transition='opacity .4s ease';el.style.opacity='1';},i*120);}
+    });
+    document.querySelector('.result-actions').style.transition='opacity .4s ease';
+    setTimeout(()=>{document.querySelector('.result-actions').style.opacity='1';},500);
+    // Only show next round if no winner yet
+    const nb=document.getElementById('next-round-btn');
+    if(!roomData.gameWinner){nb.style.display=S.isHost?'block':'none';nb.textContent=isAr?'الجولة التالية ▶':'Next Round ▶';}
+    else{nb.style.display='none';}
+
+    // Y-FIX: render round history if more than 1 round played
+    const hSnap=await get(ref(db,`rooms/${S.roomId}/history`));
+    const history=hSnap.val()?Object.values(hSnap.val()).sort((a,b)=>a.round-b.round):[];
+    const rhEl=document.getElementById('round-history');
+    const rhList=document.getElementById('rh-list');
+    if(history.length>1&&rhEl&&rhList){
+      document.getElementById('rh-title').textContent=isAr?'سجل الجولات':'Round History';
+      rhList.innerHTML=history.map(h=>{
+        const resultClass=h.draw?'draw':h.humanWon?'win':'lose';
+        const resultText=h.draw?(isAr?'تعادل':'Draw'):h.humanWon?(isAr?'بشر ✅':'Humans ✅'):(isAr?'ذكاء 🤖':'AI 🤖');
+        return`<div class="round-history-item">
+          <div class="rh-num">R${h.round}</div>
+          <div class="rh-topic">${esc(h.topic)}</div>
+          <div class="rh-ai">${h.aiAvatar} ${esc(h.aiName)}</div>
+          <div class="rh-result ${resultClass}">${resultText}</div>
+        </div>`;
+      }).join('');
+      rhEl.style.display='block';
+      setTimeout(()=>{rhEl.style.transition='opacity .4s ease';rhEl.style.opacity='1';},600);
+    }
+  },2000);
 }
 
 /* ══════════ WINNER SCREEN ══════════ */
@@ -1216,6 +1702,7 @@ async function enterWinner(room){
     :`Reached ${room.winTarget||WIN_TARGET_DEFAULT} points first!`;
   const rankSymbols=['🥇','🥈','🥉'];
   const sorted=Object.entries(players).filter(([,p])=>!p.isAI).sort((a,b)=>(scores[b[0]]||0)-(scores[a[0]]||0));
+  document.getElementById('winner-name').textContent=`${winnerData.avatar} ${winnerData.realName||winnerData.name}`;
   document.getElementById('winner-scores-list').innerHTML=sorted.map(([pid,p],i)=>`
     <div class="ws-rank-row">
       <span style="font-size:22px;width:32px;">${rankSymbols[i]||'  '}</span>
@@ -1248,6 +1735,8 @@ window.nextRound=async function(){
     }
     await remove(ref(db,`rooms/${S.roomId}/chat`));
     await remove(ref(db,`rooms/${S.roomId}/votes`));
+    await remove(ref(db,`rooms/${S.roomId}/ready`));
+    await remove(ref(db,`rooms/${S.roomId}/tallying`));
     await update(ref(db,`rooms/${S.roomId}`),{
       phase:'rename',topic:'',aiPlayerId:null,mostVotedId:null,
       humanWon:null,voteCounts:null,chatStartTime:null,voteStartTime:null,
@@ -1261,47 +1750,96 @@ function resetRound(){
   if(S._aiSched)clearTimeout(S._aiSched);
   if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
-  S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;S._lastTurnId=null;
+  S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;S._lastTurnId=null;S.players={};
 }
-/* ══════════ RENAME PHASE — Auto name reveal ══════════ */
+/* ══════════ RENAME PHASE — Name reveal + ready system ══════════ */
 function enterRename(){
   showScreen('rename-screen');
   const isAr=S.lang==='ar';
-  // Read player's already-assigned name from Firebase
+  // Always read from Firebase — source of truth for round name
   get(ref(db,`rooms/${S.roomId}/players/${S.playerId}`)).then(snap=>{
     const p=snap.val()||{};
     S.playerName=p.name||S.playerName;
     document.getElementById('rename-avatar').textContent=p.avatar||'🦊';
     document.getElementById('rename-name-display').textContent=p.name||'---';
   });
-  document.getElementById('rename-round-label').textContent=isAr?`الجولة القادمة`:`Next Round`;
+  document.getElementById('rename-round-label').textContent=isAr?'الجولة القادمة':'Next Round';
   document.getElementById('rename-label-text').textContent=isAr?'اسمك في هذه الجولة':'Your name this round';
-  document.getElementById('rename-hint').textContent=isAr?'تذكر هذا الاسم — هو هويتك الوحيدة':'Remember this name — it is your only identity';
-  document.getElementById('rename-ai-hint').textContent=isAr?'الذكاء الاصطناعي يأخذ اسماً مختلفاً أيضاً — لا أحد يعرف من هو':'The AI also gets a different name — no one knows who it is';
-  document.getElementById('rename-wait-text').textContent=isAr?'في انتظار اللاعبين الآخرين...':'Waiting for other players...';
-  // Play reveal sound
+  document.getElementById('rename-hint').textContent=isAr?'احفظ هذا الاسم جيداً — هو هويتك الوحيدة خلال الجولة':'Remember this name well — it is your only identity this round';
+  document.getElementById('rename-ai-hint').textContent=isAr?'الذكاء الاصطناعي أيضاً يأخذ اسماً وهمياً — لا أحد يعرف من هو حتى تنتهي الجولة':'The AI also gets a fake name — no one knows who it is until the round ends';
+  document.getElementById('rename-wait-text').textContent=isAr?'في انتظار تأكيد بقية اللاعبين...':'Waiting for others to confirm...';
   sndSuccess();
-  // Host area — show start button
   const hostArea=document.getElementById('rename-host-area');
   if(hostArea)hostArea.innerHTML='';
-  if(S.isHost){
-    const btn=document.createElement('button');
-    btn.className='btn btn-violet';btn.style.cssText='max-width:400px;width:100%;margin-top:4px;';
-    btn.textContent=isAr?'ابدأ الجولة ▶':'Start Round ▶';
-    btn.onclick=async()=>{
-      btn.disabled=true;
-      await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
-    };
-    if(hostArea)hostArea.appendChild(btn);
-  }
+  // Ready button for this player
+  const readyBtn=document.createElement('button');
+  readyBtn.id='rename-ready-btn';
+  readyBtn.className='btn btn-primary';
+  readyBtn.style.cssText='max-width:400px;width:100%;margin-top:16px;';
+  readyBtn.textContent=isAr?'✅ حفظت اسمي — جاهز':'✅ I got my name — Ready';
+  readyBtn.onclick=async()=>{
+    readyBtn.disabled=true;
+    readyBtn.textContent=isAr?'✅ في انتظار الآخرين...':'✅ Waiting for others...';
+    await set(ref(db,`rooms/${S.roomId}/ready/${S.playerId}`),{ts:nowTs()});
+  };
+  if(hostArea)hostArea.appendChild(readyBtn);
+  // Listen to ready count — show host start button when all ready
+  const readyRef=ref(db,`rooms/${S.roomId}/ready`);
+  const readyU=onValue(readyRef,async snap=>{
+    const ready=snap.val()||{};
+    const readyCount=Object.keys(ready).length;
+    // Get total human count
+    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+    const totalH=Object.values(pSnap.val()||{}).filter(p=>!p.isAI).length;
+    document.getElementById('rename-wait-text').textContent=isAr
+      ?`${readyCount} من ${totalH} جاهز...`
+      :`${readyCount} of ${totalH} ready...`;
+    // Host: show start when all ready
+    if(S.isHost){
+      const existing=document.getElementById('host-start-rename-btn');
+      if(existing)existing.remove();
+      if(readyCount>=totalH){
+        const startBtn=document.createElement('button');
+        startBtn.id='host-start-rename-btn';
+        startBtn.className='btn btn-violet';
+        startBtn.style.cssText='max-width:400px;width:100%;margin-top:10px;';
+        startBtn.textContent=isAr?`ابدأ الجولة — الكل جاهز ▶`:`Start Round — All Ready ▶`;
+        startBtn.onclick=async()=>{
+          startBtn.disabled=true;
+          await remove(ref(db,`rooms/${S.roomId}/ready`));
+          await update(ref(db,`rooms/${S.roomId}`),{phase:'waiting'});
+        };
+        if(hostArea)hostArea.appendChild(startBtn);
+      }
+    }
+  });
+  S._listeners.push(()=>off(readyRef,'value',readyU));
 }
 window.leaveRoom=async function(){
   clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
   if(S._aiSched)clearTimeout(S._aiSched);
   if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
-  try{if(S.roomId&&S.playerId){await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));if(S.isHost)await remove(ref(db,`rooms/${S.roomId}`));}}catch(e){}
-  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null});
+  try{
+    if(S.roomId&&S.playerId){
+      // A-FIX: Host migration — if host leaves, transfer host to next player
+      if(S.isHost){
+        const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+        const players=pSnap.val()||{};
+        const others=Object.entries(players).filter(([id,p])=>id!==S.playerId&&!p.isAI);
+        if(others.length>0){
+          // Transfer host to first remaining human player
+          const [newHostId]=others[0];
+          await update(ref(db,`rooms/${S.roomId}`),{host:newHostId});
+        } else {
+          // No one left — delete the room
+          await remove(ref(db,`rooms/${S.roomId}`));
+        }
+      }
+      await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));
+    }
+  }catch(e){}
+  Object.assign(S,{roomId:null,playerId:null,playerName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},players:{},_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null});
   _lastKeys.clear();showScreen('home-screen');
 };
 /* INPUT EVENTS */
@@ -1319,8 +1857,12 @@ document.getElementById('chat-input').addEventListener('input',function(){
 /* CURSOR */
 const _cur=document.getElementById('cursor'),_ring=document.getElementById('cursor-ring');
 let _mx=0,_my=0,_rx=0,_ry=0;
-document.addEventListener('mousemove',e=>{_mx=e.clientX;_my=e.clientY;_cur.style.left=_mx+'px';_cur.style.top=_my+'px';});
-(function animRing(){_rx+=(_mx-_rx)*.12;_ry+=(_my-_ry)*.12;_ring.style.left=_rx+'px';_ring.style.top=_ry+'px';requestAnimationFrame(animRing);})();
+// T-FIX: skip cursor entirely on touch-only devices (mobile) — RAF was running even though cursor was CSS-hidden
+const _isTouch=!window.matchMedia('(pointer:fine)').matches;
+if(!_isTouch){
+  document.addEventListener('mousemove',e=>{_mx=e.clientX;_my=e.clientY;_cur.style.left=_mx+'px';_cur.style.top=_my+'px';});
+  (function animRing(){_rx+=(_mx-_rx)*.12;_ry+=(_my-_ry)*.12;_ring.style.left=_rx+'px';_ring.style.top=_ry+'px';requestAnimationFrame(animRing);})();
+}
 /* CANVAS PARTICLES */
 const _cv=document.getElementById('bg-canvas'),_ct=_cv.getContext('2d');
 let _W,_H,_pts=[];
@@ -1330,13 +1872,11 @@ class _Pt{constructor(){this._r();}
   _r(){this.x=Math.random()*_W;this.y=Math.random()*_H;this.vx=(Math.random()-.5)*.25;this.vy=(Math.random()-.5)*.25;this.s=Math.random()*1.4+.4;this.a=Math.random()*.35+.08;this.c=Math.random()>.7?'255,32,32':Math.random()>.5?'124,58,237':'0,229,255';}
   update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>_W||this.y<0||this.y>_H)this._r();}
   draw(){_ct.beginPath();_ct.arc(this.x,this.y,this.s,0,Math.PI*2);_ct.fillStyle=`rgba(${this.c},${this.a})`;_ct.fill();}}
-for(let i=0;i<100;i++)_pts.push(new _Pt());
+// H-FIX: 50 particles (was 100), removed O(n²) line drawing (was 4950 comparisons/frame)
+for(let i=0;i<50;i++)_pts.push(new _Pt());
 function _anim(){
   _ct.clearRect(0,0,_W,_H);
   _pts.forEach(p=>{p.update();p.draw();});
-  for(let i=0;i<_pts.length;i++)for(let j=i+1;j<_pts.length;j++){
-    const dx=_pts[i].x-_pts[j].x,dy=_pts[i].y-_pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
-    if(d<110){_ct.beginPath();_ct.moveTo(_pts[i].x,_pts[i].y);_ct.lineTo(_pts[j].x,_pts[j].y);_ct.strokeStyle=`rgba(30,37,53,${(1-d/110)*.5})`;_ct.lineWidth=.5;_ct.stroke();}}
   requestAnimationFrame(_anim);}
 _anim();
 /* AMBIENT SOUND */
