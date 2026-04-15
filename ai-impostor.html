@@ -529,13 +529,13 @@ const PERSONAS_AR={
   ally:{label:'متحالف ومتعاطف',desc:'يبني تحالفات ويعزز كلام من يتفق معه',style:'"أنا كمان لاحظت" "صح والله"',gameplay:'يوجه الاتهام نحو شخص مستتراً بالإجماع'}
 };
 const PERSONAS_EN={
-  shy:{label:'Shy & Hesitant',desc:'Speaks little avoids strong opinions',style:'Short incomplete sentences starts with "idk"',gameplay:'Focuses on topic and doesn't stand out — hard to catch'},
+  shy:{label:'Shy & Hesitant',desc:'Speaks little avoids strong opinions',style:'Short incomplete sentences starts with "idk"',gameplay:'Focuses on topic and doesn\'t stand out — hard to catch'},
   sarcastic:{label:'Sarcastic & Casual',desc:'Light sarcastic comments slightly dismissive',style:'"sure lol" or "obviously right"',gameplay:'Questions everyone to deflect suspicion from self'},
-  confident:{label:'Confident & Direct',desc:'States opinions clearly tries to lead',style:'Direct sentences "clearly" or "that's obvious"',gameplay:'Accuses quickly to seem helpful may target wrong person'},
-  distracted:{label:'Distracted & Brief',desc:'Very short replies sometimes off-topic',style:'2-3 words sometimes incomplete',gameplay:'Seems uninterested doesn't raise suspicion early'},
+  confident:{label:'Confident & Direct',desc:'States opinions clearly tries to lead',style:'Direct sentences "clearly" or "that\'s obvious"',gameplay:'Accuses quickly to seem helpful may target wrong person'},
+  distracted:{label:'Distracted & Brief',desc:'Very short replies sometimes off-topic',style:'2-3 words sometimes incomplete',gameplay:'Seems uninterested doesn\'t raise suspicion early'},
   curious:{label:'Curious & Inquisitive',desc:'Asks questions interested in details',style:'"wait what?" or "how exactly?"',gameplay:'Tests others with questions that seem innocent'},
   emotional:{label:'Emotional & Expressive',desc:'Reacts strongly ties topic to self',style:'"that hit" "fr though"',gameplay:'Makes being suspected feel like a personal attack'},
-  skeptic:{label:'Skeptical & Critical',desc:'Questions everything hard to convince',style:'"I don't buy that" "doesn't add up"',gameplay:'Spreads suspicion equally makes targeting hard'},
+  skeptic:{label:'Skeptical & Critical',desc:'Questions everything hard to convince',style:'"I don\'t buy that" "doesn\'t add up"',gameplay:'Spreads suspicion equally makes targeting hard'},
   passive:{label:'Quiet & Neutral',desc:'Agrees with majority avoids conflict',style:'"yeah" "maybe" "no strong opinion"',gameplay:'Agreeing with everyone is suspicious on closer look'},
   investigator:{label:'Eager Detective',desc:'Analyzes replies openly asks probing questions',style:'"why no personal story?" "all your replies are short"',gameplay:'Seems to help catch AI while deflecting from self'},
   ally:{label:'Alliance Builder',desc:'Builds coalitions reinforces agreeing players',style:'"I noticed that too" "exactly"',gameplay:'Directs accusation via consensus to stay hidden'}
@@ -1496,7 +1496,7 @@ One sentence only, ≤50 chars.`;
         distracted:['yeah','ok','sure'],
         curious:  ['wait what?','how exactly?','can you explain?'],
         emotional:['that hit','fr though','same feeling'],
-        skeptic:  ['not sure about that','really?','doesn't add up'],
+        skeptic:  ['not sure about that','really?','doesn\'t add up'],
         passive:  ['yeah','maybe','no strong opinion'],
         investigator:['why so vague?','short replies again','noticed something off'],
         ally:     ['I noticed too','exactly','agree with that']
@@ -1515,8 +1515,8 @@ One sentence only, ≤50 chars.`;
     const maxWait=msgLen<=12?14000:msgLen<=30?10000:6000;
     const totalTypingMs=minWait+Math.random()*(maxWait-minWait);
     // Time already spent (Groq fetch took some time) — wait the remainder
-    const elapsed=Date.now()-_aiTurnStart;
-    const remaining=Math.max(500,totalTypingMs-elapsed);
+    const elapsedTyping=Date.now()-_aiTurnStart;
+    const remaining=Math.max(500,totalTypingMs-elapsedTyping);
     await new Promise(r=>setTimeout(r,remaining));
     if(S.phase!=='chat'){
       removeTyping();
@@ -2099,35 +2099,6 @@ window.playAgainSameRoom=async function(){
     if(btn){btn.disabled=false;btn.textContent=S.lang==='ar'?'🔄 العب مجدداً (نفس الغرفة)':'🔄 Play Again (Same Room)';}
     toast('خطأ: '+e.message);
   }
-};
-  clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
-  if(S._chatRef){off(S._chatRef);S._chatRef=null;}
-  if(S._aiSched)clearTimeout(S._aiSched);
-  if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
-  try{
-    if(S.roomId&&S.playerId){
-      // Clean typing entry
-      clearTimeout(_typingTimer);
-      remove(ref(db,`rooms/${S.roomId}/typing/${S.playerId}`)).catch(()=>{});
-      // A-FIX: Host migration — if host leaves, transfer host to next player
-      if(S.isHost){
-        const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
-        const players=pSnap.val()||{};
-        const others=Object.entries(players).filter(([id,p])=>id!==S.playerId&&!p.isAI);
-        if(others.length>0){
-          // Transfer host to first remaining human player
-          const [newHostId]=others[0];
-          await update(ref(db,`rooms/${S.roomId}`),{host:newHostId});
-        } else {
-          // No one left — delete the room
-          await remove(ref(db,`rooms/${S.roomId}`));
-        }
-      }
-      await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`));
-    }
-  }catch(e){}
-  Object.assign(S,{roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},players:{},winTarget:WIN_TARGET_DEFAULT,_listeners:[],_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null});
-  _lastKeys.clear();showScreen('home-screen');
 };
 /* INPUT EVENTS */
 document.getElementById('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
