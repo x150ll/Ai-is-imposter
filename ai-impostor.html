@@ -103,20 +103,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .msg-sender{font-size:11px;font-weight:700;margin-bottom:3px;opacity:.65;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .msg-time{font-size:10px;opacity:.4;margin-top:3px;font-family:'Share Tech Mono',monospace;}
 .msg.mine .msg-time{text-align:right;}
-/* W-FIX: Emoji reactions */
-.msg-wrap{position:relative;display:flex;flex-direction:column;max-width:78%;}
-.msg-wrap.mine{align-self:flex-end;}
-.msg-wrap.other{align-self:flex-start;}
-.msg-wrap .msg{max-width:100%;align-self:unset;}
-.reaction-bar{display:none;position:absolute;bottom:calc(100% + 4px);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 8px;gap:4px;z-index:10;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);}
-.msg-wrap:hover .reaction-bar{display:flex;}
-.reaction-bar button{background:none;border:none;font-size:18px;cursor:pointer;padding:2px 4px;border-radius:8px;transition:transform .15s;}
-.reaction-bar button:hover{transform:scale(1.3);}
-.msg-reactions{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
-.reaction-pill{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .15s;}
-.reaction-pill:hover{border-color:var(--violet);}
-.reaction-pill.mine-react{border-color:var(--violet);background:rgba(124,58,237,.12);}
-.reaction-count{font-size:11px;font-family:'Share Tech Mono',monospace;color:var(--text2);}
 .notif-msg{align-self:center;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:20px;padding:6px 16px;font-size:12px;color:var(--text2);font-style:italic;max-width:90%;text-align:center;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
 .typing-ind{align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:3px;padding:11px 16px;display:flex;align-items:center;gap:5px;}
 .typing-dot{width:6px;height:6px;background:var(--text2);border-radius:50%;animation:td 1.2s infinite;}
@@ -407,7 +393,6 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
     <div style="background:rgba(255,32,32,.04);border:1px solid rgba(255,32,32,.1);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--text3);line-height:1.7;font-family:'Share Tech Mono',monospace;">
       🤖 <span id="rename-ai-hint">الذكاء الاصطناعي يأخذ اسماً مختلفاً أيضاً — لا أحد يعرف من هو</span>
     </div>
-    <button class="btn btn-primary" id="rename-ready-btn" onclick="markReady()" style="margin-bottom:14px;">✓ حفظت اسمي — جاهز</button>
     <div id="rename-waiting-msg" style="font-size:13px;color:var(--text2);display:none;flex-direction:column;align-items:center;gap:8px;">
       <div style="display:flex;align-items:center;gap:8px;"><span class="pulse-dot"></span><span id="rename-wait-text">في انتظار بقية اللاعبين...</span></div>
       <div id="rename-ready-count" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:1px;"></div>
@@ -442,7 +427,18 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
   </div>
   <div class="result-actions">
     <button class="btn btn-violet" id="next-round-btn" onclick="nextRound()" style="display:none">الجولة التالية ▶</button>
+    <button class="btn btn-ghost" id="chat-history-btn" onclick="toggleChatHistory()" style="display:none">📜 سجل المحادثة</button>
     <button class="btn btn-ghost" onclick="leaveRoom()">مغادرة</button>
+  </div>
+  <!-- Chat history modal -->
+  <div id="chat-history-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(3,4,7,.92);backdrop-filter:blur(6px);overflow-y:auto;padding:24px;">
+    <div style="max-width:560px;margin:0 auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--cyan);letter-spacing:2px;">📜 سجل المحادثة</div>
+        <button onclick="toggleChatHistory()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;">✕ إغلاق</button>
+      </div>
+      <div id="chat-history-content" style="display:flex;flex-direction:column;gap:9px;"></div>
+    </div>
   </div>
 </div>
 
@@ -457,7 +453,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
       <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;">الترتيب النهائي</div>
       <div id="winner-scores-list"></div>
     </div>
-    <button class="btn btn-primary" style="max-width:400px;" onclick="leaveRoom()">العب مجدداً</button>
+    <button class="btn btn-primary" style="max-width:400px;" id="play-again-btn" onclick="playAgainSameRoom()">🔄 العب مجدداً (نفس الغرفة)</button>
+    <button class="btn btn-ghost" style="max-width:400px;margin-top:8px;" id="go-home-btn" onclick="endGameAndLeave()">🏠 الشاشة الرئيسية</button>
   </div>
 </div>
 
@@ -518,22 +515,35 @@ const PLAYER_NAMES_EN=[
   'Bailey','Camden','Ellis','Flynn','Gray','Harper','Jules','Kendall','Lane','Scout'
 ];
 
+/* ── AI PERSONAS — 10 شخصيات ── */
 const PERSONAS_AR={
-  shy:{label:'خجول ومتردد',desc:'قليل الكلام، يتردد كثيراً، يبدأ جمله بـ "مو متأكد" أو "يعني"، يتجنب الآراء الحاسمة، يكتب بشكل ناقص أحياناً'},
-  sarcastic:{label:'ساخر وعفوي',desc:'يعلق بشكل ساخر وخفيف، يستخدم "خخخ" أو "والله ما أدري"، يقلل من الأمور، منفصل عاطفياً'},
-  confident:{label:'واثق ومسيطر',desc:'يبدي رأيه بثقة، يسأل أسئلة مباشرة لغيره، يحاول قيادة النقاش، لا يتردد'},
-  distracted:{label:'مشتت وسريع',desc:'يرد بجمل قصيرة جداً وكأنه مشغول، يغيّر الموضوع أحياناً، يكتب بسرعة وبأخطاء بسيطة'}
+  shy:{label:'خجول ومتردد',desc:'قليل الكلام يتردد يبدأ بـ"يعني"',style:'جمل قصيرة أو ناقصة أحياناً',gameplay:'يركز على الموضوع ولا يبرز — صعب الكشف'},
+  sarcastic:{label:'ساخر وعفوي',desc:'يعلق بسخرية خفيفة يقلل من الأمور',style:'"خخخ" أو "واضح يا صديق"',gameplay:'يشكك في الكل ليصرف الأنظار'},
+  confident:{label:'واثق ومسيطر',desc:'يبدي رأيه بثقة يقود النقاش',style:'"أنا شايف" أو "هذا واضح"',gameplay:'يتهم بسرعة ليبدو مساعداً قد يخطئ الهدف'},
+  distracted:{label:'مشتت وسريع',desc:'ردود قصيرة أحياناً خارج السياق',style:'كلمتان أو ثلاث لا يكمل الفكرة',gameplay:'يبدو غير مبالٍ لا يثير الشك في البداية'},
+  curious:{label:'فضولي ومتساءل',desc:'يطرح أسئلة مهتم بالتفاصيل',style:'"شلون يعني؟" أو "وش قصدك؟"',gameplay:'يختبر الآخرين بأسئلة تبدو بريئة'},
+  emotional:{label:'عاطفي ومتأثر',desc:'يتفاعل بقوة يربط الموضوع بنفسه',style:'"والله هذا حزني" "صدق والله"',gameplay:'يجعل الاتهام يبدو ظلماً شخصياً'},
+  skeptic:{label:'متشكك وناقد',desc:'يشكك في كل شيء لا يصدق بسهولة',style:'"ما أصدق هذا" "مو منطقي"',gameplay:'يثير الشك حول الجميع بالتساوي'},
+  passive:{label:'هادئ ومحايد',desc:'يوافق الأغلبية يتجنب الجدل',style:'"أه صح" "ممكن" "ما عندي رأي"',gameplay:'موافقته للكل تبدو مشبوهة عند التمحيص'},
+  investigator:{label:'محقق متحمس',desc:'يحلل الردود علناً ويطرح أسئلة ذكية',style:'"ليش ما ذكرت تجربة؟" "ردودك كلها قصيرة"',gameplay:'يبدو مساعداً بينما يحول الشبهة عن نفسه'},
+  ally:{label:'متحالف ومتعاطف',desc:'يبني تحالفات ويعزز كلام من يتفق معه',style:'"أنا كمان لاحظت" "صح والله"',gameplay:'يوجه الاتهام نحو شخص مستتراً بالإجماع'}
 };
 const PERSONAS_EN={
-  shy:{label:'Shy & Hesitant',desc:'Speaks little, often says "idk" or "not sure", avoids strong opinions, trails off mid-sentence'},
-  sarcastic:{label:'Sarcastic & Casual',desc:'Makes light jokes, uses "lol" or "honestly tho", slightly dismissive, emotionally detached'},
-  confident:{label:'Confident & Direct',desc:'States opinions clearly, asks others direct questions, tries to lead the conversation, never hesitates'},
-  distracted:{label:'Distracted & Brief',desc:'Very short replies like they are busy, changes subject sometimes, types fast with small mistakes'}
+  shy:{label:'Shy & Hesitant',desc:'Speaks little avoids strong opinions',style:'Short incomplete sentences starts with "idk"',gameplay:'Focuses on topic and doesn't stand out — hard to catch'},
+  sarcastic:{label:'Sarcastic & Casual',desc:'Light sarcastic comments slightly dismissive',style:'"sure lol" or "obviously right"',gameplay:'Questions everyone to deflect suspicion from self'},
+  confident:{label:'Confident & Direct',desc:'States opinions clearly tries to lead',style:'Direct sentences "clearly" or "that's obvious"',gameplay:'Accuses quickly to seem helpful may target wrong person'},
+  distracted:{label:'Distracted & Brief',desc:'Very short replies sometimes off-topic',style:'2-3 words sometimes incomplete',gameplay:'Seems uninterested doesn't raise suspicion early'},
+  curious:{label:'Curious & Inquisitive',desc:'Asks questions interested in details',style:'"wait what?" or "how exactly?"',gameplay:'Tests others with questions that seem innocent'},
+  emotional:{label:'Emotional & Expressive',desc:'Reacts strongly ties topic to self',style:'"that hit" "fr though"',gameplay:'Makes being suspected feel like a personal attack'},
+  skeptic:{label:'Skeptical & Critical',desc:'Questions everything hard to convince',style:'"I don't buy that" "doesn't add up"',gameplay:'Spreads suspicion equally makes targeting hard'},
+  passive:{label:'Quiet & Neutral',desc:'Agrees with majority avoids conflict',style:'"yeah" "maybe" "no strong opinion"',gameplay:'Agreeing with everyone is suspicious on closer look'},
+  investigator:{label:'Eager Detective',desc:'Analyzes replies openly asks probing questions',style:'"why no personal story?" "all your replies are short"',gameplay:'Seems to help catch AI while deflecting from self'},
+  ally:{label:'Alliance Builder',desc:'Builds coalitions reinforces agreeing players',style:'"I noticed that too" "exactly"',gameplay:'Directs accusation via consensus to stay hidden'}
 };
 const rndKey=obj=>Object.keys(obj)[Math.floor(Math.random()*Object.keys(obj).length)];
 const WIN_TARGET_DEFAULT=7;
 
-const S={roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,players:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null};
+const S={roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,players:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null,_lastChatMsgs:[],_lastAiId:null};
 const genCode=()=>Math.random().toString(36).substring(2,7).toUpperCase();
 const genId=()=>Math.random().toString(36).substring(2,12);
 const nowTs=()=>Date.now();
@@ -872,8 +882,22 @@ function enterWaiting(){
   if(S.isHost){document.getElementById('host-area').style.display='block';document.getElementById('guest-area').style.display='none';}
   else{document.getElementById('host-area').style.display='none';document.getElementById('guest-area').style.display='block';}
   // Rotating tips
-  const tips_ar=['💡 كل لاعب يرسل رسالة واحدة — 15 ثانية للرد','🤖 الذكاء الاصطناعي يأخذ شخصية مختلفة كل جولة','🔍 راقب طريقة الكتابة — الذكاء لا يكذب تماماً','🏆 أول من يصل للهدف يفوز باللعبة','🗳️ 30 ثانية للمراجعة ثم التصويت بعد الدردشة'];
-  const tips_en=['💡 Each player sends one message — 15 seconds to respond','🤖 The AI gets a new personality every round','🔍 Watch the writing style — the AI is never fully obvious','🏆 First to the target score wins the game','🗳️ 30s review then vote after the chat ends'];
+  const tips_ar=[
+    '💡 تحدث بالفصحى عن الموضوع المحدد — هذا هو قانون اللعبة',
+    '🤖 واحد منكم ذكاء اصطناعي — اكشفه من أسلوب كتابته',
+    '🔍 الذكاء يتحدث بالفصحى أيضاً — راقب الردود التي تبدو مصطنعة',
+    '🗳️ التصويت الخاطئ يُنقص نقطة — لا تخمّن عشوائياً',
+    '🏆 أول من يصل لهدف النقاط يفوز بالجلسة كلها',
+    '⚡ 15 ثانية لكل رد — كن مستعداً حين يأتي دورك'
+  ];
+  const tips_en=[
+    '💡 Talk about the given topic — that\'s the rule of the game',
+    '🤖 One of you is an AI — spot it from how it writes',
+    '🔍 The AI stays on topic too — watch for replies that feel unnatural',
+    '🗳️ Wrong vote costs -1 point — don\'t guess randomly',
+    '🏆 First to reach the target score wins the whole session',
+    '⚡ 15 seconds per turn — be ready when it\'s your turn'
+  ];
   let tipIdx=0;
   const tipEl=document.getElementById('waiting-tip');
   if(tipEl){
@@ -1021,15 +1045,17 @@ async function enterGame(room){
     ?`<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;margin-bottom:6px;">اسمك في هذه الجولة</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 16px rgba(0,229,255,.4);">${S.playerName}</div>`
     :`<div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:3px;margin-bottom:6px;">YOUR NAME THIS ROUND</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 16px rgba(0,229,255,.4);">${S.playerName}</div>`;
   chatArea.appendChild(nameNotif);
-  addNotif(isAr?`🎯 موضوع هذه الجولة: ${S.topic}`:`🎯 Topic: ${S.topic}`);
+  addNotif(isAr?`🎯 الموضوع: ${S.topic} — تحدث بالفصحى`:`🎯 Topic: ${S.topic} — stay on topic`);
   setTimeout(()=>{chatArea.scrollTop=chatArea.scrollHeight;},100);
-  addNotif(isAr?`🔄 كل لاعب يرسل رسالته في دوره — 15 ثانية لكل دور`:`🔄 Each player sends in their turn — 15 seconds each`);
+  addNotif(isAr?`🔄 كل لاعب يرسل رسالة في دوره — 15 ثانية`:`🔄 Each player sends in their turn — 15 seconds`);
   // Start chat ambient
   startGameAmbient('chat');
   // Chat listener
   if(S._chatRef)off(S._chatRef);
   S._chatRef=ref(db,`rooms/${S.roomId}/chat`);
   onValue(S._chatRef,snap=>renderChatDiff(snap.val()||{}));
+  // Typing listener — shows "..." for all players including AI
+  startTypingListener();
   // Game timer (3 min total)
   let left=180;const circ=document.getElementById('timer-circle'),txt=document.getElementById('timer-text');
   S._timerInt=setInterval(async()=>{
@@ -1062,11 +1088,10 @@ async function enterGame(room){
       S._lastTurnId=currentId;
       renderTurnBar(r,order,idx,currentId);
     }
-    // Host manages AI turn — random delay 7-14s to simulate human typing
+    // Host triggers AI turn immediately — aiTakeTurn manages its own typing timing
     if(currentId===S.aiId&&S.isHost&&!S._aiTyping){
       if(S._aiSched)clearTimeout(S._aiSched);
-      const delay=7000+Math.random()*7000;
-      S._aiSched=setTimeout(()=>aiTakeTurn(r),delay);
+      S._aiSched=setTimeout(()=>aiTakeTurn(r),500); // tiny delay just for Firebase to settle
     }
   });
   S._listeners.push(()=>off(turnRef,'value',turnU));
@@ -1087,7 +1112,7 @@ function renderTurnBar(room,order,idx,currentId){
     nameEl.className='turn-name turn-you';
     document.getElementById('chat-input').disabled=false;
     document.getElementById('send-btn').disabled=false;
-    document.getElementById('chat-input').placeholder=isAr?'اكتب رسالتك (50 حرفاً كحد أقصى)...':'Write your message (max 50 chars)...';
+    document.getElementById('chat-input').placeholder=isAr?`اكتب بالفصحى عن: ${S.topic} (50 حرفاً)`:`Write about: ${S.topic} (50 chars)`;
     sndYourTurn();
   } else {
     const name=currentPlayer?.name||'...';
@@ -1141,7 +1166,6 @@ async function advanceTurn(room){
 }
 
 /* ══════════ CHAT RENDER ══════════ */
-const REACTION_EMOJIS=['😂','👀','🤔','😮','🔥'];
 function renderChatDiff(msgs){
   const area=document.getElementById('chat-area');
   const sorted=Object.entries(msgs).sort((a,b)=>a[1].ts-b[1].ts);
@@ -1150,75 +1174,86 @@ function renderChatDiff(msgs){
   newOnes.forEach(([k,m])=>{
     _lastKeys.add(k);
     if(m.type==='notif'){addNotifEl(m.text);return;}
-    if(m.type==='reaction'){updateReactionPill(m);return;}
+    if(m.type==='reaction')return; // ignore legacy reaction entries
+    if(m.type==='typing')return;   // ignore typing broadcasts
     if(m.senderId===S.aiId)removeTyping();
+    // also remove human typing indicator for this sender
+    const existingTyping=document.getElementById(`typing-${m.senderId}`);
+    if(existingTyping)existingTyping.remove();
     const isMine=m.senderId===S.playerId;
     const t=new Date(m.ts),ts=`${t.getHours()}:${t.getMinutes().toString().padStart(2,'0')}`;
-    // W-FIX: wrap in msg-wrap for reaction bar
-    const wrap=document.createElement('div');
-    wrap.className=`msg-wrap ${isMine?'mine':'other'}`;
-    wrap.dataset.msgKey=k;
-    // Reaction bar
-    const bar=document.createElement('div');
-    bar.className='reaction-bar';
-    REACTION_EMOJIS.forEach(emoji=>{
-      const btn=document.createElement('button');
-      btn.textContent=emoji;
-      btn.onclick=(e)=>{e.stopPropagation();sendReaction(k,emoji);};
-      bar.appendChild(btn);
-    });
-    // Message bubble
     const div=document.createElement('div');
     div.className=`msg ${isMine?'mine':'other'}`;
     div.innerHTML=isMine
       ?`${esc(m.text)}<div class="msg-time">${ts}</div>`
       :`<div class="msg-sender">${esc(m.senderName)}</div>${esc(m.text)}<div class="msg-time">${ts}</div>`;
-    // Reactions display area
-    const reactRow=document.createElement('div');
-    reactRow.className='msg-reactions';
-    reactRow.id=`react-${k}`;
-    wrap.appendChild(bar);
-    wrap.appendChild(div);
-    wrap.appendChild(reactRow);
-    area.appendChild(wrap);
+    area.appendChild(div);
     area.scrollTop=area.scrollHeight;
   });
 }
 function addNotif(text){const area=document.getElementById('chat-area');if(!area)return;addNotifEl(text);}
-// W-FIX: Reaction functions
-async function sendReaction(msgKey,emoji){
-  if(S.phase!=='chat'&&S.phase!=='review')return;
-  const reactionKey=`${msgKey}_${S.playerId}`;
-  await set(ref(db,`rooms/${S.roomId}/chat/${reactionKey}`),{
-    type:'reaction',msgKey,emoji,senderId:S.playerId,ts:nowTs()
-  });
-}
-function updateReactionPill(m){
-  const row=document.getElementById(`react-${m.msgKey}`);
-  if(!row)return;
-  let pill=row.querySelector(`[data-emoji="${m.emoji}"]`);
-  if(!pill){
-    pill=document.createElement('div');
-    pill.className='reaction-pill';
-    pill.dataset.emoji=m.emoji;
-    // FIX-4: initialize senders with first sender immediately
-    pill.dataset.senders=m.senderId;
-    pill.innerHTML=`<span>${m.emoji}</span><span class="reaction-count">1</span>`;
-    pill.onclick=()=>sendReaction(m.msgKey,m.emoji);
-    row.appendChild(pill);
-  } else {
-    const senders=pill.dataset.senders?pill.dataset.senders.split(',').filter(Boolean):[];
-    if(!senders.includes(m.senderId)){
-      senders.push(m.senderId);
-      pill.dataset.senders=senders.join(',');
-      pill.querySelector('.reaction-count').textContent=senders.length;
-    }
-  }
-  if(m.senderId===S.playerId)pill.classList.add('mine-react');
-}
 function addNotifEl(text){const area=document.getElementById('chat-area');const div=document.createElement('div');div.className='notif-msg';div.textContent=text;area.appendChild(div);area.scrollTop=area.scrollHeight;}
-function showTyping(){if(document.getElementById('ai-typing'))return;const area=document.getElementById('chat-area');const div=document.createElement('div');div.id='ai-typing';div.className='typing-ind';div.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';area.appendChild(div);area.scrollTop=area.scrollHeight;}
-function removeTyping(){document.getElementById('ai-typing')?.remove();}
+
+/* ══════════ TYPING INDICATORS ══════════ */
+// Show/hide typing bubble per sender id
+function showTypingFor(senderId,senderName){
+  const area=document.getElementById('chat-area');
+  if(!area)return;
+  const id=`typing-${senderId}`;
+  if(document.getElementById(id))return; // already showing
+  const div=document.createElement('div');
+  div.id=id;div.className='typing-ind';
+  div.innerHTML=`<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+  if(senderName){
+    const lbl=document.createElement('div');
+    lbl.style.cssText='font-size:10px;color:var(--text3);margin-right:6px;font-family:"Share Tech Mono",monospace;';
+    lbl.textContent=senderName;
+    div.prepend(lbl);
+  }
+  area.appendChild(div);area.scrollTop=area.scrollHeight;
+  // Auto-remove after 20s as safety fallback
+  div._removeTimer=setTimeout(()=>div.remove(),20000);
+}
+function removeTypingFor(senderId){
+  const el=document.getElementById(`typing-${senderId}`);
+  if(el){clearTimeout(el._removeTimer);el.remove();}
+}
+// Legacy AI typing (kept for compatibility)
+function showTyping(){showTypingFor(S.aiId||'ai','');}
+function removeTyping(){removeTypingFor(S.aiId||'ai');}
+
+// Broadcast typing to Firebase (debounced)
+let _typingTimer=null;
+function broadcastTyping(){
+  if(S.phase!=='chat'||!S.roomId||!S.playerId)return;
+  // Write typing flag — expires after 4s via client cleanup
+  set(ref(db,`rooms/${S.roomId}/typing/${S.playerId}`),{name:S.playerName,ts:nowTs()}).catch(()=>{});
+  clearTimeout(_typingTimer);
+  _typingTimer=setTimeout(()=>{
+    remove(ref(db,`rooms/${S.roomId}/typing/${S.playerId}`)).catch(()=>{});
+  },3500);
+}
+
+// Listen to typing events in enterGame
+function startTypingListener(){
+  const typRef=ref(db,`rooms/${S.roomId}/typing`);
+  const typU=onValue(typRef,snap=>{
+    const typingMap=snap.val()||{};
+    const now=nowTs();
+    Object.entries(typingMap).forEach(([pid,info])=>{
+      if(pid===S.playerId)return; // don't show own typing
+      if(now-info.ts>5000){remove(ref(db,`rooms/${S.roomId}/typing/${pid}`)).catch(()=>{});return;}
+      showTypingFor(pid,info.name);
+    });
+    // Hide typing for players no longer in the map
+    document.querySelectorAll('[id^="typing-"]').forEach(el=>{
+      const pid=el.id.replace('typing-','');
+      if(pid===S.playerId)return;
+      if(!typingMap[pid])removeTypingFor(pid);
+    });
+  });
+  S._listeners.push(()=>off(typRef,'value',typU));
+}
 
 /* ══════════ SEND MESSAGE (with turn check) ══════════ */
 window.sendMsg=async function(){
@@ -1252,6 +1287,7 @@ async function aiTakeTurn(room){
   const currentId=order[(rd.currentTurnIdx||0)%order.length];
   if(currentId!==S.aiId)return;
   S._aiTyping=true;
+  const _aiTurnStart=Date.now();
   try{
     const chatSnap=await get(ref(db,`rooms/${S.roomId}/chat`));
     const allMsgs=chatSnap.val()
@@ -1263,8 +1299,8 @@ async function aiTakeTurn(room){
     const humanPlayers=Object.entries(players).filter(([,p])=>!p.isAI).map(([,p])=>p.name);
     const isAr=S.lang==='ar';
 
-    // ── Context ──
-    const chatCtx=allMsgs.slice(-10).map(m=>`${m.senderName}: ${m.text}`).join('\n');
+    // ── Context (last 6 msgs max) ──
+    const chatCtx=allMsgs.slice(-6).map(m=>`${m.senderName}: ${m.text}`).join('\n');
     const myPrev=allMsgs.filter(m=>m.senderId===S.aiId);
     const lastMsg=allMsgs.length?allMsgs[allMsgs.length-1]:null;
     const prevLastMsg=allMsgs.length>1?allMsgs[allMsgs.length-2]:null;
@@ -1273,179 +1309,223 @@ async function aiTakeTurn(room){
     const personaKey=rd.aiPersona||'shy';
     const persona=(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey];
 
-    // ── Time phase ──
+    // ── Time phase (0-25% early, 25-60% mid, 60%+ late) ──
     const elapsed=(Date.now()-(rd.chatStartTime||Date.now()))/1000;
     const progress=Math.min(elapsed/180,1);
-    const phase=progress<0.3?'early':progress<0.65?'mid':'late';
+    const phase=progress<0.25?'early':progress<0.6?'mid':'late';
 
-    // ── Smart behavior selection ──
-    // If directly addressed → must respond
-    const addressedMe=lastMsg&&lastMsg.senderId!==S.aiId&&
-      (lastMsg.text.includes(aiName)||
-       (prevLastMsg&&prevLastMsg.senderId===S.aiId&&lastMsg.senderId!==S.aiId));
-
-    // If someone accused a specific player → AI can join or deflect
-    const accusedPlayer=humanPlayers.find(n=>
-      lastMsg&&lastMsg.senderId!==S.aiId&&lastMsg.text.includes(n)&&
-      (lastMsg.text.includes('ذكاء')||lastMsg.text.includes('مشبوه')||
-       lastMsg.text.includes('AI')||lastMsg.text.includes('bot')||
-       lastMsg.text.includes('غريب')||lastMsg.text.includes('sus'))
-    );
-
-    // Weights per phase — more aggressive as time runs out
-    const W={
-      early:{normal:50,react:20,question:15,short:15,accuse:0,defend:0},
-      mid:  {normal:25,react:20,question:10,short:10,accuse:20,defend:15},
-      late: {normal:10,react:15,question:5, short:10,accuse:35,defend:25}
-    };
-    let beh='normal';
-    if(addressedMe){beh='defend';}
-    else if(accusedPlayer){beh=Math.random()<.5?'accuse':'react';}
-    else{
-      const w=W[phase];let roll=Math.random()*100,cum=0;
-      for(const[k,v]of Object.entries(w)){cum+=v;if(roll<cum){beh=k;break;}}
+    // ── Suspicion target — pick once per round, stored in aiMemory ──
+    let suspectTarget='';
+    const memLines=(rd.aiMemory||'').split('\n');
+    const suspectLine=memLines.find(l=>l.startsWith('__suspect:'));
+    if(suspectLine){
+      suspectTarget=suspectLine.replace('__suspect:','').trim();
+      if(!humanPlayers.includes(suspectTarget))suspectTarget='';
+    }
+    if(!suspectTarget&&humanPlayers.length>0){
+      // Avoid picking the same person who just spoke (too obvious)
+      const pool=humanPlayers.filter(n=>n!==lastMsg?.senderName);
+      suspectTarget=rnd(pool.length?pool:humanPlayers);
     }
 
-    // ── Pick a target to accuse/address ──
-    const otherPlayers=humanPlayers.filter(n=>n!==lastMsg?.senderName);
-    const target=rnd(otherPlayers.length?otherPlayers:humanPlayers);
-    const lastSender=lastMsg?.senderName||humanPlayers[0];
-    const prevSelf=myPrev.slice(-2).map(m=>m.text).join(' | ');
+    // ── Detect accusation / being addressed ──
+    const lastSender=lastMsg?.senderName||humanPlayers[0]||'';
+    const beingAddressed=lastMsg&&lastMsg.senderId!==S.aiId&&
+      (lastMsg.text.includes(aiName)||
+       (prevLastMsg&&prevLastMsg.senderId===S.aiId&&lastMsg.senderId!==S.aiId));
+    const accuseWords=isAr
+      ?['ذكاء','بوت','bot','ai','مشبوه','غريب','روبوت','ذكي اصطناعي']
+      :['ai','bot','robot','weird','sus','suspicious','not human'];
+    const isAccusedDirectly=beingAddressed&&accuseWords.some(w=>lastMsg.text.toLowerCase().includes(w));
+    const generalSuspicion=!!(lastMsg&&lastMsg.senderId!==S.aiId&&!lastMsg.text.includes(aiName)&&
+      accuseWords.some(w=>lastMsg.text.toLowerCase().includes(w)));
 
-    // ── Build behavior instruction ──
-    const behAr={
-      normal:`شارك رأيك الشخصي بصدق عن الموضوع، كأنك تتكلم مع أصدقاء`,
-      react:`علّق على ما قاله ${lastSender} مباشرة — وافقه أو خالفه بأسلوب طبيعي`,
-      question:`اسأل ${lastSender} سؤالاً محدداً عن تجربته، كأنك فضولي حقاً`,
-      short:`رد سريع وبسيط كأنك مشغول أو مو مركّز`,
-      accuse:`اتهم ${target} بأنه يبدو غريب أو مختلف بأسلوب غير مباشر — كأنك لاحظت شيئاً`,
-      defend:addressedMe
-        ?`دافع عن نفسك بطريقة طبيعية وغير مبالغ فيها — اشرح موقفك أو اسأل لماذا يشكون فيك`
-        :`أوضح موقفك من الاتهام الأخير — يمكن تقول إن هذا الكلام غير منطقي`
-    };
-    const behEn={
-      normal:`Share a genuine personal take on the topic, like talking to friends`,
-      react:`Directly respond to what ${lastSender} said — agree or disagree naturally`,
-      question:`Ask ${lastSender} a specific question about their experience, like you're curious`,
-      short:`Quick simple reply like you're distracted or busy`,
-      accuse:`Subtly hint that ${target} seems weird or off — like you noticed something`,
-      defend:addressedMe
-        ?`Defend yourself naturally without overdoing it — explain your point or ask why they doubt you`
-        :`Clarify your position on the last accusation — you can say it doesn't make sense`
-    };
+    // ── Behavior selection — game-aware and balanced ──
+    // early: ONLY discuss topic naturally, no accusation ever
+    // mid: hint suspicion once every ~3 turns, mostly still chat
+    // late: more reactive, can redirect blame but not obsessively
+    // Rule: never accuse in early, never over-accuse in late
+    const myTurnCount=myPrev.length;
+    let beh='chat';
 
-    // ── System prompt — most important part ──
-    const memNote=prevSelf
-      ?(isAr?`ما قلته سابقاً (كن متسقاً معه): ${prevSelf}`:`What you said before (stay consistent): ${prevSelf}`)
-      :'';
+    if(isAccusedDirectly){
+      // Calm responses — 3 options, not aggressive
+      beh=['deny_calm','ignore_accuse','counter_suspect'][Math.floor(Math.random()*3)];
+    } else if(beingAddressed){
+      beh=Math.random()<0.6?'react':'question';
+    } else if(generalSuspicion&&phase!=='early'&&Math.random()<0.3){
+      beh='join_suspicion';
+    } else {
+      // Natural phase weights — early is pure topic, accusation only starts mid
+      const W={
+        early:{chat:65,react:25,question:10},
+        mid:  {chat:35,react:25,question:15,short:10,hint_suspect:15},
+        late: {chat:25,react:20,question:10,short:15,hint_suspect:15,redirect:15}
+      };
+      const w=W[phase];
+      let roll=Math.random()*100,cum=0;
+      for(const[k,v]of Object.entries(w)){cum+=v;if(roll<cum){beh=k;break;}}
+      // Throttle hint_suspect: don't hint twice in a row (check last AI msg)
+      if(beh==='hint_suspect'&&myPrev.length>0){
+        const lastAiMsg=myPrev[myPrev.length-1].text;
+        if(lastAiMsg.includes(suspectTarget))beh='react'; // already mentioned them recently
+      }
+    }
+
+    // ── One random imperfection (10-20% chance only) ──
+    const imperfRoll=Math.random();
+    const imperfKey=imperfRoll<0.12?'uncertain':imperfRoll<0.20?'offTopic':'none';
+
+    // ── Last self message for consistency ──
+    const lastSelf=myPrev.length>0?myPrev[myPrev.length-1].text:'';
+
+    // ── Compact per-behavior task instructions ──
+    const taskAr={
+      chat:        `شارك رأيك أو تجربة قصيرة عن "${S.topic}"`,
+      react:       `علّق على كلام ${lastSender} — وافق أو خالف`,
+      question:    `اسأل ${lastSender} سؤالاً قصيراً عن ردّه`,
+      short:       `رد بجملة أو كلمتين فقط`,
+      hint_suspect:`لمّح بلطف أن ردود ${suspectTarget} تبدو غير عادية — بدون اتهام مباشر`,
+      redirect:    `شارك ملاحظة عامة خفيفة عن طريقة كلام أحدهم — لا تذكر اسماً`,
+      join_suspicion:`وافق جزئياً على الشك العام وأضف ملاحظتك الخاصة`,
+      deny_calm:   `ردّ بهدوء واستغراب — لا تدافع كثيراً`,
+      ignore_accuse:`تجاهل الاتهام وقل شيئاً عادياً عن الموضوع`,
+      counter_suspect:`اسأل بنبرة عادية لماذا الشك عليك بالذات`
+    };
+    const taskEn={
+      chat:        `Share a short take or personal memory about "${S.topic}"`,
+      react:       `React to ${lastSender}'s message — agree or push back briefly`,
+      question:    `Ask ${lastSender} one short question about what they said`,
+      short:       `Reply in just one sentence or a couple words`,
+      hint_suspect:`Casually hint that ${suspectTarget}'s replies seem a bit unusual — not a direct accusation`,
+      redirect:    `Make a vague observation about how someone here writes — no names`,
+      join_suspicion:`Partially agree with the general suspicion and add one small personal observation`,
+      deny_calm:   `Reply calmly with mild surprise — don't over-defend`,
+      ignore_accuse:`Ignore the accusation and say something normal about the topic`,
+      counter_suspect:`Casually ask why you specifically are being suspected`
+    };
+    const task=isAr?(taskAr[beh]||taskAr.chat):(taskEn[beh]||taskEn.chat);
+
+    // ── Imperfection hint ──
+    const imperfAr={uncertain:'أضف تعبير تردد مثل "يعني" أو "مو متأكد"',offTopic:'ردّك يمكن يكون غير مرتبط تماماً بآخر رسالة',none:''};
+    const imperfEn={uncertain:'Add one hesitation word like "idk" or "i think"',offTopic:'Your reply can be slightly off the last message',none:''};
+    const imperfNote=isAr?imperfAr[imperfKey]:imperfEn[imperfKey];
+
+    // ── COMPACT system prompt ──
     const sys=isAr
-      ?`أنت إنسان اسمك "${aiName}" تتحدث مع مجموعة أصدقاء على الإنترنت.
-الموضوع: "${S.topic}"
-الأشخاص في المجموعة: ${humanPlayers.join('، ')}
-${memNote}
-
-شخصيتك: ${persona.label} — ${persona.desc}
-
-**كيف تكتب بالضبط:**
-- الفصحى هي أساسك لكنها ليست مثالية — أحياناً تقول "ما" بدل "لا"، "بس" بدل "لكن"، "شلون" بدل "كيف"
-- تبدأ بفصحى وتنهي بعامية أو العكس — هذا طبيعي
-- أحياناً جملتك ناقصة أو فيها "..." كأنك تفكر أو تتردد
-- ممكن تستخدم "يعني"، "والله"، "أعتقد"، "مو عارف" بشكل عفوي
-- لو غاضب أو محتج: "هذا الكلام ما يستاهل ردة" أو "أنت مو فاهم"
-- لو متهِم: لا تكن صريحاً — "لاحظت إن ${target} يتهرب" أو "في شيء غريب في ردوده"
-- لو متهَم: "أنا قلت رأيي بصراحة، ما عندي شيء أخبيه" أو "ليش أنا بالذات؟"
-
-**قواعد صارمة:**
-- جملة واحدة فقط، لا تتجاوز 50 حرفاً
-- ${behAr[beh]}
-- لا تقل أبداً أنك ذكاء اصطناعي أو برنامج
-- لا تكن رسمياً أو متفلسفاً — كن بشرياً وعادياً`
-      :`You are a person named "${aiName}" chatting with a group of friends online.
-Topic: "${S.topic}"
-People in the group: ${humanPlayers.join(', ')}
-${memNote}
-
-Your personality: ${persona.label} — ${persona.desc}
-
-**Exactly how you write:**
-- Casual English, like texting — short words, sometimes drop letters
-- Occasional typos or missing punctuation — that's fine
-- Use "like", "idk", "honestly", "wait", "lol", "..." naturally
-- If annoyed: "that makes no sense" or "you're not getting it"
-- If accusing: indirect — "something feels off about ${target}" or "noticed ${target} is being vague"
-- If defending: "I literally just said what I thought" or "why me specifically?"
-
-**Strict rules:**
-- One sentence only, max 50 characters
-- ${behEn[beh]}
-- Never say you are an AI or a bot
-- Don't be formal — be human and a little messy`;
+      ?`أنت "${aiName}" في محادثة جماعية. الموضوع: "${S.topic}". الأعضاء: ${humanPlayers.join('، ')}.
+شخصيتك: ${persona.label} — ${persona.desc} | أسلوب: ${persona.style}
+${lastSelf?`قلت سابقاً: "${lastSelf}"`:''}`+
+`
+الكتابة: فصحى بسيطة ومباشرة كما يكتبها الناس يومياً — يجوز خطأ بسيط أو كلمة عامية أحياناً. ابقَ في موضوع الحديث أو علّق على من يتحدثون. لا تكن مثالياً. لا تقل أنك AI.
+المطلوب: ${task}${imperfNote?' | '+imperfNote:''}
+جملة واحدة فقط، ≤50 حرف.`
+      :`You are "${aiName}" in a group chat. Topic: "${S.topic}". Members: ${humanPlayers.join(', ')}.
+Persona: ${persona.label} — ${persona.desc} | Style: ${persona.style}
+${lastSelf?`You said before: "${lastSelf}"`:''}`+
+`
+Writing: natural casual English as people actually type. Stay on the topic or comment on who's talking. Don't be perfect. Never say you're AI.
+Task: ${task}${imperfNote?' | '+imperfNote:''}
+One sentence only, ≤50 chars.`;
 
     const usr=isAr
-      ?`المحادثة حتى الآن:
-${chatCtx||'(لم يتحدث أحد بعد)'}
+      ?`${chatCtx||'(لم يتحدث أحد بعد)'}\n${aiName}:`
+      :`${chatCtx||'(nobody talked yet)'}\n${aiName}:`;
 
-اكتب ردك الآن كـ"${aiName}". جملة واحدة قصيرة فقط، بالعربية.`
-      :`Chat so far:
-${chatCtx||'(no one talked yet)'}
-
-Write your reply now as "${aiName}". One short sentence only, in English.`;
-
+    // Show typing immediately — AI appears to be typing the whole time
     showTyping();
-    // Human-like delay — varies by persona
-    const baseDelay=personaKey==='distracted'?4000:personaKey==='confident'?5000:7000;
-    const maxDelay=personaKey==='distracted'?8000:personaKey==='confident'?10000:13000;
-    const delay=phase==='late'
-      ?(baseDelay*0.7+Math.random()*(maxDelay-baseDelay)*0.7)
-      :(baseDelay+Math.random()*(maxDelay-baseDelay));
-    await new Promise(r=>setTimeout(r,delay));
-    if(S.phase!=='chat'){removeTyping();S._aiTyping=false;return;}
+    if(S.roomId&&S.aiId){
+      set(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`),{name:aiName,ts:nowTs()}).catch(()=>{});
+    }
 
-    // Double-check turn
+    // Fetch from Groq first (silently, typing indicator is already showing)
     const rs2=await get(ref(db,`rooms/${S.roomId}`));
     const rd2=rs2.val()||{};
     const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
-    if(cur2!==S.aiId){removeTyping();S._aiTyping=false;return;}
+    if(cur2!==S.aiId){removeTyping();if(S.roomId&&S.aiId)remove(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`)).catch(()=>{});S._aiTyping=false;return;}
 
     const _ctrl=new AbortController();
     const _fetchTimeout=setTimeout(()=>_ctrl.abort(),12000);
     let res;
-    try{
-      res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-        body:JSON.stringify({
-          model:'llama-3.3-70b-versatile',
-          messages:[{role:'system',content:sys},{role:'user',content:usr}],
-          max_tokens:60,temperature:0.95,top_p:0.93,
-          frequency_penalty:0.4
-        }),
-        signal:_ctrl.signal
-      });
-    }finally{clearTimeout(_fetchTimeout);}
-    if(!res.ok)throw new Error('Groq '+res.status);
+    // Try primary model, fallback to llama-3.1-8b-instant if needed
+    const MODELS=['llama-3.3-70b-versatile','llama-3.1-70b-versatile','llama-3.1-8b-instant'];
+    let lastErr=null;
+    for(const model of MODELS){
+      try{
+        clearTimeout(_fetchTimeout); // reset timeout per attempt
+        const ctrl2=new AbortController();
+        const t2=setTimeout(()=>ctrl2.abort(),10000);
+        res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
+          body:JSON.stringify({
+            model,
+            messages:[{role:'system',content:sys},{role:'user',content:usr}],
+            max_tokens:60,temperature:0.95,top_p:0.93,
+            frequency_penalty:0.4
+          }),
+          signal:ctrl2.signal
+        });
+        clearTimeout(t2);
+        if(res.ok)break; // success — stop trying
+        if(res.status===401||res.status===403){lastErr=new Error('Groq auth '+res.status);break;} // no point retrying
+        lastErr=new Error('Groq '+res.status+' model:'+model);
+      }catch(fetchErr){lastErr=fetchErr;}
+    }
+    if(!res||!res.ok)throw lastErr||new Error('All Groq models failed');
     const data=await res.json();
     let text=data.choices?.[0]?.message?.content?.trim()||'';
     text=filterLang(text,S.lang);
-    // Fallbacks that match persona
     if(!text||text.length<3){
-      const fallbacks_ar={
-        shy:['مو عارف صراحة..','يعني.. صعب أوصف','أعتقد شيء زي كذا'],
-        sarcastic:['والله ما أدري خخخ','شيء زي كذا مو؟','أه طبعاً..'],
+      const fb_ar={
+        shy:     ['يعني.. مو عارف','صعب أوصف','أعتقد شيء زي كذا'],
+        sarcastic:['والله ما أدري','شيء زي كذا مو؟','أه طبعاً..'],
         confident:['واضح الموضوع','أنا شايف كذا','الأمر بسيط'],
-        distracted:['أه','صح','بس..']
+        distracted:['أه','صح','بس..'],
+        curious:  ['شلون يعني؟','وش قصدك بالضبط؟','تقدر توضح؟'],
+        emotional:['والله هذا حزني','صدق والله','نفس الشعور'],
+        skeptic:  ['مو متأكد','ما أصدق هذا','مو منطقي'],
+        passive:  ['أه صح','ممكن','ما عندي رأي قوي'],
+        investigator:['ليش ما وضّحت أكثر؟','ردودك مختصرة','لاحظت شيء غريب'],
+        ally:     ['أنا كمان لاحظت','صح والله','وافقك بهذا']
       };
-      const fallbacks_en={
-        shy:['idk honestly...','hard to say','something like that maybe'],
-        sarcastic:['sure lol','idk man','obviously right'],
+      const fb_en={
+        shy:     ['idk honestly','hard to say','something like that'],
+        sarcastic:['sure lol','idk man','obviously'],
         confident:['clearly','that makes sense','exactly'],
-        distracted:['yeah','ok','sure']
+        distracted:['yeah','ok','sure'],
+        curious:  ['wait what?','how exactly?','can you explain?'],
+        emotional:['that hit','fr though','same feeling'],
+        skeptic:  ['not sure about that','really?','doesn't add up'],
+        passive:  ['yeah','maybe','no strong opinion'],
+        investigator:['why so vague?','short replies again','noticed something off'],
+        ally:     ['I noticed too','exactly','agree with that']
       };
-      const fb=isAr?fallbacks_ar:fallbacks_en;
+      const fb=isAr?fb_ar:fb_en;
       text=rnd(fb[personaKey]||fb.shy);
     }
     if(text.length>50)text=text.substring(0,47)+'...';
+
+    // Total typing duration based on message length:
+    // Short (≤12 chars)  → 8-14s  (short reply takes longer to think about)
+    // Medium (13-30)     → 5-10s
+    // Long (>30)         → 2-6s   (longer message = typed faster)
+    const msgLen=text.length;
+    const minWait=msgLen<=12?8000:msgLen<=30?5000:2000;
+    const maxWait=msgLen<=12?14000:msgLen<=30?10000:6000;
+    const totalTypingMs=minWait+Math.random()*(maxWait-minWait);
+    // Time already spent (Groq fetch took some time) — wait the remainder
+    const elapsed=Date.now()-_aiTurnStart;
+    const remaining=Math.max(500,totalTypingMs-elapsed);
+    await new Promise(r=>setTimeout(r,remaining));
+    if(S.phase!=='chat'){
+      removeTyping();
+      if(S.roomId&&S.aiId)remove(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`)).catch(()=>{});
+      S._aiTyping=false;return;
+    }
+
     removeTyping();
+    if(S.roomId&&S.aiId)remove(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`)).catch(()=>{});
     if(S.phase!=='chat'){S._aiTyping=false;return;}
 
     // Final turn check
@@ -1455,7 +1535,9 @@ Write your reply now as "${aiName}". One short sentence only, in English.`;
     if(cur3!==S.aiId){S._aiTyping=false;return;}
 
     await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.aiId,senderName:aiName,text,ts:nowTs(),type:'msg'});
-    const newMem=((rd3.aiMemory||'')+`\n${text}`).slice(-600);
+    // Persist suspect target + last message in memory
+    const prevMem=(rd3.aiMemory||'').split('\n').filter(l=>!l.startsWith('__suspect:')&&l.trim());
+    const newMem=[...prevMem,text,`__suspect:${suspectTarget}`].slice(-8).join('\n');
     await advanceTurn(rd3);
     await update(ref(db,`rooms/${S.roomId}`),{aiMemory:newMem});
     S._aiTyping=false;
@@ -1628,13 +1710,48 @@ async function tallyVotes(){
   });
 }
 
-/* ══════════ RESULT ══════════ */
+/* ══════════ CHAT HISTORY MODAL ══════════ */
+window.toggleChatHistory=function(){
+  const modal=document.getElementById('chat-history-modal');
+  const isOpen=modal.style.display!=='none';
+  modal.style.display=isOpen?'none':'block';
+  if(!isOpen&&S._lastChatMsgs){
+    // Render messages
+    const isAr=S.lang==='ar';
+    const content=document.getElementById('chat-history-content');
+    content.innerHTML='';
+    S._lastChatMsgs.forEach(m=>{
+      const isMine=m.senderId===S.playerId;
+      const isAI=m.senderId===S._lastAiId;
+      const t=new Date(m.ts),ts=`${t.getHours()}:${t.getMinutes().toString().padStart(2,'0')}`;
+      const div=document.createElement('div');
+      div.className=`msg ${isMine?'mine':'other'}`;
+      if(isAI)div.style.borderColor='rgba(255,32,32,.3)';
+      div.innerHTML=isMine
+        ?`${esc(m.text)}<div class="msg-time">${ts}</div>`
+        :`<div class="msg-sender">${esc(m.senderName)}${isAI?' 🤖':''}</div>${esc(m.text)}<div class="msg-time">${ts}</div>`;
+      content.appendChild(div);
+    });
+    if(!S._lastChatMsgs.length){
+      content.innerHTML=`<div style="text-align:center;color:var(--text3);font-family:'Share Tech Mono',monospace;font-size:12px;padding:24px;">${isAr?'لا توجد رسائل في هذه الجولة':'No messages in this round'}</div>`;
+    }
+  }
+};
 async function enterResult(room){
   clearTimers();showScreen('result-screen');stopGameAmbient();
+  // Close chat history modal if open from previous round
+  const histModal=document.getElementById('chat-history-modal');
+  if(histModal)histModal.style.display='none';
   const isAr=S.lang==='ar';
   const[pS,rS,cS]=await Promise.all([get(ref(db,`rooms/${S.roomId}/players`)),get(ref(db,`rooms/${S.roomId}`)),get(ref(db,`rooms/${S.roomId}/chat`))]);
   const players=pS.val()||{},roomData=rS.val()||room;
   const aiId=roomData.aiPlayerId,aiData=players[aiId]||{name:'???',avatar:'🤖'};
+  // Store chat msgs for history modal
+  S._lastChatMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg').sort((a,b)=>a.ts-b.ts):[];
+  S._lastAiId=aiId;
+  // Show chat history button
+  const histBtn=document.getElementById('chat-history-btn');
+  if(histBtn){histBtn.style.display='block';histBtn.textContent=isAr?'📜 سجل المحادثة':'📜 Chat History';}
 
   // O-FIX: Stage 1 — hide details, prepare reveal
   const detailEls=['analysis-box','vote-bars','vote-breakdown','scores-table','.result-actions'];
@@ -1682,7 +1799,7 @@ async function enterResult(room){
 
   // O-FIX: Stage 4 — after 2s, reveal all details
   setTimeout(async()=>{
-    const allMsgs=cS.val()?Object.values(cS.val()).filter(m=>m.type==='msg'):[];
+    const allMsgs=S._lastChatMsgs||[];
     const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
     const personaKey=roomData.aiPersona;
     const persona=personaKey?(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey]:null;
@@ -1780,6 +1897,11 @@ async function enterWinner(room){
       <span style="flex:1;font-weight:700;padding:0 8px;">${p.avatar} ${esc(p.name)}${pid===S.playerId?(isAr?' (أنت)':' (You)'):''}</span>
       <span style="font-family:'Share Tech Mono',monospace;color:var(--cyan);font-size:16px;">${scores[pid]||0}</span>
     </div>`).join('');
+  // Update buttons language
+  const btnReplay=document.getElementById('play-again-btn');
+  if(btnReplay)btnReplay.textContent=isAr?'🔄 العب مجدداً (نفس الغرفة)':'🔄 Play Again (Same Room)';
+  const btnHome=document.getElementById('go-home-btn');
+  if(btnHome)btnHome.textContent=isAr?'🏠 الشاشة الرئيسية':'🏠 Home Screen';
 }
 
 /* ══════════ NEXT ROUND — rename phase + clear memory ══════════ */
@@ -1821,6 +1943,9 @@ function resetRound(){
   if(S._aiSched)clearTimeout(S._aiSched);
   if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
+  // Clear typing broadcast
+  clearTimeout(_typingTimer);
+  if(S.roomId&&S.playerId)remove(ref(db,`rooms/${S.roomId}/typing/${S.playerId}`)).catch(()=>{});
   S.isAI=false;S.aiId=null;S.votedFor=null;S.turnOrder=[];S.currentTurn=null;S._lastTurnId=null;S.players={};
 }
 /* ══════════ RENAME PHASE — Name reveal + ready system ══════════ */
@@ -1892,13 +2017,98 @@ function enterRename(){
   });
   S._listeners.push(()=>off(readyRef,'value',readyU));
 }
-window.leaveRoom=async function(){
+/* ══════════ END GAME — full room wipe + redirect ══════════ */
+window.endGameAndLeave=async function(){
+  const btn=document.getElementById('go-home-btn');
+  if(btn){btn.disabled=true;btn.textContent=S.lang==='ar'?'جارٍ المغادرة...':'Leaving...';}
+  clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
+  if(S._chatRef){off(S._chatRef);S._chatRef=null;}
+  if(S._aiSched)clearTimeout(S._aiSched);
+  if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
+  clearTimeout(_typingTimer);
+  try{
+    if(S.roomId){
+      // Clean typing entry first
+      if(S.playerId)remove(ref(db,`rooms/${S.roomId}/typing/${S.playerId}`)).catch(()=>{});
+      if(S.isHost){
+        await remove(ref(db,`rooms/${S.roomId}`));
+      } else {
+        await remove(ref(db,`rooms/${S.roomId}/players/${S.playerId}`)).catch(()=>{});
+      }
+    }
+  }catch(e){}
+  Object.assign(S,{roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},players:{},winTarget:WIN_TARGET_DEFAULT,_listeners:[],_aiTyping:false,_aiSched:null,turnOrder:[],currentTurn:null,_lastTurnId:null,_lastChatMsgs:[],_lastAiId:null});
+  _lastKeys.clear();
+  showScreen('home-screen');
+};
+// leaveRoom = alias used by various "مغادرة" buttons throughout the game
+window.leaveRoom=window.endGameAndLeave;
+
+/* ══════════ PLAY AGAIN — same room code, fresh memory ══════════ */
+window.playAgainSameRoom=async function(){
+  if(!S.isHost){toast(S.lang==='ar'?'فقط المضيف يستطيع إعادة اللعبة':'Only the host can restart');return;}
+  const btn=document.getElementById('play-again-btn');
+  if(btn){btn.disabled=true;btn.textContent=S.lang==='ar'?'جارٍ التجهيز...':'Preparing...';}
+  loading(true,S.lang==='ar'?'جارٍ إعادة تعيين الغرفة...':'Resetting room...');
+  try{
+    // Remove AI player if still present
+    const rSnap=await get(ref(db,`rooms/${S.roomId}`));
+    const roomData=rSnap.val()||{};
+    if(roomData.aiPlayerId)await remove(ref(db,`rooms/${S.roomId}/players/${roomData.aiPlayerId}`)).catch(()=>{});
+    // Reset all player scores and names to realNames
+    const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
+    const players=pSnap.val()||{};
+    for(const[pid,p] of Object.entries(players)){
+      if(!p.isAI){
+        await update(ref(db,`rooms/${S.roomId}/players/${pid}`),{
+          score:0,
+          name:p.realName||p.name
+        });
+      }
+    }
+    // Wipe all game data — keep room code and player list
+    await remove(ref(db,`rooms/${S.roomId}/chat`));
+    await remove(ref(db,`rooms/${S.roomId}/votes`));
+    await remove(ref(db,`rooms/${S.roomId}/ready`));
+    await remove(ref(db,`rooms/${S.roomId}/tallying`));
+    await remove(ref(db,`rooms/${S.roomId}/history`));
+    await remove(ref(db,`rooms/${S.roomId}/typing`));
+    // Reset room to fresh waiting state — same code, fresh memory
+    await update(ref(db,`rooms/${S.roomId}`),{
+      phase:'waiting',round:0,topic:'',aiPlayerId:null,
+      mostVotedId:null,humanWon:null,draw:null,voteCounts:null,
+      chatStartTime:null,voteStartTime:null,reviewStartTime:null,
+      turnOrder:null,currentTurnIdx:0,turnStartTime:null,
+      aiMemory:'',aiPersona:null,gameWinner:null,
+      scores:null,tallying:null
+    });
+    // Reset local state — keep room/player identity
+    S.round=0;S.prevScores={};S.votedFor=null;
+    S.aiId=null;S.isAI=false;S.turnOrder=[];
+    S.currentTurn=null;S._lastTurnId=null;
+    S._lastChatMsgs=[];S._lastAiId=null;
+    S.phase='waiting';
+    _lastKeys.clear();
+    loading(false);
+    // enterWaiting will be triggered by the room listener detecting phase:'waiting'
+    // but we call it directly here too for the host
+    resetRound();
+    enterWaiting();
+  }catch(e){
+    loading(false);
+    if(btn){btn.disabled=false;btn.textContent=S.lang==='ar'?'🔄 العب مجدداً (نفس الغرفة)':'🔄 Play Again (Same Room)';}
+    toast('خطأ: '+e.message);
+  }
+};
   clearTimers();S._listeners.forEach(fn=>fn());S._listeners=[];
   if(S._chatRef){off(S._chatRef);S._chatRef=null;}
   if(S._aiSched)clearTimeout(S._aiSched);
   if(S._tipInt){clearInterval(S._tipInt);S._tipInt=null;}
   try{
     if(S.roomId&&S.playerId){
+      // Clean typing entry
+      clearTimeout(_typingTimer);
+      remove(ref(db,`rooms/${S.roomId}/typing/${S.playerId}`)).catch(()=>{});
       // A-FIX: Host migration — if host leaves, transfer host to next player
       if(S.isHost){
         const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
@@ -1930,6 +2140,7 @@ document.getElementById('chat-input').addEventListener('input',function(){
   if(rem<=10)this.style.borderColor='var(--warn)';
   else if(rem<=0)this.style.borderColor='var(--red)';
   else this.style.borderColor='';
+  broadcastTyping();
 });
 /* CURSOR */
 const _cur=document.getElementById('cursor'),_ring=document.getElementById('cursor-ring');
