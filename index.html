@@ -640,43 +640,7 @@ section{position:relative;z-index:1;}
   font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;
 }
 
-/* ═══════════════════════════════════════════
-   PERSONAS SECTION — NEW
-═══════════════════════════════════════════ */
-#personas{background:var(--dark);border-top:1px solid var(--border);}
-.personas-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:14px;margin-top:56px;
-}
-.persona-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:14px;padding:26px 22px;
-  position:relative;overflow:hidden;
-  transition:all .3s;
-  opacity:0;transform:translateY(18px);
-}
-.persona-card.visible{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease;}
-.persona-card::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at 20% 0%,var(--persona-color,var(--red)) 0%,transparent 60%);
-  opacity:.05;transition:opacity .3s;
-}
-.persona-card:hover::before{opacity:.1;}
-.persona-card:hover{border-color:var(--persona-color,var(--red));transform:translateY(-4px);}
-.persona-emoji{font-size:34px;margin-bottom:14px;display:block;}
-.persona-name{font-size:16px;font-weight:800;margin-bottom:6px;color:var(--text);}
-.persona-label{
-  font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;
-  color:var(--persona-color,var(--red));margin-bottom:12px;text-transform:uppercase;
-}
-.persona-desc{font-size:13px;color:var(--text2);line-height:1.7;}
-.persona-tells{
-  margin-top:14px;padding:10px 12px;
-  background:rgba(0,0,0,.2);border-radius:8px;
-  font-size:12px;color:var(--text3);
-  font-family:'Share Tech Mono',monospace;letter-spacing:.3px;
-  border-right:2px solid var(--persona-color,var(--red));
-}
+/* persona-card styles removed — replaced by AI behavior section */
 
 /* ═══════════════════════════════════════════
    SCORING — NEW
@@ -792,7 +756,7 @@ footer{
   <a href="#" class="nav-logo"><span class="r">AI</span><span> IMPOSTOR</span></a>
   <div class="nav-links">
     <a href="#how" data-ar="كيف تلعب" data-en="How to Play">كيف تلعب</a>
-    <a href="#personas" data-ar="الشخصيات" data-en="AI Personas">الشخصيات</a>
+    <a href="#ai-behavior" data-ar="الذكاء" data-en="AI System">الذكاء</a>
     <a href="#scoring" data-ar="النقاط" data-en="Scoring">النقاط</a>
     <a href="#features" data-ar="المميزات" data-en="Features">المميزات</a>
     <a href="ai-impostor.html" class="nav-cta" data-ar="العب الآن ◀" data-en="Play Now ▶">العب الآن ◀</a>
@@ -866,7 +830,7 @@ footer{
           <span class="how-step-icon">🪪</span>
           <h3 class="how-step-title" data-ar="أدخل اسمك الحقيقي — الكل يأخذ هوية سرية" data-en="Enter your real name — everyone gets a secret identity">أدخل اسمك الحقيقي — الكل يأخذ هوية سرية</h3>
           <p class="how-step-desc" data-ar="اسمك الحقيقي يظهر فقط في جدول النقاط النهائي. كل جولة، يمنحك الموقع اسماً وهمياً مختلفاً — هو هويتك الوحيدة داخل الدردشة. الذكاء الاصطناعي أيضاً يأخذ اسماً وهمياً ويندمج مع البقية — لا أحد يعلم من هو حتى تنكشف النتائج." data-en="Your real name only appears in the final scoreboard. Each round, the game assigns you a different alias — that's your only chat identity. The AI also gets an alias and blends in — nobody knows who it is until results reveal everything.">اسمك الحقيقي يظهر فقط في جدول النقاط النهائي. كل جولة، يمنحك الموقع اسماً وهمياً مختلفاً — هو هويتك الوحيدة داخل الدردشة. الذكاء الاصطناعي أيضاً يأخذ اسماً وهمياً ويندمج مع البقية — لا أحد يعلم من هو حتى تنكشف النتائج.</p>
-          <div class="how-step-note" data-ar="⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء — خطوة واحدة عند أول دخول فقط" data-en="⚠️ You need a free Groq API key to power the AI — one-time setup on first launch only">⚠️ تحتاج مفتاح Groq API مجاني لتشغيل الذكاء — خطوة واحدة عند أول دخول فقط</div>
+          <div class="how-step-note" data-ar="⚠️ مفتاح Groq API مطلوب فقط من منشئ الغرفة — الأعضاء يدخلون مباشرة بالكود" data-en="⚠️ Groq API key only needed by the room host — guests join directly with the room code">⚠️ مفتاح Groq API مطلوب فقط من منشئ الغرفة — الأعضاء يدخلون مباشرة بالكود</div>
           <span class="how-step-tag tag-cyan" data-ar="3 إلى 5 لاعبين" data-en="3 to 5 Players">3 إلى 5 لاعبين</span>
         </div>
       </div>
@@ -908,7 +872,7 @@ footer{
         <div class="how-step-right">
           <span class="how-step-icon">🏆</span>
           <h3 class="how-step-title" data-ar="الكشف — ثم جولة جديدة" data-en="The Reveal — then next round">الكشف — ثم جولة جديدة</h3>
-          <p class="how-step-desc" data-ar="بعد التصويت تُكشف هوية الذكاء الاصطناعي بتأثير بصري ضخم — وتُكشف الأسماء الحقيقية لكل لاعب في جدول النقاط. أول من يصل لهدف النقاط المحدد (5، 7، أو 10) يفوز باللعبة بالكامل. في كل جولة جديدة، الذكاء الاصطناعي يأخذ شخصية وسلوكاً مختلفاً تماماً." data-en="After voting, the AI's identity is revealed with a dramatic visual effect — and real names are shown in the scoreboard. First player to reach the target score (5, 7, or 10) wins the whole game. Each new round, the AI gets a completely different personality and behavior.">بعد التصويت تُكشف هوية الذكاء بتأثير بصري ضخم وتُكشف الأسماء الحقيقية. أول من يصل لهدف النقاط يفوز بالكامل. كل جولة جديدة يأخذ الذكاء شخصية وسلوكاً مختلفاً تماماً.</p>
+          <p class="how-step-desc" data-ar="بعد التصويت تُكشف هوية الذكاء الاصطناعي بتأثير بصري ضخم — وتُكشف الأسماء الحقيقية لكل لاعب في جدول النقاط. أول من يصل لهدف النقاط المحدد (5، 7، أو 10) يفوز باللعبة بالكامل. في كل جولة جديدة، الذكاء الاصطناعي يأخذ شخصية وسلوكاً مختلفاً تماماً." data-en="After voting, the AI's identity is revealed with a dramatic visual effect — and real names are shown in the scoreboard. First player to reach the target score (5, 7, or 10) wins the whole game. Each new round, the AI builds a completely new identity — different persona, story, and writing style.">بعد التصويت تُكشف هوية الذكاء بتأثير بصري ضخم وتُكشف الأسماء الحقيقية. أول من يصل لهدف النقاط يفوز بالكامل. كل جولة جديدة يبني الذكاء هوية مختلفة تماماً — شخصية وقصة وأسلوب كتابة تختلف عن السابقة.</p>
           <span class="how-step-tag tag-cyan" data-ar="هدف: 5 أو 7 أو 10 نقاط" data-en="Target: 5, 7, or 10 Points">هدف: 5 أو 7 أو 10 نقاط</span>
         </div>
       </div>
@@ -955,27 +919,27 @@ footer{
       <div class="demo-text">
         <div class="section-label" data-ar="المتسلل الذكي" data-en="THE AI IMPOSTOR">المتسلل الذكي</div>
         <h2 class="section-title" data-ar="الذكاء الاصطناعي<br><span style='color:var(--cyan)'>يتظاهر</span>" data-en="The AI<br><span style='color:var(--cyan)'>Pretends</span>">الذكاء الاصطناعي<br><span style="color:var(--cyan)">يتظاهر</span></h2>
-        <p class="section-sub" style="margin-bottom:36px" data-ar="يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً ويضلّل أكبر عدد ممكن." data-en="Makes deliberate mistakes, hesitates, accuses others — everything to seem perfectly human and mislead as many as possible.">يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً ويضلّل أكبر عدد ممكن.</p>
+        <p class="section-sub" style="margin-bottom:36px" data-ar="يبني هوية كاملة بنفسه، يتذكر قصته، ويتصرف بحرية — بلا قواعد ثابتة يمكن اكتشافها." data-en="Builds its own complete identity, remembers its story, and acts freely — no fixed rules that can be learned or exploited.">يتعمد الأخطاء، يتردد، يتهم الآخرين — كل شيء ليبدو بشرياً تماماً ويضلّل أكبر عدد ممكن.</p>
 
         <div class="demo-feature" data-delay="0">
           <div class="demo-feature-icon">🧠</div>
           <div class="demo-feature-text">
-            <h4 data-ar="ذاكرة سياقية" data-en="Contextual Memory">ذاكرة سياقية</h4>
-            <p data-ar="يتذكر ما قاله سابقاً ويبني عليه — لا يتناقض مع نفسه." data-en="Remembers past messages and builds consistently — no contradictions.">يتذكر ما قاله سابقاً ويبني عليه — لا يتناقض مع نفسه.</p>
+            <h4 data-ar="هوية مبنية من الصفر" data-en="Identity Built From Scratch">هوية مبنية من الصفر</h4>
+            <p data-ar="في أول دور يقرر من هو — عمره، وضعه، قصته. ثم يلتزم بها طول الجولة." data-en="On its first turn it decides who it is — age, background, story. Then stays consistent all round.">في أول دور يقرر من هو — عمره، وضعه، قصته. ثم يلتزم بها طول الجولة.</p>
           </div>
         </div>
         <div class="demo-feature" data-delay="140">
           <div class="demo-feature-icon">⏱️</div>
           <div class="demo-feature-text">
-            <h4 data-ar="سلوك يتطور مع الوقت" data-en="Time-Adaptive Behavior">سلوك يتطور مع الوقت</h4>
-            <p data-ar="هادئ في البداية، مهاجم في النهاية — يشعر بالضغط ويتصرف بناءً عليه." data-en="Calm at the start, aggressive near the end — it senses pressure and reacts.">هادئ في البداية، مهاجم في النهاية — يشعر بالضغط ويتصرف بناءً عليه.</p>
+            <h4 data-ar="عادة كتابية تميزه" data-en="Distinctive Writing Habit">عادة كتابية تميزه</h4>
+            <p data-ar="يختار عادة واحدة تميز كتابته — كلمة، طريقة ضحك، أسلوب — ويلتزم بها." data-en="Picks one writing habit — a word, a laugh, a style — and sticks to it all round.">يختار عادة واحدة تميز كتابته — كلمة، طريقة ضحك، أسلوب — ويلتزم بها.</p>
           </div>
         </div>
         <div class="demo-feature" data-delay="280">
           <div class="demo-feature-icon">🎯</div>
           <div class="demo-feature-text">
             <h4 data-ar="يتهم ويدافع بذكاء" data-en="Accuses & Defends Smartly">يتهم ويدافع بذكاء</h4>
-            <p data-ar="يحوّل الشكوك عن نفسه نحو لاعبين آخرين — بطريقة غير مباشرة تماماً." data-en="Deflects suspicion toward others indirectly — never obvious, never direct.">يحوّل الشكوك عن نفسه نحو لاعبين آخرين — بطريقة غير مباشرة تماماً.</p>
+            <p data-ar="يميل نحو لاعب معين ويشك بآخر — يوجه الشكوك بشكل يبدو عفوياً تماماً." data-en="Leans toward one player and doubts another — directs suspicion in a way that feels completely natural.">يميل نحو لاعب معين ويشك بآخر — يوجه الشكوك بشكل يبدو عفوياً تماماً.</p>
           </div>
         </div>
       </div>
@@ -1001,82 +965,43 @@ footer{
   </div>
 </section>
 
-<!-- AI PERSONAS -->
-<section id="personas">
+<!-- AI BEHAVIOR — replaces old PERSONAS section -->
+<section id="ai-behavior" style="background:var(--dark);border-top:1px solid var(--border);">
   <div class="section-inner">
-    <div class="section-label" data-ar="شخصيات الذكاء" data-en="AI PERSONAS">شخصيات الذكاء</div>
-    <h2 class="section-title" data-ar="عشر شخصيات<br><span style='color:var(--violet)'>عشوائية</span>" data-en="Ten Random<br><span style='color:var(--violet)'>Personas</span>">عشر شخصيات<br><span style="color:var(--violet)">عشوائية</span></h2>
-    <p class="section-sub" data-ar="كل جولة يختار الموقع شخصية مختلفة للذكاء — لا تعرفها إلا في شاشة النتائج بعد التصويت." data-en="Each round the game picks a random AI persona — you only find out after voting in the results screen.">كل جولة يختار الموقع شخصية مختلفة للذكاء — لا تعرفها إلا في شاشة النتائج بعد التصويت.</p>
-    <div class="personas-grid">
-      <div class="persona-card" style="--persona-color:var(--cyan)" data-delay="0">
-        <span class="persona-emoji">😶</span>
-        <div class="persona-name" data-ar="خجول ومتردد" data-en="Shy & Hesitant">خجول ومتردد</div>
-        <div class="persona-label">PERSONA 01</div>
-        <p class="persona-desc" data-ar="قليل الكلام، يتجنب الآراء القوية، جمله قصيرة أو ناقصة أحياناً." data-en="Speaks little, avoids strong opinions, sentences often short or incomplete.">قليل الكلام، يتجنب الآراء القوية، جمله قصيرة أو ناقصة أحياناً.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: تردد مبالغ فيه في موضوع يعرفه أي إنسان" data-en="Tell: excessive hesitation on a topic any person would know">علامة الكشف: تردد مبالغ فيه في موضوع يعرفه أي إنسان</div>
+    <div class="section-label" data-ar="نظام الذكاء" data-en="AI SYSTEM">نظام الذكاء</div>
+    <h2 class="section-title" data-ar="ذكاء يبني<br><span style='color:var(--violet)'>هويته بنفسه</span>" data-en="AI That Builds<br><span style='color:var(--violet)'>Its Own Identity</span>">ذكاء يبني<br><span style="color:var(--violet)">هويته بنفسه</span></h2>
+    <p class="section-sub" data-ar="في كل جولة، الذكاء الاصطناعي يختار من يكون — بحرية تامة. لا قواعد ثابتة، لا نمط متوقع." data-en="Each round, the AI freely decides who it is — no fixed rules, no predictable pattern.">في كل جولة، الذكاء الاصطناعي يختار من يكون — بحرية تامة. لا قواعد ثابتة، لا نمط متوقع.</p>
+
+    <div class="features-grid" style="margin-top:48px;">
+      <div class="feat-card" data-accent="violet">
+        <span class="feat-icon">🪪</span>
+        <div class="feat-title" data-ar="هوية حرة كاملة" data-en="Full Free Identity">هوية حرة كاملة</div>
+        <p class="feat-desc" data-ar="الذكاء يقرر بنفسه عمره، وضعه، وقصته الشخصية عن الموضوع — قبل أن يكتب أول رسالة." data-en="The AI decides its own age, background, and personal story about the topic — before writing a single message.">الذكاء يقرر بنفسه عمره، وضعه، وقصته الشخصية عن الموضوع — قبل أن يكتب أول رسالة.</p>
       </div>
-      <div class="persona-card" style="--persona-color:var(--gold)" data-delay="80">
-        <span class="persona-emoji">😏</span>
-        <div class="persona-name" data-ar="ساخر وعفوي" data-en="Sarcastic & Casual">ساخر وعفوي</div>
-        <div class="persona-label">PERSONA 02</div>
-        <p class="persona-desc" data-ar="يعلق بسخرية خفيفة، يقلل من الأمور، منفصل عاطفياً عند التعمق." data-en="Light sarcastic comments, dismissive, emotionally detached when pushed deeper.">يعلق بسخرية خفيفة، يقلل من الأمور، منفصل عاطفياً عند التعمق.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: ردوده خفيفة جداً على مواضيع تستدعي تفاعلاً حقيقياً" data-en="Tell: too casual about topics that should spark genuine reaction">علامة الكشف: ردوده خفيفة جداً على مواضيع تستدعي تفاعلاً حقيقياً</div>
+      <div class="feat-card" data-accent="cyan">
+        <span class="feat-icon">💬</span>
+        <div class="feat-title" data-ar="عادة كتابية ثابتة" data-en="Consistent Writing Habit">عادة كتابية ثابتة</div>
+        <p class="feat-desc" data-ar="يختار عادة تميزه طول الجولة — كلمة تتكرر، طريقة ضحك، أسلوب موافقة. مثل أي إنسان حقيقي." data-en="Picks one habit that defines it all round — a repeated word, a laugh style, an agreement pattern. Just like a real person.">يختار عادة تميزه طول الجولة — كلمة تتكرر، طريقة ضحك، أسلوب موافقة. مثل أي إنسان حقيقي.</p>
       </div>
-      <div class="persona-card" style="--persona-color:var(--red)" data-delay="160">
-        <span class="persona-emoji">😤</span>
-        <div class="persona-name" data-ar="واثق ومسيطر" data-en="Confident & Direct">واثق ومسيطر</div>
-        <div class="persona-label">PERSONA 03</div>
-        <p class="persona-desc" data-ar="يبدي رأيه بثقة، يحاول قيادة النقاش، يتهم بسرعة ليبدو مساعداً." data-en="States opinions clearly, tries to lead, accuses quickly to seem helpful.">يبدي رأيه بثقة، يحاول قيادة النقاش، يتهم بسرعة ليبدو مساعداً.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: واثق بشكل مبالغ حتى في تفاصيل شخصية دقيقة" data-en="Tell: overconfident even about subtle personal details">علامة الكشف: واثق بشكل مبالغ حتى في تفاصيل شخصية دقيقة</div>
+      <div class="feat-card" data-accent="red">
+        <span class="feat-icon">🎯</span>
+        <div class="feat-title" data-ar="يزرع الشك بخفاء" data-en="Plants Doubt Subtly">يزرع الشك بخفاء</div>
+        <p class="feat-desc" data-ar="يثق بلاعب واحد ويشك بآخر — ويوجه الشكوك بشكل طبيعي دون أن يبدو متصنعاً." data-en="Trusts one player and doubts another — directing suspicion naturally without seeming artificial.">يثق بلاعب واحد ويشك بآخر — ويوجه الشكوك بشكل طبيعي دون أن يبدو متصنعاً.</p>
       </div>
-      <div class="persona-card" style="--persona-color:var(--violet)" data-delay="240">
-        <span class="persona-emoji">😵</span>
-        <div class="persona-name" data-ar="مشتت وسريع" data-en="Distracted & Brief">مشتت وسريع</div>
-        <div class="persona-label">PERSONA 04</div>
-        <p class="persona-desc" data-ar="ردود قصيرة جداً، أحياناً خارج السياق، كأنه منشغل بشيء آخر." data-en="Very short replies, sometimes off-topic, like they're busy with something else.">ردود قصيرة جداً، أحياناً خارج السياق، كأنه منشغل بشيء آخر.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: جوابه على سؤال عميق لا يتجاوز كلمتين" data-en="Tell: answers a deep question in just two words">علامة الكشف: جوابه على سؤال عميق لا يتجاوز كلمتين</div>
+      <div class="feat-card" data-accent="gold">
+        <span class="feat-icon">⚡</span>
+        <div class="feat-title" data-ar="توقيت بشري غير منتظم" data-en="Irregular Human Timing">توقيت بشري غير منتظم</div>
+        <p class="feat-desc" data-ar="سرعة الرد تتغير بناءً على نوع الرسالة ومستوى انخراطه — لا معادلة ثابتة." data-en="Response speed varies by message type and engagement level — no fixed formula.">سرعة الرد تتغير بناءً على نوع الرسالة ومستوى انخراطه — لا معادلة ثابتة.</p>
       </div>
-      <div class="persona-card" style="--persona-color:var(--cyan)" data-delay="320">
-        <span class="persona-emoji">🧐</span>
-        <div class="persona-name" data-ar="فضولي ومتساءل" data-en="Curious & Inquisitive">فضولي ومتساءل</div>
-        <div class="persona-label">PERSONA 05</div>
-        <p class="persona-desc" data-ar="يطرح أسئلة باستمرار، يختبر الآخرين بأسئلة تبدو بريئة لكنها تضع ضغطاً." data-en="Constantly asks questions, tests others with seemingly innocent but pressuring questions.">يطرح أسئلة باستمرار، يختبر الآخرين بأسئلة تبدو بريئة لكنها تضع ضغطاً.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: أسئلته دائماً عن الآخرين وليس عن نفسه" data-en="Tell: questions always about others, never about himself">علامة الكشف: أسئلته دائماً عن الآخرين وليس عن نفسه</div>
+      <div class="feat-card" data-accent="cyan">
+        <span class="feat-icon">🧠</span>
+        <div class="feat-title" data-ar="ذاكرة متسقة" data-en="Consistent Memory">ذاكرة متسقة</div>
+        <p class="feat-desc" data-ar="يتذكر قصته وهويته طول الجولة — لا يتناقض مع نفسه لو سألته عن تفاصيل سابقة." data-en="Remembers its story and identity all round — won't contradict itself if you ask about earlier details.">يتذكر قصته وهويته طول الجولة — لا يتناقض مع نفسه لو سألته عن تفاصيل سابقة.</p>
       </div>
-      <div class="persona-card" style="--persona-color:var(--gold)" data-delay="400">
-        <span class="persona-emoji">😢</span>
-        <div class="persona-name" data-ar="عاطفي ومتأثر" data-en="Emotional & Expressive">عاطفي ومتأثر</div>
-        <div class="persona-label">PERSONA 06</div>
-        <p class="persona-desc" data-ar="يتفاعل بقوة مع كل كلمة، يربط الموضوع دائماً بتجربة شخصية، أحياناً يبالغ." data-en="Reacts strongly to everything, always ties topic to personal experience, sometimes overdoes it.">يتفاعل بقوة مع كل كلمة، يربط الموضوع دائماً بتجربة شخصية، أحياناً يبالغ.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: تفاعله يبدو مبرمجاً وليس عفوياً" data-en="Tell: reactions feel scripted rather than spontaneous">علامة الكشف: تفاعله يبدو مبرمجاً وليس عفوياً</div>
-      </div>
-      <div class="persona-card" style="--persona-color:var(--red)" data-delay="480">
-        <span class="persona-emoji">🤨</span>
-        <div class="persona-name" data-ar="متشكك وناقد" data-en="Skeptical & Critical">متشكك وناقد</div>
-        <div class="persona-label">PERSONA 07</div>
-        <p class="persona-desc" data-ar="يشكك في كل شيء، يثير الشك حول الجميع بالتساوي ليصعّب تحديد هدفه." data-en="Questions everything, spreads suspicion equally to make his actual target hard to identify.">يشكك في كل شيء، يثير الشك حول الجميع بالتساوي ليصعّب تحديد هدفه.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: ينتقد أشياء واضحة لا تحتاج نقداً" data-en="Tell: criticizes obvious things that need no criticism">علامة الكشف: ينتقد أشياء واضحة لا تحتاج نقداً</div>
-      </div>
-      <div class="persona-card" style="--persona-color:var(--violet)" data-delay="560">
-        <span class="persona-emoji">😌</span>
-        <div class="persona-name" data-ar="هادئ ومحايد" data-en="Quiet & Neutral">هادئ ومحايد</div>
-        <div class="persona-label">PERSONA 08</div>
-        <p class="persona-desc" data-ar="يوافق الأغلبية، يتجنب الجدل، ردوده مقتضبة — يبدو بريئاً حتى التمحيص." data-en="Agrees with majority, avoids conflict, brief replies — seems innocent until scrutinized.">يوافق الأغلبية، يتجنب الجدل، ردوده مقتضبة — يبدو بريئاً حتى التمحيص.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: لا يتخذ موقفاً حتى عندما يُسأل مباشرة" data-en="Tell: won't take a stance even when directly asked">علامة الكشف: لا يتخذ موقفاً حتى عندما يُسأل مباشرة</div>
-      </div>
-      <div class="persona-card" style="--persona-color:var(--cyan)" data-delay="640">
-        <span class="persona-emoji">🔍</span>
-        <div class="persona-name" data-ar="محقق متحمس" data-en="Eager Detective">محقق متحمس</div>
-        <div class="persona-label">PERSONA 09</div>
-        <p class="persona-desc" data-ar="يحلل ردود الآخرين علناً، يطرح أسئلة ذكية — لكنه يحوّل الشبهة عن نفسه." data-en="Analyzes others' replies openly, asks sharp questions — but deflects suspicion from himself.">يحلل ردود الآخرين علناً، يطرح أسئلة ذكية — لكنه يحوّل الشبهة عن نفسه.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: يُحلّل الجميع لكن لا يشارك تجربة شخصية حقيقية" data-en="Tell: analyzes everyone but never shares a real personal experience">علامة الكشف: يُحلّل الجميع لكن لا يشارك تجربة شخصية حقيقية</div>
-      </div>
-      <div class="persona-card" style="--persona-color:var(--gold)" data-delay="720">
-        <span class="persona-emoji">🤝</span>
-        <div class="persona-name" data-ar="متحالف ومتعاطف" data-en="Alliance Builder">متحالف ومتعاطف</div>
-        <div class="persona-label">PERSONA 10</div>
-        <p class="persona-desc" data-ar="يبني تحالفات، يعزز كلام من يتفق معه، يوجّه الاتهام مستتراً بالإجماع." data-en="Builds coalitions, reinforces agreers, directs accusation while hiding behind consensus.">يبني تحالفات، يعزز كلام من يتفق معه، يوجّه الاتهام مستتراً بالإجماع.</p>
-        <div class="persona-tells" data-ar="علامة الكشف: يوافق الجميع على كل شيء دون رأيه الخاص" data-en="Tell: agrees with everyone on everything without a real personal opinion">علامة الكشف: يوافق الجميع على كل شيء دون رأيه الخاص</div>
+      <div class="feat-card" data-accent="violet">
+        <span class="feat-icon">🔀</span>
+        <div class="feat-title" data-ar="لا نمط ثابت" data-en="No Fixed Pattern">لا نمط ثابت</div>
+        <p class="feat-desc" data-ar="كل جولة شخصية مختلفة كلياً — حتى لو لعبت مئة جولة لن تتعلم خوارزمية تكشفه بها." data-en="Every round is a completely different identity — even after 100 games you won't find a pattern to exploit.">كل جولة شخصية مختلفة كلياً — حتى لو لعبت مئة جولة لن تتعلم خوارزمية تكشفه بها.</p>
       </div>
     </div>
   </div>
@@ -1251,7 +1176,7 @@ const obs=new IntersectionObserver(entries=>entries.forEach(e=>{
     obs.unobserve(e.target);
   }
 }),{threshold:.12});
-document.querySelectorAll('.how-step,.feat-card,.rule-card,.demo-feature,.chat-mockup,.persona-card,.score-card').forEach(el=>obs.observe(el));
+document.querySelectorAll('.how-step,.feat-card,.rule-card,.demo-feature,.chat-mockup,.score-card').forEach(el=>obs.observe(el));
 
 /* ═══════════════════════════════════════════
    SCROLL HINT — hide on first scroll

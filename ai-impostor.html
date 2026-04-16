@@ -494,53 +494,6 @@ const AI_EN=[
   'Bailey','Camden','Ellis','Flynn','Gray','Harper','Indigo','Jules','Kendall','Lane'
 ];
 
-/* ── AI PERSONAS ── */
-/* ── PLAYER NAME POOLS (auto-assigned, same source as AI) ── */
-const PLAYER_NAMES_AR=[
-  'سامي','فهد','خالد','طارق','عمر','ماجد','راشد','سلطان','عبدالله','حمد',
-  'جاسم','نواف','بندر','مشعل','فيصل','تركي','سعود','منصور','زياد','نورا',
-  'ريم','لمى','هند','منى','شيخة','فاطمة','مريم','سارة','غادة','دانة',
-  'علي','حيدر','مصطفى','أحمد','محمد','حسن','كرار','عمار','باسل','ياسر',
-  'ليث','زينة','رنا','وسن','بتول','إيمان','نسرين','هديل','دنيا','سجى',
-  'كريم','مازن','وائل','رامي','شادي','نادر','تامر','عمرو','هاني','سيف',
-  'ياسمين','نهى','رانيا','لين','دينا','روان','نادين','سلمى','أمين','يوسف',
-  'إلياس','أيوب','أنس','حمزة','إبراهيم','إسماعيل','عثمان','آية','إيناس',
-  'أسماء','خديجة','زينب','حفصة','أميرة','سناء','ندى','نور','ملك','لارا',
-  'جنى','تالا','رؤى','عبدالرحمن','مازن','ريان','لمار','جود','بيان','باسل'
-];
-const PLAYER_NAMES_EN=[
-  'Alex','Jordan','Sam','Casey','Riley','Morgan','Drew','Quinn','Avery','Blake',
-  'Taylor','Skyler','Parker','Reese','Sage','River','Ash','Rowan','Finley','Emery',
-  'Charlie','Jamie','Jesse','Kai','Logan','Marley','Noel','Phoenix','Sloane','Spencer',
-  'Bailey','Camden','Ellis','Flynn','Gray','Harper','Jules','Kendall','Lane','Scout'
-];
-
-/* ── AI PERSONAS — 10 شخصيات ── */
-const PERSONAS_AR={
-  shy:{label:'خجول ومتردد',desc:'قليل الكلام يتردد يبدأ بـ"يعني"',style:'جمل قصيرة أو ناقصة أحياناً',gameplay:'يركز على الموضوع ولا يبرز — صعب الكشف'},
-  sarcastic:{label:'ساخر وعفوي',desc:'يعلق بسخرية خفيفة يقلل من الأمور',style:'"خخخ" أو "واضح يا صديق"',gameplay:'يشكك في الكل ليصرف الأنظار'},
-  confident:{label:'واثق ومسيطر',desc:'يبدي رأيه بثقة يقود النقاش',style:'"أنا شايف" أو "هذا واضح"',gameplay:'يتهم بسرعة ليبدو مساعداً قد يخطئ الهدف'},
-  distracted:{label:'مشتت وسريع',desc:'ردود قصيرة أحياناً خارج السياق',style:'كلمتان أو ثلاث لا يكمل الفكرة',gameplay:'يبدو غير مبالٍ لا يثير الشك في البداية'},
-  curious:{label:'فضولي ومتساءل',desc:'يطرح أسئلة مهتم بالتفاصيل',style:'"شلون يعني؟" أو "وش قصدك؟"',gameplay:'يختبر الآخرين بأسئلة تبدو بريئة'},
-  emotional:{label:'عاطفي ومتأثر',desc:'يتفاعل بقوة يربط الموضوع بنفسه',style:'"والله هذا حزني" "صدق والله"',gameplay:'يجعل الاتهام يبدو ظلماً شخصياً'},
-  skeptic:{label:'متشكك وناقد',desc:'يشكك في كل شيء لا يصدق بسهولة',style:'"ما أصدق هذا" "مو منطقي"',gameplay:'يثير الشك حول الجميع بالتساوي'},
-  passive:{label:'هادئ ومحايد',desc:'يوافق الأغلبية يتجنب الجدل',style:'"أه صح" "ممكن" "ما عندي رأي"',gameplay:'موافقته للكل تبدو مشبوهة عند التمحيص'},
-  investigator:{label:'محقق متحمس',desc:'يحلل الردود علناً ويطرح أسئلة ذكية',style:'"ليش ما ذكرت تجربة؟" "ردودك كلها قصيرة"',gameplay:'يبدو مساعداً بينما يحول الشبهة عن نفسه'},
-  ally:{label:'متحالف ومتعاطف',desc:'يبني تحالفات ويعزز كلام من يتفق معه',style:'"أنا كمان لاحظت" "صح والله"',gameplay:'يوجه الاتهام نحو شخص مستتراً بالإجماع'}
-};
-const PERSONAS_EN={
-  shy:{label:'Shy & Hesitant',desc:'Speaks little avoids strong opinions',style:'Short incomplete sentences starts with "idk"',gameplay:'Focuses on topic and doesn\'t stand out — hard to catch'},
-  sarcastic:{label:'Sarcastic & Casual',desc:'Light sarcastic comments slightly dismissive',style:'"sure lol" or "obviously right"',gameplay:'Questions everyone to deflect suspicion from self'},
-  confident:{label:'Confident & Direct',desc:'States opinions clearly tries to lead',style:'Direct sentences "clearly" or "that\'s obvious"',gameplay:'Accuses quickly to seem helpful may target wrong person'},
-  distracted:{label:'Distracted & Brief',desc:'Very short replies sometimes off-topic',style:'2-3 words sometimes incomplete',gameplay:'Seems uninterested doesn\'t raise suspicion early'},
-  curious:{label:'Curious & Inquisitive',desc:'Asks questions interested in details',style:'"wait what?" or "how exactly?"',gameplay:'Tests others with questions that seem innocent'},
-  emotional:{label:'Emotional & Expressive',desc:'Reacts strongly ties topic to self',style:'"that hit" "fr though"',gameplay:'Makes being suspected feel like a personal attack'},
-  skeptic:{label:'Skeptical & Critical',desc:'Questions everything hard to convince',style:'"I don\'t buy that" "doesn\'t add up"',gameplay:'Spreads suspicion equally makes targeting hard'},
-  passive:{label:'Quiet & Neutral',desc:'Agrees with majority avoids conflict',style:'"yeah" "maybe" "no strong opinion"',gameplay:'Agreeing with everyone is suspicious on closer look'},
-  investigator:{label:'Eager Detective',desc:'Analyzes replies openly asks probing questions',style:'"why no personal story?" "all your replies are short"',gameplay:'Seems to help catch AI while deflecting from self'},
-  ally:{label:'Alliance Builder',desc:'Builds coalitions reinforces agreeing players',style:'"I noticed that too" "exactly"',gameplay:'Directs accusation via consensus to stay hidden'}
-};
-const rndKey=obj=>Object.keys(obj)[Math.floor(Math.random()*Object.keys(obj).length)];
 const WIN_TARGET_DEFAULT=7;
 
 const S={roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,players:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null,_lastChatMsgs:[],_lastAiId:null};
@@ -764,7 +717,14 @@ window.saveGroqKey=async function(){
     if(!r.ok){if(r.status===401)throw new Error('auth');if(r.status===429)throw new Error('quota');throw new Error('unknown');}
     localStorage.setItem('__ai_imp_gk',key);GROQ=key;sndSuccess();
     btn.textContent='✅ تم التحقق!';toast('✅ تم حفظ المفتاح بنجاح!');
-    setTimeout(()=>showScreen('home-screen'),800);
+    // If came from createRoom, resume creation automatically
+    const pending=sessionStorage.getItem('__pending_create');
+    if(pending){
+      sessionStorage.removeItem('__pending_create');
+      setTimeout(()=>{showScreen('home-screen');setTimeout(()=>createRoom(),300);},600);
+    } else {
+      setTimeout(()=>showScreen('home-screen'),800);
+    }
   }catch(e){
     const msgs={auth:'❌ المفتاح غير صحيح — تأكد من نسخه كاملاً',quota:'⚠️ تجاوزت الحد المجاني لـ Groq — جرب لاحقاً',unknown:'❌ تعذر التحقق — تأكد من الاتصال بالإنترنت'};
     errEl.textContent=msgs[e.message]||msgs.unknown;errEl.style.display='block';
@@ -805,27 +765,17 @@ async function _validateGroqKey(key,isRetry=false){
 }
 
 (function init(){
+  // Everyone goes to home screen directly — no Groq check on load
+  // Groq API is only required when CREATING a room (host only)
   const saved=localStorage.getItem('__ai_imp_gk');
   if(saved&&saved.startsWith('gsk_')&&saved.length>20){
     GROQ=saved;
-    showScreen('home-screen');
-    // Phase 4: validate in background — non-blocking
+    // Validate in background silently — non-blocking
     _validateGroqKey(saved).then(valid=>{
-      if(!valid){
-        // Key was silently cleared — redirect to groq screen
-        GROQ='';
-        showScreen('groq-screen');
-        // Show subtle notice on the groq screen
-        const errEl=document.getElementById('groq-error');
-        if(errEl){
-          errEl.textContent='⚠️ مفتاحك السابق لم يعد صالحاً — أدخل مفتاحاً جديداً';
-          errEl.style.display='block';
-        }
-      }
-    }).catch(()=>{}); // never crash on validation failure
-  } else {
-    showScreen('groq-screen');
+      if(!valid){GROQ='';localStorage.removeItem('__ai_imp_gk');}
+    }).catch(()=>{});
   }
+  showScreen('home-screen');
   setTimeout(attachSounds,100);
 })();
 window.switchTab=function(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-btn-'+tab).classList.add('active');document.getElementById('tab-create').style.display=tab==='create'?'block':'none';document.getElementById('tab-join').style.display=tab==='join'?'block':'none';};
@@ -836,6 +786,19 @@ window.createRoom=async function(){
   const lang=document.getElementById('create-lang').value;
   const winTarget=parseInt(document.getElementById('create-wintarget')?.value)||WIN_TARGET_DEFAULT;
   const realName=document.getElementById('create-realname').value.trim()||'لاعب';
+  // HOST needs Groq API key — check before creating
+  if(!GROQ||!GROQ.startsWith('gsk_')){
+    // Save pending create info and redirect to groq setup
+    sessionStorage.setItem('__pending_create',JSON.stringify({lang,winTarget,realName}));
+    const isAr=lang==='ar';
+    const errEl=document.getElementById('groq-error');
+    if(errEl){
+      errEl.textContent=isAr?'⚠️ منشئ الغرفة يحتاج مفتاح Groq API لتشغيل الذكاء الاصطناعي':'⚠️ Room host needs a Groq API key to power the AI';
+      errEl.style.display='block';
+    }
+    showScreen('groq-screen');
+    return;
+  }
   loading(true,lang==='ar'?'جارٍ إنشاء الغرفة...':'Creating room...');
   try{
     const roomId=genCode(),playerId=genId(),avatar=rnd(AVATARS);
@@ -983,8 +946,6 @@ window.hostStart=async function(){
   try{
     const topic=rnd(S.lang==='ar'?T_AR:T_EN);
     const aiId=genId(),aiAvatar=rnd(AVATARS),aiName=rnd(S.lang==='ar'?AI_AR:AI_EN);
-    // Pick random persona for this round
-    const personaKey=rndKey(S.lang==='ar'?PERSONAS_AR:PERSONAS_EN);
     const pSnap=await get(ref(db,`rooms/${S.roomId}/players`));
     const players=pSnap.val()||{};
     const scores={};Object.entries(players).forEach(([id,p])=>{if(!p.isAI)scores[id]=p.score||0;});
@@ -1009,7 +970,7 @@ window.hostStart=async function(){
       phase:'chat',topic,round:curRound,aiPlayerId:aiId,
       chatStartTime:nowTs(),scores,humanWon:null,mostVotedId:null,voteCounts:null,
       turnOrder:allIds,currentTurnIdx:0,turnStartTime:nowTs(),
-      aiMemory:'',sentCount:0,aiPersona:personaKey,gameWinner:null
+      aiMemory:'',sentCount:0,gameWinner:null
     });
     loading(false);
   }catch(e){loading(false);document.getElementById('start-btn').disabled=false;toast('خطأ: '+e.message);}
@@ -1032,6 +993,14 @@ async function enterGame(room){
   // Cache players locally to avoid repeated Firebase gets in renderTurnBar
   const allPSnap=await get(ref(db,`rooms/${S.roomId}/players`));
   S.players=allPSnap.val()||{};
+  // BUG-FIX: render turn bar immediately after S.players is ready
+  // prevents empty/broken first turn on round 2+
+  const initRoomSnap=await get(ref(db,`rooms/${S.roomId}`));
+  const initRoom=initRoomSnap.val()||{};
+  if(initRoom.turnOrder&&initRoom.phase==='chat'){
+    const _io=initRoom.turnOrder,_ii=initRoom.currentTurnIdx||0;
+    renderTurnBar(initRoom,_io,_ii,_io[_ii%_io.length]);
+  }
   document.getElementById('game-topic').textContent=isAr?`الموضوع: ${S.topic}`:`Topic: ${S.topic}`;
   document.getElementById('round-badge').textContent=`R${S.round}`;
   const myScore=S.prevScores[S.playerId]||0;
@@ -1278,7 +1247,90 @@ window.sendMsg=async function(){
 window.handleKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}};
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';};
 
-/* ══════════ AI TAKE TURN — Smart human-like system ══════════ */
+/* ══════════ GROQ FETCH HELPER ══════════ */
+async function groqFetch(messages, maxTokens=80, temperature=0.95){
+  const MODELS=['llama-3.3-70b-versatile','llama-3.1-70b-versatile','llama-3.1-8b-instant'];
+  let lastErr=null;
+  for(const model of MODELS){
+    try{
+      const ctrl=new AbortController();
+      const t=setTimeout(()=>ctrl.abort(),12000);
+      const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
+        body:JSON.stringify({model,messages,max_tokens:maxTokens,temperature,top_p:0.95,frequency_penalty:0.5}),
+        signal:ctrl.signal
+      });
+      clearTimeout(t);
+      if(res.ok){const d=await res.json();return d.choices?.[0]?.message?.content?.trim()||'';}
+      if(res.status===401||res.status===403){throw new Error('Groq auth '+res.status);}
+      lastErr=new Error('Groq '+res.status);
+    }catch(e){lastErr=e;if(e.message?.includes('auth'))break;}
+  }
+  throw lastErr||new Error('All models failed');
+}
+
+/* ══════════ AI IDENTITY BUILDER — runs once per round ══════════ */
+async function buildAiIdentity(aiName, topic, humanNames, isAr){
+  // Pick a random ally and a random doubt target (different people)
+  const shuffled=[...humanNames].sort(()=>Math.random()-.5);
+  const ally=shuffled[0]||'';
+  const doubt=shuffled[1]||shuffled[0]||'';
+
+  const promptAr=`أنت ستلعب دور إنسان في محادثة جماعية.
+اسمك: ${aiName}
+الموضوع: "${topic}"
+المشاركون: ${humanNames.join('، ')}
+
+قرر الآن بحرية تامة من أنت. اختر:
+- عمرك ووضعك (طالب، موظف، إلخ)
+- ذكراك أو موقفك الشخصي من الموضوع — تفصيلة واحدة حسية صغيرة
+- عادة كتابية واحدة تميزك (كلمة تتكرر، طريقة ضحك، أسلوب موافقة)
+- مستوى انخراطك: عالي أو عادي أو منخفض
+
+أجب بـ JSON فقط بدون أي نص إضافي:
+{"identity":"[عمرك ووضعك في جملة]","story":"[ذكراك عن الموضوع]","habit":"[عادتك الكتابية]","engagement":"[high/normal/low]"}`;
+
+  const promptEn=`You will play the role of a human in a group chat.
+Your name: ${aiName}
+Topic: "${topic}"
+Members: ${humanNames.join(', ')}
+
+Freely decide who you are. Choose:
+- Your age and situation (student, worker, etc.)
+- One personal memory or take on the topic — one small sensory detail
+- One writing habit that defines you (repeated word, laugh style, agreement style)
+- Engagement level: high, normal, or low
+
+Reply with JSON only, no extra text:
+{"identity":"[age and situation in one phrase]","story":"[your memory about the topic]","habit":"[your writing habit]","engagement":"[high/normal/low]"}`;
+
+  try{
+    const raw=await groqFetch([{role:'user',content:isAr?promptAr:promptEn}],120,0.98);
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    return {
+      identity:parsed.identity||'',
+      story:parsed.story||'',
+      habit:parsed.habit||'',
+      engagement:parsed.engagement||'normal',
+      ally,
+      doubt
+    };
+  }catch(e){
+    // Fallback identity if JSON parse fails
+    return {
+      identity:isAr?'شخص عادي في العشرينات':'someone in their twenties',
+      story:isAr?`تجربة شخصية مع موضوع ${topic}`:`personal experience with ${topic}`,
+      habit:isAr?'يقول "والله" أحياناً':'says "honestly" sometimes',
+      engagement:'normal',
+      ally,
+      doubt
+    };
+  }
+}
+
+/* ══════════ AI TAKE TURN — Identity-based natural system ══════════ */
 async function aiTakeTurn(room){
   if(S.phase!=='chat'||S._aiTyping)return;
   const rs=await get(ref(db,`rooms/${S.roomId}`));
@@ -1298,226 +1350,121 @@ async function aiTakeTurn(room){
     const aiName=(players[S.aiId]||{}).name||'مجهول';
     const humanPlayers=Object.entries(players).filter(([,p])=>!p.isAI).map(([,p])=>p.name);
     const isAr=S.lang==='ar';
-
-    // ── Context (last 6 msgs max) ──
-    const chatCtx=allMsgs.slice(-6).map(m=>`${m.senderName}: ${m.text}`).join('\n');
     const myPrev=allMsgs.filter(m=>m.senderId===S.aiId);
+    const isFirstTurn=myPrev.length===0;
+
+    // ── Load or build identity ──
+    let identity=null;
+    const memRaw=rd.aiMemory||'';
+    if(memRaw.startsWith('__id:')){
+      try{identity=JSON.parse(memRaw.slice(5));}catch(e){identity=null;}
+    }
+
+    // Build identity on first turn
+    if(!identity){
+      identity=await buildAiIdentity(aiName,S.topic,humanPlayers,isAr);
+      // Save identity to Firebase immediately
+      await update(ref(db,`rooms/${S.roomId}`),{aiMemory:'__id:'+JSON.stringify(identity)});
+    }
+
+    // ── Context: last 8 messages ──
+    const chatCtx=allMsgs.slice(-8).map(m=>`${m.senderName}: ${m.text}`).join('\n');
     const lastMsg=allMsgs.length?allMsgs[allMsgs.length-1]:null;
-    const prevLastMsg=allMsgs.length>1?allMsgs[allMsgs.length-2]:null;
 
-    // ── Persona ──
-    const personaKey=rd.aiPersona||'shy';
-    const persona=(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey];
-
-    // ── Time phase (0-25% early, 25-60% mid, 60%+ late) ──
-    const elapsed=(Date.now()-(rd.chatStartTime||Date.now()))/1000;
-    const progress=Math.min(elapsed/180,1);
-    const phase=progress<0.25?'early':progress<0.6?'mid':'late';
-
-    // ── Suspicion target — pick once per round, stored in aiMemory ──
-    let suspectTarget='';
-    const memLines=(rd.aiMemory||'').split('\n');
-    const suspectLine=memLines.find(l=>l.startsWith('__suspect:'));
-    if(suspectLine){
-      suspectTarget=suspectLine.replace('__suspect:','').trim();
-      if(!humanPlayers.includes(suspectTarget))suspectTarget='';
-    }
-    if(!suspectTarget&&humanPlayers.length>0){
-      // Avoid picking the same person who just spoke (too obvious)
-      const pool=humanPlayers.filter(n=>n!==lastMsg?.senderName);
-      suspectTarget=rnd(pool.length?pool:humanPlayers);
-    }
-
-    // ── Detect accusation / being addressed ──
-    const lastSender=lastMsg?.senderName||humanPlayers[0]||'';
-    const beingAddressed=lastMsg&&lastMsg.senderId!==S.aiId&&
-      (lastMsg.text.includes(aiName)||
-       (prevLastMsg&&prevLastMsg.senderId===S.aiId&&lastMsg.senderId!==S.aiId));
+    // ── Detect if being accused ──
     const accuseWords=isAr
-      ?['ذكاء','بوت','bot','ai','مشبوه','غريب','روبوت','ذكي اصطناعي']
-      :['ai','bot','robot','weird','sus','suspicious','not human'];
-    const isAccusedDirectly=beingAddressed&&accuseWords.some(w=>lastMsg.text.toLowerCase().includes(w));
-    const generalSuspicion=!!(lastMsg&&lastMsg.senderId!==S.aiId&&!lastMsg.text.includes(aiName)&&
-      accuseWords.some(w=>lastMsg.text.toLowerCase().includes(w)));
+      ?['ذكاء','بوت','bot','ai','مشبوه','غريب','روبوت','اصطناعي']
+      :['ai','bot','robot','weird','sus','suspicious','not human','fake'];
+    const beingAccused=lastMsg&&lastMsg.senderId!==S.aiId&&
+      accuseWords.some(w=>lastMsg.text.toLowerCase().includes(w))&&
+      (lastMsg.text.includes(aiName)||myPrev.length>0);
 
-    // ── Behavior selection — game-aware and balanced ──
-    // early: ONLY discuss topic naturally, no accusation ever
-    // mid: hint suspicion once every ~3 turns, mostly still chat
-    // late: more reactive, can redirect blame but not obsessively
-    // Rule: never accuse in early, never over-accuse in late
-    const myTurnCount=myPrev.length;
-    let beh='chat';
+    // ── Build the prompt ──
+    // First turn: introduce naturally via story
+    // Later turns: react freely as this person
+    const firstTurnNoteAr=isFirstTurn
+      ?`\nهذه رسالتك الأولى — ابدأ بذكرى أو موقف شخصي قصير من قصتك.`:'';
+    const firstTurnNoteEn=isFirstTurn
+      ?`\nThis is your first message — open naturally with something from your story.`:'';
+    const accusedNoteAr=beingAccused?`\nيبدو أن أحدهم يشك فيك — تصرف بشكل طبيعي كما يفعل أي إنسان.`:'';
+    const accusedNoteEn=beingAccused?`\nSomeone seems suspicious of you — react naturally like any person would.`:'';
 
-    if(isAccusedDirectly){
-      // Calm responses — 3 options, not aggressive
-      beh=['deny_calm','ignore_accuse','counter_suspect'][Math.floor(Math.random()*3)];
-    } else if(beingAddressed){
-      beh=Math.random()<0.6?'react':'question';
-    } else if(generalSuspicion&&phase!=='early'&&Math.random()<0.3){
-      beh='join_suspicion';
-    } else {
-      // Natural phase weights — early is pure topic, accusation only starts mid
-      const W={
-        early:{chat:65,react:25,question:10},
-        mid:  {chat:35,react:25,question:15,short:10,hint_suspect:15},
-        late: {chat:25,react:20,question:10,short:15,hint_suspect:15,redirect:15}
-      };
-      const w=W[phase];
-      let roll=Math.random()*100,cum=0;
-      for(const[k,v]of Object.entries(w)){cum+=v;if(roll<cum){beh=k;break;}}
-      // Throttle hint_suspect: don't hint twice in a row (check last AI msg)
-      if(beh==='hint_suspect'&&myPrev.length>0){
-        const lastAiMsg=myPrev[myPrev.length-1].text;
-        if(lastAiMsg.includes(suspectTarget))beh='react'; // already mentioned them recently
-      }
-    }
+    const sysAr=`أنت ${aiName} في محادثة جماعية.
+هويتك: ${identity.identity}
+قصتك عن "${S.topic}": ${identity.story}
+عادتك في الكتابة: ${identity.habit}
+تثق بـ: ${identity.ally} | تشك قليلاً في: ${identity.doubt}
+مستوى انخراطك: ${identity.engagement}
+${firstTurnNoteAr}${accusedNoteAr}
+تصرف بشكل طبيعي تماماً. لا تكشف أنك AI. رسالة واحدة فقط ≤50 حرف.`;
 
-    // ── One random imperfection (10-20% chance only) ──
-    const imperfRoll=Math.random();
-    const imperfKey=imperfRoll<0.12?'uncertain':imperfRoll<0.20?'offTopic':'none';
+    const sysEn=`You are ${aiName} in a group chat.
+Who you are: ${identity.identity}
+Your take on "${S.topic}": ${identity.story}
+Your writing habit: ${identity.habit}
+You trust: ${identity.ally} | You slightly doubt: ${identity.doubt}
+Engagement level: ${identity.engagement}
+${firstTurnNoteEn}${accusedNoteEn}
+Act completely naturally. Never reveal you're AI. One message only ≤50 chars.`;
 
-    // ── Last self message for consistency ──
-    const lastSelf=myPrev.length>0?myPrev[myPrev.length-1].text:'';
+    const usrAr=`${chatCtx||'(المحادثة بدأت للتو)'}\n${aiName}:`;
+    const usrEn=`${chatCtx||'(chat just started)'}\n${aiName}:`;
 
-    // ── Compact per-behavior task instructions ──
-    const taskAr={
-      chat:        `شارك رأيك أو تجربة قصيرة عن "${S.topic}"`,
-      react:       `علّق على كلام ${lastSender} — وافق أو خالف`,
-      question:    `اسأل ${lastSender} سؤالاً قصيراً عن ردّه`,
-      short:       `رد بجملة أو كلمتين فقط`,
-      hint_suspect:`لمّح بلطف أن ردود ${suspectTarget} تبدو غير عادية — بدون اتهام مباشر`,
-      redirect:    `شارك ملاحظة عامة خفيفة عن طريقة كلام أحدهم — لا تذكر اسماً`,
-      join_suspicion:`وافق جزئياً على الشك العام وأضف ملاحظتك الخاصة`,
-      deny_calm:   `ردّ بهدوء واستغراب — لا تدافع كثيراً`,
-      ignore_accuse:`تجاهل الاتهام وقل شيئاً عادياً عن الموضوع`,
-      counter_suspect:`اسأل بنبرة عادية لماذا الشك عليك بالذات`
-    };
-    const taskEn={
-      chat:        `Share a short take or personal memory about "${S.topic}"`,
-      react:       `React to ${lastSender}'s message — agree or push back briefly`,
-      question:    `Ask ${lastSender} one short question about what they said`,
-      short:       `Reply in just one sentence or a couple words`,
-      hint_suspect:`Casually hint that ${suspectTarget}'s replies seem a bit unusual — not a direct accusation`,
-      redirect:    `Make a vague observation about how someone here writes — no names`,
-      join_suspicion:`Partially agree with the general suspicion and add one small personal observation`,
-      deny_calm:   `Reply calmly with mild surprise — don't over-defend`,
-      ignore_accuse:`Ignore the accusation and say something normal about the topic`,
-      counter_suspect:`Casually ask why you specifically are being suspected`
-    };
-    const task=isAr?(taskAr[beh]||taskAr.chat):(taskEn[beh]||taskEn.chat);
-
-    // ── Imperfection hint ──
-    const imperfAr={uncertain:'أضف تعبير تردد مثل "يعني" أو "مو متأكد"',offTopic:'ردّك يمكن يكون غير مرتبط تماماً بآخر رسالة',none:''};
-    const imperfEn={uncertain:'Add one hesitation word like "idk" or "i think"',offTopic:'Your reply can be slightly off the last message',none:''};
-    const imperfNote=isAr?imperfAr[imperfKey]:imperfEn[imperfKey];
-
-    // ── COMPACT system prompt ──
-    const sys=isAr
-      ?`أنت "${aiName}" في محادثة جماعية. الموضوع: "${S.topic}". الأعضاء: ${humanPlayers.join('، ')}.
-شخصيتك: ${persona.label} — ${persona.desc} | أسلوب: ${persona.style}
-${lastSelf?`قلت سابقاً: "${lastSelf}"`:''}`+
-`
-الكتابة: فصحى بسيطة ومباشرة كما يكتبها الناس يومياً — يجوز خطأ بسيط أو كلمة عامية أحياناً. ابقَ في موضوع الحديث أو علّق على من يتحدثون. لا تكن مثالياً. لا تقل أنك AI.
-المطلوب: ${task}${imperfNote?' | '+imperfNote:''}
-جملة واحدة فقط، ≤50 حرف.`
-      :`You are "${aiName}" in a group chat. Topic: "${S.topic}". Members: ${humanPlayers.join(', ')}.
-Persona: ${persona.label} — ${persona.desc} | Style: ${persona.style}
-${lastSelf?`You said before: "${lastSelf}"`:''}`+
-`
-Writing: natural casual English as people actually type. Stay on the topic or comment on who's talking. Don't be perfect. Never say you're AI.
-Task: ${task}${imperfNote?' | '+imperfNote:''}
-One sentence only, ≤50 chars.`;
-
-    const usr=isAr
-      ?`${chatCtx||'(لم يتحدث أحد بعد)'}\n${aiName}:`
-      :`${chatCtx||'(nobody talked yet)'}\n${aiName}:`;
-
-    // Show typing immediately — AI appears to be typing the whole time
+    // Show typing indicator immediately
     showTyping();
     if(S.roomId&&S.aiId){
       set(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`),{name:aiName,ts:nowTs()}).catch(()=>{});
     }
 
-    // Fetch from Groq first (silently, typing indicator is already showing)
+    // Verify still our turn before fetching
     const rs2=await get(ref(db,`rooms/${S.roomId}`));
     const rd2=rs2.val()||{};
     const cur2=(rd2.turnOrder||[])[(rd2.currentTurnIdx||0)%(rd2.turnOrder||[1]).length];
-    if(cur2!==S.aiId){removeTyping();if(S.roomId&&S.aiId)remove(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`)).catch(()=>{});S._aiTyping=false;return;}
-
-    const _ctrl=new AbortController();
-    const _fetchTimeout=setTimeout(()=>_ctrl.abort(),12000);
-    let res;
-    // Try primary model, fallback to llama-3.1-8b-instant if needed
-    const MODELS=['llama-3.3-70b-versatile','llama-3.1-70b-versatile','llama-3.1-8b-instant'];
-    let lastErr=null;
-    for(const model of MODELS){
-      try{
-        clearTimeout(_fetchTimeout); // reset timeout per attempt
-        const ctrl2=new AbortController();
-        const t2=setTimeout(()=>ctrl2.abort(),10000);
-        res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ}`},
-          body:JSON.stringify({
-            model,
-            messages:[{role:'system',content:sys},{role:'user',content:usr}],
-            max_tokens:60,temperature:0.95,top_p:0.93,
-            frequency_penalty:0.4
-          }),
-          signal:ctrl2.signal
-        });
-        clearTimeout(t2);
-        if(res.ok)break; // success — stop trying
-        if(res.status===401||res.status===403){lastErr=new Error('Groq auth '+res.status);break;} // no point retrying
-        lastErr=new Error('Groq '+res.status+' model:'+model);
-      }catch(fetchErr){lastErr=fetchErr;}
+    if(cur2!==S.aiId){
+      removeTyping();
+      if(S.roomId&&S.aiId)remove(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`)).catch(()=>{});
+      S._aiTyping=false;return;
     }
-    if(!res||!res.ok)throw lastErr||new Error('All Groq models failed');
-    const data=await res.json();
-    let text=data.choices?.[0]?.message?.content?.trim()||'';
+
+    // Fetch response from Groq
+    let text=await groqFetch(
+      [{role:'system',content:isAr?sysAr:sysEn},{role:'user',content:isAr?usrAr:usrEn}],
+      80, 0.97
+    );
     text=filterLang(text,S.lang);
-    if(!text||text.length<3){
-      const fb_ar={
-        shy:     ['يعني.. مو عارف','صعب أوصف','أعتقد شيء زي كذا'],
-        sarcastic:['والله ما أدري','شيء زي كذا مو؟','أه طبعاً..'],
-        confident:['واضح الموضوع','أنا شايف كذا','الأمر بسيط'],
-        distracted:['أه','صح','بس..'],
-        curious:  ['شلون يعني؟','وش قصدك بالضبط؟','تقدر توضح؟'],
-        emotional:['والله هذا حزني','صدق والله','نفس الشعور'],
-        skeptic:  ['مو متأكد','ما أصدق هذا','مو منطقي'],
-        passive:  ['أه صح','ممكن','ما عندي رأي قوي'],
-        investigator:['ليش ما وضّحت أكثر؟','ردودك مختصرة','لاحظت شيء غريب'],
-        ally:     ['أنا كمان لاحظت','صح والله','وافقك بهذا']
-      };
-      const fb_en={
-        shy:     ['idk honestly','hard to say','something like that'],
-        sarcastic:['sure lol','idk man','obviously'],
-        confident:['clearly','that makes sense','exactly'],
-        distracted:['yeah','ok','sure'],
-        curious:  ['wait what?','how exactly?','can you explain?'],
-        emotional:['that hit','fr though','same feeling'],
-        skeptic:  ['not sure about that','really?','doesn\'t add up'],
-        passive:  ['yeah','maybe','no strong opinion'],
-        investigator:['why so vague?','short replies again','noticed something off'],
-        ally:     ['I noticed too','exactly','agree with that']
-      };
-      const fb=isAr?fb_ar:fb_en;
-      text=rnd(fb[personaKey]||fb.shy);
+
+    // Fallback if empty
+    if(!text||text.length<2){
+      const fallbackAr=['والله ما أدري','يعني...','أه صح','نفس الشيء','صراحة غريب'];
+      const fallbackEn=['honestly idk','yeah','same','that\'s weird','true'];
+      text=rnd(isAr?fallbackAr:fallbackEn);
     }
     if(text.length>50)text=text.substring(0,47)+'...';
 
-    // Total typing duration based on message length:
-    // Short (≤12 chars)  → 8-14s  (short reply takes longer to think about)
-    // Medium (13-30)     → 5-10s
-    // Long (>30)         → 2-6s   (longer message = typed faster)
+    // ── Human-like typing delay based on engagement + message length ──
+    const eng=identity.engagement||'normal';
     const msgLen=text.length;
-    const minWait=msgLen<=12?8000:msgLen<=30?5000:2000;
-    const maxWait=msgLen<=12?14000:msgLen<=30?10000:6000;
-    const totalTypingMs=minWait+Math.random()*(maxWait-minWait);
-    // Time already spent (Groq fetch took some time) — wait the remainder
+    let minWait,maxWait;
+    if(eng==='high'){
+      // Engaged person types quickly but thinks a bit
+      minWait=msgLen<=15?4000:msgLen<=35?3000:2000;
+      maxWait=msgLen<=15?9000:msgLen<=35?7000:5000;
+    } else if(eng==='low'){
+      // Disengaged person is slow and inconsistent
+      minWait=msgLen<=15?6000:msgLen<=35?4000:2000;
+      maxWait=msgLen<=15?16000:msgLen<=35?12000:8000;
+    } else {
+      // Normal — varied
+      minWait=msgLen<=15?5000:msgLen<=35?3500:2000;
+      maxWait=msgLen<=15?13000:msgLen<=35?9000:6000;
+    }
+    // Add true randomness — sometimes faster, sometimes slower (human inconsistency)
+    const randomMultiplier=0.6+Math.random()*0.8;
+    const totalTypingMs=(minWait+Math.random()*(maxWait-minWait))*randomMultiplier;
     const elapsedTyping=Date.now()-_aiTurnStart;
-    const remaining=Math.max(500,totalTypingMs-elapsedTyping);
+    const remaining=Math.max(400,totalTypingMs-elapsedTyping);
     await new Promise(r=>setTimeout(r,remaining));
+
     if(S.phase!=='chat'){
       removeTyping();
       if(S.roomId&&S.aiId)remove(ref(db,`rooms/${S.roomId}/typing/${S.aiId}`)).catch(()=>{});
@@ -1535,11 +1482,7 @@ One sentence only, ≤50 chars.`;
     if(cur3!==S.aiId){S._aiTyping=false;return;}
 
     await push(ref(db,`rooms/${S.roomId}/chat`),{senderId:S.aiId,senderName:aiName,text,ts:nowTs(),type:'msg'});
-    // Persist suspect target + last message in memory
-    const prevMem=(rd3.aiMemory||'').split('\n').filter(l=>!l.startsWith('__suspect:')&&l.trim());
-    const newMem=[...prevMem,text,`__suspect:${suspectTarget}`].slice(-8).join('\n');
     await advanceTurn(rd3);
-    await update(ref(db,`rooms/${S.roomId}`),{aiMemory:newMem});
     S._aiTyping=false;
   }catch(e){
     console.warn('AI err:',e);
@@ -1801,11 +1744,16 @@ async function enterResult(room){
   setTimeout(async()=>{
     const allMsgs=S._lastChatMsgs||[];
     const aiMsgs=allMsgs.filter(m=>m.senderId===aiId);
-    const personaKey=roomData.aiPersona;
-    const persona=personaKey?(isAr?PERSONAS_AR:PERSONAS_EN)[personaKey]:null;
-    const personaHTML=persona
-      ?`<div class="analysis-item"><div class="analysis-icon">🎭</div><div class="analysis-text">${isAr?'شخصية الجولة:':'Round personality:'} <strong style="color:var(--cyan)">${persona.label}</strong></div></div>`
-      :'';
+    // Show AI identity from aiMemory instead of old persona system
+    let personaHTML='';
+    const _mem=roomData.aiMemory||'';
+    if(_mem.startsWith('__id:')){
+      try{
+        const _id=JSON.parse(_mem.slice(5));
+        personaHTML=`<div class="analysis-item"><div class="analysis-icon">🎭</div><div class="analysis-text">${isAr?'هويته:':'Identity:'} <strong style="color:var(--cyan)">${_id.identity||''}</strong></div></div>`
+          +`<div class="analysis-item"><div class="analysis-icon">📖</div><div class="analysis-text">${isAr?'قصته:':'Story:'} ${_id.story||''}</div></div>`;
+      }catch(e){}
+    }
     document.getElementById('analysis-title').textContent=isAr?'تحليل المتسلل':'Impostor Analysis';
     document.getElementById('analysis-content').innerHTML=personaHTML+(aiMsgs.length
       ?aiMsgs.map(m=>`<div class="analysis-item"><div class="analysis-icon">💬</div><div class="analysis-text">"${esc(m.text)}"</div></div>`).join('')
@@ -2104,6 +2052,22 @@ window.playAgainSameRoom=async function(){
 document.getElementById('join-code').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom();});
 document.getElementById('join-code').addEventListener('input',function(){this.value=this.value.toUpperCase();});
 document.getElementById('groq-input').addEventListener('keydown',e=>{if(e.key==='Enter')saveGroqKey();});
+// Show back-to-home link on groq screen if user arrived from home (not first time)
+(function(){
+  const gScreen=document.getElementById('groq-screen');
+  if(gScreen&&!document.getElementById('groq-back-link')){
+    const bl=document.createElement('a');
+    bl.id='groq-back-link';
+    bl.className='back-link';
+    bl.style.cssText='margin-top:16px;display:inline-flex;';
+    bl.href='#';
+    bl.textContent='← العودة';
+    bl.onclick=function(e){e.preventDefault();sessionStorage.removeItem('__pending_create');showScreen('home-screen');};
+    // Insert at top of groq card
+    const card=gScreen.querySelector('.card');
+    if(card)card.insertBefore(bl,card.firstChild);
+  }
+})();
 // rename is now auto — no input needed
 /* CHAR COUNTER */
 document.getElementById('chat-input').addEventListener('input',function(){
