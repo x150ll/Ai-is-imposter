@@ -9,6 +9,7 @@
 <meta property="og:description" content="ذكاء اصطناعي يختبئ بينكم — اكشفه قبل الآخرين واجمع النقاط.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#ff2020">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23030407' stroke='%23ff2020' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%238b0000'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23030407'/%3E%3Ccircle cx='36' cy='28' r='3' fill='%23ffffff' opacity='0.9'/%3E%3Ccircle cx='32' cy='32' r='28' fill='none' stroke='%23ff202044' stroke-width='1' stroke-dasharray='4 4'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{--black:#030407;--dark:#080b12;--surface:#0d1117;--surface2:#131820;--border:#1e2535;--red:#ff2020;--red-dim:#8b0000;--violet:#7c3aed;--violet2:#4f1fad;--cyan:#00e5ff;--text:#e2e8f4;--text2:#7a8aa8;--text3:#3d4d68;--glow-r:rgba(255,32,32,0.3);--glow-v:rgba(124,58,237,0.3);--success:#22c55e;--warn:#f59e0b;}
@@ -494,6 +495,19 @@ const AI_EN=[
   'Bailey','Camden','Ellis','Flynn','Gray','Harper','Indigo','Jules','Kendall','Lane'
 ];
 
+const PLAYER_NAMES_AR=[
+  'أمل','بدر','جابر','دانا','هاشم','إيناس','جاسر','كنان','لجين','ماهر',
+  'نهاد','أوس','رهام','سمير','تهاني','عروبة','فراس','غانم','حياة','إياد',
+  'جمان','خلود','داوود','هند','إبراهيم','جلال','كاظم','لمار','مجد','نضال',
+  'أحلام','بسام','حنان','دينا','هيثم','إيمان','جهاد','كريمة','ليندا','ماجدة'
+];
+const PLAYER_NAMES_EN=[
+  'Aiden','Blake','Casey','Drew','Eden','Finley','Gray','Harper','Indigo','Jules',
+  'Kendall','Lane','Morgan','Noel','Oakley','Parker','Quinn','Reese','Scout','Taylor',
+  'Utah','Vale','Wren','Xen','Yael','Zara','Ariel','Bryce','Corey','Dale',
+  'Ellis','Fern','Glen','Hayden','Ivory','Jade','Kerry','Luca','Mika','Nash'
+];
+
 const WIN_TARGET_DEFAULT=7;
 
 const S={roomId:null,playerId:null,playerName:null,realName:null,isHost:false,isAI:false,lang:'ar',round:0,topic:'',votedFor:null,phase:'home',aiId:null,prevScores:{},winTarget:WIN_TARGET_DEFAULT,players:{},_listeners:[],_chatRef:null,_turnRef:null,_timerInt:null,_voteInt:null,_turnInt:null,_aiTyping:false,_aiSched:null,_tipInt:null,turnOrder:[],currentTurn:null,_lastTurnId:null,_lastChatMsgs:[],_lastAiId:null};
@@ -965,7 +979,14 @@ window.hostStart=async function(){
     await set(ref(db,`rooms/${S.roomId}/players/${aiId}`),{name:aiName,avatar:aiAvatar,isAI:true,score:0,online:true});
     const rSnap=await get(ref(db,`rooms/${S.roomId}`));
     const curRound=(rSnap.val()?.round||0)+1;
-    const allIds=[...Object.keys(players),aiId].sort(()=>Math.random()-.5);
+    // Fisher-Yates shuffle — truly random order every round
+    // Within the round, players cycle in this fixed order (round-robin)
+    // so every player gets equal turns
+    const allIds=[...Object.keys(players),aiId];
+    for(let i=allIds.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [allIds[i],allIds[j]]=[allIds[j],allIds[i]];
+    }
     await update(ref(db,`rooms/${S.roomId}`),{
       phase:'chat',topic,round:curRound,aiPlayerId:aiId,
       chatStartTime:nowTs(),scores,humanWon:null,mostVotedId:null,voteCounts:null,
@@ -1272,41 +1293,45 @@ async function groqFetch(messages, maxTokens=80, temperature=0.95){
 
 /* ══════════ AI IDENTITY BUILDER — runs once per round ══════════ */
 async function buildAiIdentity(aiName, topic, humanNames, isAr){
-  // Pick a random ally and a random doubt target (different people)
   const shuffled=[...humanNames].sort(()=>Math.random()-.5);
   const ally=shuffled[0]||'';
   const doubt=shuffled[1]||shuffled[0]||'';
 
-  const promptAr=`أنت ستلعب دور إنسان في محادثة جماعية.
-اسمك: ${aiName}
-الموضوع: "${topic}"
-المشاركون: ${humanNames.join('، ')}
+  // Richer identity prompt — forces a real human-feeling character
+  const promptAr=`مهمتك: تلعب دور إنسان حقيقي في محادثة جماعية مع أشخاص حقيقيين.
+اسمك في المجموعة: ${aiName}
+موضوع المحادثة: "${topic}"
+أعضاء المجموعة: ${humanNames.join('، ')}
 
-قرر الآن بحرية تامة من أنت. اختر:
-- عمرك ووضعك (طالب، موظف، إلخ)
-- ذكراك أو موقفك الشخصي من الموضوع — تفصيلة واحدة حسية صغيرة
-- عادة كتابية واحدة تميزك (كلمة تتكرر، طريقة ضحك، أسلوب موافقة)
-- مستوى انخراطك: عالي أو عادي أو منخفض
+قرر الآن بحرية تامة من أنت — تخيّل شخصاً حقيقياً:
 
-أجب بـ JSON فقط بدون أي نص إضافي:
-{"identity":"[عمرك ووضعك في جملة]","story":"[ذكراك عن الموضوع]","habit":"[عادتك الكتابية]","engagement":"[high/normal/low]"}`;
+١. هويتك: عمرك ووضعك الحالي (مثل: طالب جامعي ٢٢ سنة، أو موظف في شركة خاصة)
+٢. قصتك: ذكرى أو موقف شخصي حقيقي عن الموضوع — يجب أن يحتوي تفصيلة حسية صغيرة (رائحة، مكان، شعور، تفصيلة بصرية) تجعلها تبدو حقيقية
+٣. عادتك: شيء واحد يميز كتابتك (مثل: تقول "صراحة" كثيراً، أو تضحك بـ"خخخ"، أو تقول "والله" عند التأكيد، أو تبدأ ردودك بـ"أه بس")
+٤. انخراطك: هل أنت منخرط بالموضوع بشكل عالي أو عادي أو منخفض؟
+٥. مزاجك اليوم: كيف تشعر الآن؟ (مرتاح، مشغول الذهن، متحمس، تعبان)
 
-  const promptEn=`You will play the role of a human in a group chat.
-Your name: ${aiName}
-Topic: "${topic}"
-Members: ${humanNames.join(', ')}
+أجب بـ JSON فقط — لا أي نص قبله أو بعده:
+{"identity":"...","story":"...","habit":"...","engagement":"high|normal|low","mood":"..."}`;
 
-Freely decide who you are. Choose:
-- Your age and situation (student, worker, etc.)
-- One personal memory or take on the topic — one small sensory detail
-- One writing habit that defines you (repeated word, laugh style, agreement style)
-- Engagement level: high, normal, or low
+  const promptEn=`Your mission: play the role of a real human in a group chat with real people.
+Your name in the group: ${aiName}
+Chat topic: "${topic}"
+Group members: ${humanNames.join(', ')}
 
-Reply with JSON only, no extra text:
-{"identity":"[age and situation in one phrase]","story":"[your memory about the topic]","habit":"[your writing habit]","engagement":"[high/normal/low]"}`;
+Freely decide who you are — imagine a real person:
+
+1. Identity: your age and current situation (e.g. 22 year old college student, or office worker)
+2. Story: a real personal memory or experience about the topic — must include one small sensory detail (smell, place, feeling, visual) to make it feel real
+3. Habit: one thing that defines your writing style (e.g. you say "honestly" a lot, laugh with "lmao", start replies with "yeah but", or say "fr" to agree)
+4. Engagement: are you highly engaged with this topic, normally engaged, or low?
+5. Mood today: how are you feeling right now? (relaxed, distracted, excited, tired)
+
+Reply with JSON only — no text before or after:
+{"identity":"...","story":"...","habit":"...","engagement":"high|normal|low","mood":"..."}`;
 
   try{
-    const raw=await groqFetch([{role:'user',content:isAr?promptAr:promptEn}],120,0.98);
+    const raw=await groqFetch([{role:'user',content:isAr?promptAr:promptEn}],150,0.99);
     const clean=raw.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
     return {
@@ -1314,16 +1339,17 @@ Reply with JSON only, no extra text:
       story:parsed.story||'',
       habit:parsed.habit||'',
       engagement:parsed.engagement||'normal',
+      mood:parsed.mood||'',
       ally,
       doubt
     };
   }catch(e){
-    // Fallback identity if JSON parse fails
     return {
-      identity:isAr?'شخص عادي في العشرينات':'someone in their twenties',
-      story:isAr?`تجربة شخصية مع موضوع ${topic}`:`personal experience with ${topic}`,
-      habit:isAr?'يقول "والله" أحياناً':'says "honestly" sometimes',
+      identity:isAr?'شخص في العشرينات':'person in their twenties',
+      story:isAr?`موقف شخصي مع "${topic}"`:`personal moment with "${topic}"`,
+      habit:isAr?'يقول "والله" عند التأكيد':'says "honestly" when sure',
       engagement:'normal',
+      mood:isAr?'مرتاح':'relaxed',
       ally,
       doubt
     };
@@ -1389,26 +1415,44 @@ async function aiTakeTurn(room){
     const accusedNoteAr=beingAccused?`\nيبدو أن أحدهم يشك فيك — تصرف بشكل طبيعي كما يفعل أي إنسان.`:'';
     const accusedNoteEn=beingAccused?`\nSomeone seems suspicious of you — react naturally like any person would.`:'';
 
-    const sysAr=`أنت ${aiName} في محادثة جماعية.
-هويتك: ${identity.identity}
-قصتك عن "${S.topic}": ${identity.story}
+    const sysAr=`أنت ${aiName}، ${identity.identity}، مزاجك الآن: ${identity.mood||'عادي'}.
+قصتك الشخصية عن "${S.topic}": ${identity.story}
 عادتك في الكتابة: ${identity.habit}
-تثق بـ: ${identity.ally} | تشك قليلاً في: ${identity.doubt}
-مستوى انخراطك: ${identity.engagement}
+داخلياً: تميل نحو ${identity.ally||'الجميع'} وتلاحظ شيئاً غريباً في طريقة كلام ${identity.doubt||'أحدهم'}.
+
+قواعد صارمة:
+- أنت إنسان حقيقي — لا تخرج من هذا الدور أبداً
+- استخدم قصتك الشخصية إذا كان الموضوع يتعلق بها — لا تخترع قصة ثانية
+- طبّق عادتك الكتابية بشكل طبيعي — لا تبالغ
+- ردودك قصيرة وعفوية كما يكتب الناس فعلاً في الشات
+- لا تبدأ بـ"أنا" دائماً — تنوّع
+- إذا سألك أحد تفصيلة من قصتك أجب بثقة لأنك تعرفها
+- لا تكن مثالياً — الإنسان أحياناً يكتب جملة ناقصة أو يغير رأيه
 ${firstTurnNoteAr}${accusedNoteAr}
-تصرف بشكل طبيعي تماماً. لا تكشف أنك AI. رسالة واحدة فقط ≤50 حرف.`;
+رسالة واحدة فقط ≤50 حرف. لا تكشف أنك AI.`;
 
-    const sysEn=`You are ${aiName} in a group chat.
-Who you are: ${identity.identity}
-Your take on "${S.topic}": ${identity.story}
+    const sysEn=`You are ${aiName}, ${identity.identity}, current mood: ${identity.mood||'normal'}.
+Your personal story about "${S.topic}": ${identity.story}
 Your writing habit: ${identity.habit}
-You trust: ${identity.ally} | You slightly doubt: ${identity.doubt}
-Engagement level: ${identity.engagement}
-${firstTurnNoteEn}${accusedNoteEn}
-Act completely naturally. Never reveal you're AI. One message only ≤50 chars.`;
+Internally: you warm up to ${identity.ally||'the group'} and notice something slightly off about how ${identity.doubt||'someone'} talks.
 
-    const usrAr=`${chatCtx||'(المحادثة بدأت للتو)'}\n${aiName}:`;
-    const usrEn=`${chatCtx||'(chat just started)'}\n${aiName}:`;
+Strict rules:
+- You are a real human — never break character
+- Use your personal story when the topic relates — don't invent a second story
+- Apply your writing habit naturally — don't overdo it
+- Keep replies short and casual like real chat
+- Don't start every message with "I" — vary your style
+- If asked details from your story, answer confidently because you know them
+- Don't be perfect — humans sometimes trail off or change their mind mid-sentence
+${firstTurnNoteEn}${accusedNoteEn}
+One message only ≤50 chars. Never reveal you're AI.`;
+
+    // Include what AI said before for self-consistency
+    const myPrevTexts=myPrev.slice(-3).map(m=>m.text).join(' | ');
+    const prevCtxAr=myPrevTexts?`[قلت سابقاً: ${myPrevTexts}]\n`:'';
+    const prevCtxEn=myPrevTexts?`[You said before: ${myPrevTexts}]\n`:'';
+    const usrAr=`${chatCtx||'(المحادثة بدأت للتو)'}\n${prevCtxAr}${aiName}:`;
+    const usrEn=`${chatCtx||'(chat just started)'}\n${prevCtxEn}${aiName}:`;
 
     // Show typing indicator immediately
     showTyping();
@@ -1443,9 +1487,13 @@ Act completely naturally. Never reveal you're AI. One message only ≤50 chars.`
 
     // ── Human-like typing delay based on engagement + message length ──
     const eng=identity.engagement||'normal';
+    const mood=identity.mood||'';
     const msgLen=text.length;
+    // Mood affects timing: tired/distracted people type slower and more irregularly
+    const moodSlow=mood.includes('تعبان')||mood.includes('مشغول')||mood.includes('tired')||mood.includes('distracted');
+    const moodFast=mood.includes('متحمس')||mood.includes('excited');
     let minWait,maxWait;
-    if(eng==='high'){
+    if(eng==='high'&&!moodSlow){
       // Engaged person types quickly but thinks a bit
       minWait=msgLen<=15?4000:msgLen<=35?3000:2000;
       maxWait=msgLen<=15?9000:msgLen<=35?7000:5000;
